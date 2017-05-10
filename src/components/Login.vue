@@ -18,7 +18,7 @@
                     <el-checkbox v-model="checked" @change='rempw'>记住密码</el-checkbox>
                 </div>
                 <div>
-                    <el-button class="home-login-btn" type="info" @click='login'>登陆</el-button>
+                    <el-button class="home-login-btn basebg" type="info" @click='login'>登陆</el-button>
                 </div>
             </form>
         </div>

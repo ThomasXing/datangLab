@@ -81,12 +81,9 @@
                 </tr>
                 <tr>
                     <td class='tr'>班级状态：</td>
-                    <td colspan="3">
-                        <el-select v-model="formInline.status" placeholder="全部状态">
-                            <el-option label="等待开课" value="等待开课"></el-option>
-                            <el-option label="开课" value="开课"></el-option>
-                            <el-option label="结课" value="结课"></el-option>
-                            <el-option label="失效" value="失效"></el-option>
+                    <td colspan="2">
+                        <el-select v-model="formInline.status" placeholder="请选择">
+                            <el-option :label="key" :value="key" v-for="(val,key) in classState" :key="val" ></el-option>
                         </el-select>
                     </td>
                 </tr>
@@ -119,18 +116,24 @@ export default {
             formInline: {
                 school: '',
                 professional: '',
-                product:'',
+                product: '',
                 className: '',
                 courseContent: '',
                 status: '',
                 jiagoushi: '',
                 PM: ''
             },
+            classState: {
+                "等待开课": "W",
+                "开课": "S",
+                "结课": "E",
+                "失效": "N"
+            },
             schoolList: '',
             professionList: '',
             schoolCode: '',
             professionCode: '',
-            productList:'',
+            productList: '',
             productCode: '',
             teacherList: '',
             courseList: [],
@@ -147,6 +150,7 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getTeacherList()
+        this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
     },
@@ -180,6 +184,7 @@ export default {
                 this.productList = res.data.productList;
                 this.productCode = res.data.productList[0].productCode
             }).catch(err => console.log(err))
+
         },
         get_schoolCode(a) {
             this.schoolCode = a;
@@ -196,6 +201,9 @@ export default {
         get_teacherTwo(e) {
             this.pmCode = e;
         },
+        get_classState(f){
+            console.log(f)
+        },
         getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
@@ -208,18 +216,18 @@ export default {
                 teacherOne: this.formInline.jiagoushi,
                 teacherTwo: this.formInline.PM,
                 className: this.formInline.className,
-                classState: this.formInline.status,
+                classState: this.classState[this.formInline.status],
                 productCode: this.productCode,
                 schoolCode: this.schoolCode,
                 professionCode: this.professionCode,
-                courseIdListStr:""
+                courseIdListStr: JSON.stringify(this.checkedCourse)
             })).then(res => {
-                    if (res.data.addCourseFlag === "success") {
-                        this.$alert('课程添加成功', '提示信息', {
-                            confirmButtonText: '确定',
-                        });
-                    }
-                })
+                if (res.data.addClassFlag === "success") {
+                    this.$alert('班级添加成功', '提示信息', {
+                        confirmButtonText: '确定',
+                    });
+                }
+            })
         },
         back() {
             this.$router.go(-1)

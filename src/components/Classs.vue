@@ -49,9 +49,9 @@
             <el-table :data="classList" border style="width: 100%" class='course-list' v-show='classList.length!==0'>
                 <el-table-column fixed prop="index" label="序号" width="80">
                 </el-table-column>
-                <el-table-column prop="classCode" label="课程编码" width="140">
+                <el-table-column prop="classCode" label="班级编码" width="140">
                 </el-table-column>
-                <el-table-column prop="className" label="课程名称" width="180">
+                <el-table-column prop="className" label="班级名称" width="180">
                 </el-table-column>
                 <el-table-column prop="professionName" label="所属专业" width="180">
                 </el-table-column>
@@ -110,6 +110,7 @@ export default {
         this.getAllProfession()
         this.getTeacherList()
         this.getpmList()
+        this.getAllClass()
     },
     methods: {
         //获取所有学校
@@ -122,6 +123,12 @@ export default {
         getAllProfession() {
             this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.professionList = res.data.professionList;
+            })
+        },
+          //获取所有班级
+        getAllClass(){
+             this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+                this.classList = res.data.classList
             })
         },
         //查询教师
@@ -182,6 +189,9 @@ export default {
             color: rgb(51, 51, 51);
             font-size: 16px;
         }
+    }
+    .class-list{
+        margin-top: 20px;
     }
 }
 </style>

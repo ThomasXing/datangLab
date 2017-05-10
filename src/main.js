@@ -21,6 +21,7 @@ Vue.directive('focus', {
     el.focus()
   }
 })
+
 new Vue({
   el: '#app',
   store,

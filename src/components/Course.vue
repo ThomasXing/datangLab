@@ -87,6 +87,7 @@ export default {
         this.password = sessionStorage.getItem("keyToken")
         this.getSchoolList()
         this.getAllProfession()
+        this.getAllCourse()
     },
     methods: {
         // 按条件查询课程
@@ -121,6 +122,12 @@ export default {
         getAllProfession() {
             this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.professionList = res.data.professionList;
+            })
+        },
+        //获取所有课程
+        getAllCourse(){
+             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+                this.courseList = res.data.courseList;
             })
         },
         get_schoolCode(a) {

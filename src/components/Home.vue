@@ -2,8 +2,8 @@
     <div id="home">
         <div class="home-header con">
             <h1 class="home-header-title"><a href="" >
-                                    <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
-                                </a></h1>
+                                        <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
+                                    </a></h1>
         </div>
         <div class="home-login" @keyup.enter='login'>
             <div class="home-login-con">
@@ -13,10 +13,10 @@
                         <input class="home-user-input" type="text" placeholder="请输入用户名" v-model='userid'>
                     </li>
                     <li class="home-login-con-user mar clearfix"><span class="login-icon pw"></span>
-                        <input class="home-user-input" type="password" placeholder="请输入密码" v-model='accesstoken'>
+                        <input class="home-user-input" type="password" placeholder="请输入密码" v-model='password'>
                     </li>
                     <li>
-                        <el-checkbox v-model="checked" @click="remmpw">记住密码</el-checkbox>
+                        <el-checkbox v-model="checked" @change='rempw' fill="#0491cd">记住密码</el-checkbox>
                     </li>
                     <li>
                         <el-button class="home-login-btn" type="info" @click='login'>登陆</el-button>
@@ -38,34 +38,54 @@ export default {
     data() {
         return {
             checked: false,
-            accesstoken: null,
-            userid: null,
+            password: '',
+            userid: '',
             alertMiss: false
         }
     },
-    created() {
-
+    created(){
+        this.doremmberpass()
     },
     methods: {
         login() {
-            if (this.userid == '' && this.accesstoken == '') {
+            if (this.userid === "" || this.password === "") {
                 this.$alert('用户名或密码不能为空', '提示信息', {
                     confirmButtonText: '确定',
                 })
             } else {
-                this.$http.post('/api/yzh/inter/login', qs.stringify({
+                this.$http.post("http://www.369college.com/369manage/yzh/manage/inter/login", qs.stringify({
                     userName: this.userid,
-                    passWord: this.accesstoken
+                    passWord: this.password
                 })).then(res => {
-                    this.$router.push({ name: 'lab', params: { userId: this.userid } })
+                    if (res.data.loginFlag === true) {
+                        sessionStorage.setItem('userid', this.userid)
+                        this.$router.push({ name: 'lab', params: { userId: this.userid } })
+                    }
                 }).catch(err => {
                     this.open()
                 })
             }
 
         },
-        remmpw() {
-           
+        rempw() {
+          
+            if (this.checked === true) {
+                localStorage.setItem('un', this.userid)
+                localStorage.setItem('pw', this.password)
+            } else {
+                localStorage.removeItem("userName")
+                localStorage.removeItem("passWord")
+            }
+        },
+        doremmberpass() {  
+            let nameVal = localStorage.getItem("un")
+            let passVal = localStorage.getItem("pw")
+            if (nameVal) {
+                this.userid = nameVal
+            } if (passVal) {
+                this.password = passVal
+                this.checked=true;
+            }
         },
         open() {
             this.$alert('用户名或密码输入错误', '提示信息', {
