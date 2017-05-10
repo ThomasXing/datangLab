@@ -63,7 +63,7 @@
                 </el-table-column>
                  <el-table-column prop="classStuCount" label="班级人数" width="180">
                 </el-table-column>
-                <el-table-column prop="classState" label="状态" width="120">
+                <el-table-column prop="(classState | courseStatus)" label="状态" width="120">
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
@@ -77,6 +77,7 @@
     </div>
 </template>
 <script>
+import {courseStatus} from '../filters'
 export default {
     name: 'course',
     data() {
@@ -111,6 +112,9 @@ export default {
         this.getTeacherList()
         this.getpmList()
         this.getAllClass()
+    },
+    filters:{
+        courseStatus
     },
     methods: {
         //获取所有学校

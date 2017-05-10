@@ -31,8 +31,6 @@
             </el-form>
     
         </div>
-           
-      
         <div class="course-list">
             <el-button class="btn" type="primary" @click="newCourse">新建课程</el-button>
             <el-table :data="courseList" border style="width: 100%" class='course-list' v-show='courseList.length!==0' row-key='courseList.courseId' current-row-key>
@@ -46,7 +44,10 @@
                 </el-table-column>
                 <el-table-column prop="schoolName" label="所属学校" width="180">
                 </el-table-column>
-                <el-table-column prop="courseState" label="状态" width="120" >
+                <el-table-column   label="状态" width="120">
+                <template scope="scope">
+                    {{scope.row.courseState | courseStatus}}
+                </template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
@@ -61,7 +62,7 @@
 <script>
 import qs from 'qs'
 import {mapActions} from 'vuex'
-// import courseStatus from "../filters/index.js"
+import {courseStatus} from "../filters"
 export default {
     name: 'course',
     data() {
@@ -89,6 +90,9 @@ export default {
         this.getAllProfession()
         this.getAllCourse()
     },
+    filters:{
+        courseStatus
+    },
     methods: {
         // 按条件查询课程
         onSubmit() {
@@ -100,7 +104,10 @@ export default {
             console.log(111)
 
         },
-        modiCourse(courseId){
+    //     filterTag(value, row) {
+    //     return row.courseState === value;
+    //   },
+        modiCourse(courseId,b){
              this.$router.push({path:'newCourse'})
 
             //  this.$http.post("/api/yzh/research/inter/updateCourse",{

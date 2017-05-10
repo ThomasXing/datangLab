@@ -53,6 +53,7 @@
             </el-form>
     
         </div>
+        <div>{{"Thu May 25 2017 00:00:00 GMT+0800 (中国标准时间)" | normalTime}}</div>
         <div class="class-list">
             <el-button class="btn" type="primary" @click="addXuJi">新建学籍</el-button>
             <el-table :data="stuManagementList" border style="width: 100%" class='course-list' v-show='stuManagementList.length!==0'>
@@ -161,8 +162,8 @@ export default {
         },
         creDate(time) {  
                 let d = new Date(time);
-                let nowTime =  d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-                console.log(nowTime)
+                time =  d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                console.log(time)
         },
         handleClick() {
 
