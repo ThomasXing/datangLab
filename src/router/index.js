@@ -13,6 +13,7 @@ import Cultivate from '@/components/Cultivate'
 import Gaimi from '@/components/gaimi'
 import NewCourse from '@/components/newCourse'
 import NewClass from '@/components/newClass'
+import NewXueJi from '@/components/newXueJi'
 
 Vue.use(Router)
 
@@ -47,7 +48,8 @@ export default new Router({
         {path:'newCourse',component:NewCourse},
         {path:'classs',component:Classs},
         {path:'newclass',component:NewClass},
-        {path:'xueji',component:XueJi}
+        {path:'xueji',component:XueJi},
+        {path:'newXueJi',component:NewXueJi}
       ]
     },
     {path:'/cultivate',component:Cultivate,

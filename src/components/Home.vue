@@ -10,7 +10,7 @@
                 <div class="home-login-con-title">用户登录</div>
                 <ul>
                     <li class="home-login-con-user clearfix"><span class="login-icon user"></span>
-                        <input class="home-user-input" type="text" placeholder="请输入用户名" v-model='userid'>
+                        <input class="home-user-input" type="text" placeholder="请输入用户名" v-model='userid' v-focus>
                     </li>
                     <li class="home-login-con-user mar clearfix"><span class="login-icon pw"></span>
                         <input class="home-user-input" type="password" placeholder="请输入密码" v-model='password'>

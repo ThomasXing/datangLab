@@ -44,35 +44,73 @@
                 </el-table-column>
                 <el-table-column prop="schoolName" label="所属学校" width="180">
                 </el-table-column>
-                <el-table-column   label="状态" width="120">
-                <template scope="scope">
-                    {{scope.row.courseState | courseStatus}}
-                </template>
+                <el-table-column label="状态" width="120">
+                    <template scope="scope">
+                        {{scope.row.courseState | courseStatus}}
+                    </template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
-                        <el-button @click="handleClick" type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small" @click='modiCourse(scope.row.courseId)' >修改</el-button>
+                        <el-button @click="handleClick(scope.row.courseId,scope.row.courseState)" type="text" size="small"> {{scope.row.courseState |courseFilter}}</el-button>
+                        <el-button type="text" size="small" @click='modiCourse(scope.row.courseId)'>修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </div>
+        <el-dialog title="修改" :visible.sync="dialogVisible" size="small">
+    
+            <table class='baseNews'>
+                <thead class="base-head">课程信息</thead>
+                <tr>
+                    <td class='tr'>课程名称：</td>
+                    <td>
+                        <el-input v-model="formInline.courseName" placeholder="支持中文,数字,英文,不超过40个字符" max-length='40'></el-input>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tr">
+                        课程状态：
+                    </td>
+                    <td>
+                        <el-select v-model="formInline.courseStatus" placeholder="全部状态">
+                            <el-option label="有效" value="有效"></el-option>
+                            <el-option label="失效" value="失效"></el-option>
+                        </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='tr'>课程说明：</td>
+                    <td>
+                        <el-input class='textarea-wh' v-model='formInline.courseContent' type="textarea" :rows="4" placeholder=" 填写有关课程的其他说明，200字以内，可选填">
+                        </el-input>
+                    </td>
+                </tr>
+    
+            </table>
+            <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="changeCoourse">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
 import qs from 'qs'
-import {mapActions} from 'vuex'
-import {courseStatus} from "../filters"
+import { mapActions } from 'vuex'
+import { courseStatus,courseFilter } from "../filters"
 export default {
     name: 'course',
     data() {
         return {
-              formInline: {
+            formInline: {
                 name: '',
                 bianma: '',
                 school: '',
                 professional: '',
-                status: ''
+                status: '',
+                courseContent: '',
+                courseName: '',
+                courseStatus: ''
             },
             username: '',
             password: '',
@@ -80,7 +118,13 @@ export default {
             schoolCode: '',
             professionList: '',
             professionCode: '',
-            courseList: []
+            courseList: [],
+            courseState: {
+                "有效": 'Y',
+                "失效": 'N'
+            },
+            dialogVisible: false,
+            courseId: ""
         }
     },
     created() {
@@ -90,36 +134,74 @@ export default {
         this.getAllProfession()
         this.getAllCourse()
     },
-    filters:{
-        courseStatus
+    filters: {
+        courseStatus,
+        courseFilter
     },
+
     methods: {
         // 按条件查询课程
         onSubmit() {
-            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(this.formInline.name) + "&courseState=" + this.formInline.status + "&courseCode=" + this.formInline.bianma).then(res => {
+            if (this.formInline.status === "") {
+                this.courseState[this.formInline.status] = "";
+            }
+            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(this.formInline.name) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma).then(res => {
                 this.courseList = res.data.courseList
             })
         },
-        handleClick() {
-            console.log(111)
+        handleClick(courseId,courseState) {
+            if(courseState==="N"){
+                courseState="Y"
+            }else{
+                courseState="N"
+            }
+            this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
+                userid: this.username,
+                accesstoken: this.password,
+                courseId: courseId,
+                courseState: courseState,
+
+            })).then(res => {
+                if (res.data.updateCourseFlag === "success") {
+                    this.dialogVisible = false;
+                    this.getAllCourse()
+                }
+
+            })
 
         },
-    //     filterTag(value, row) {
-    //     return row.courseState === value;
-    //   },
-        modiCourse(courseId,b){
-             this.$router.push({path:'newCourse'})
+        modiCourse(courseId) {
+            this.dialogVisible = true;
+            this.courseId = courseId;
 
-            //  this.$http.post("/api/yzh/research/inter/updateCourse",{
-            //      userid:this.username,
-            //      accesstoken:this.password,
-            //      courseId:courseId,
-            //      courseName:courseName
-            //  }).then(res => {
-            //     console.log(res)
-            // })
         },
-         //获取所有学校
+        changeCoourse() {
+            if (this.formInline.courseStatus === "") {
+                this.courseState[this.formInline.courseStatus] = "";
+            }
+           if(this.formInline.courseName===""&&this.formInline.courseStatus===""&&this.formInline.courseContent===""){
+               this.dialogVisible = false;
+           }else{
+                 this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
+                userid: this.username,
+                accesstoken: this.password,
+                courseId: this.courseId,
+                courseName: this.formInline.courseName,
+                courseState: this.courseState[this.formInline.courseStatus],
+                courseContent: this.formInline.courseContent
+
+            })).then(res => {
+                if (res.data.updateCourseFlag === "success") {
+                    this.dialogVisible = false;
+                    this.getAllCourse()
+                }
+
+            })
+           }
+
+
+        },
+        //获取所有学校
         getSchoolList() {
             this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.schoolList = res.data.schoolList;
@@ -132,8 +214,8 @@ export default {
             })
         },
         //获取所有课程
-        getAllCourse(){
-             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+        getAllCourse() {
+            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.courseList = res.data.courseList;
             })
         },
@@ -146,15 +228,16 @@ export default {
         newCourse() {
             this.$router.push({ path: 'newCourse' })
         }
+    
 
-    }
+}
 }
 </script>
 <style lang="less">
 .course {
     margin-left: 20px;
     width: 88%;
-   &-query {
+    &-query {
         margin-top: 22px;
         border-bottom: 1px solid #e8e8e8;
         input {

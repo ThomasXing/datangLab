@@ -21,20 +21,16 @@
                 </el-form-item>
                 <el-form-item label="班级状态">
                     <el-select v-model="formInline.status" placeholder="全部状态">
-                        <el-option label="等待开课" value="等待开课"></el-option>
-                        <el-option label="开课" value="开课"></el-option>
-                        <el-option label="结课" value="结课"></el-option>
-                        <el-option label="失效" value="失效"></el-option>
+                        <el-option :label="key" :value="key" v-for="(val,key) in classStatus" :key="val"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="架构师">
                     <el-select v-model="formInline.jiagoushi" placeholder="全部架构师" v-for="teacher in teacherList" :key="teacher.pxTeacherId" @change="get_teacherOne(teacher.pxTeacherId)">
                         <el-option :label="teacher.pxTeacherName" :value="teacher.pxTeacherName"></el-option>
-    
                     </el-select>
                 </el-form-item>
                 <el-form-item label="项目经理">
-                    <el-select v-model="formInline.PM" placeholder="全部项目经理" v-for="teacher in pmList" :key="teacher.pxTeacherId"  @change="get_teacherTwo(teacher.pxTeacherId)">
+                    <el-select v-model="formInline.PM" placeholder="全部项目经理" v-for="teacher in pmList" :key="teacher.pxTeacherId" @change="get_teacherTwo(teacher.pxTeacherId)">
                         <el-option :label="teacher.pxTeacherName" :value="teacher.pxTeacherName"></el-option>
                     </el-select>
                 </el-form-item>
@@ -57,27 +53,84 @@
                 </el-table-column>
                 <el-table-column prop="schoolName" label="所属学校" width="180">
                 </el-table-column>
-                 <el-table-column prop="teacherOne" label="架构师" width="180">
+                <el-table-column prop="teacherOne" label="架构师" width="140">
                 </el-table-column>
-                 <el-table-column prop="teacherTwo" label="项目经理" width="180">
+                <el-table-column prop="teacherTwo" label="项目经理" width="140">
                 </el-table-column>
-                 <el-table-column prop="classStuCount" label="班级人数" width="180">
+                <el-table-column prop="classStuCount" label="班级人数" width="100">
                 </el-table-column>
-                <el-table-column prop="(classState | courseStatus)" label="状态" width="120">
+                <el-table-column label="状态" width="100">
+                    <template scope="scope">
+                        {{scope.row.classState | classStatus}}
+                    </template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
                         <el-button @click="handleClick" type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small">修改</el-button>
+                        <el-button type="text" size="small" @click="modiClass(scope.row.classId)">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
-      
+    
         </div>
+        <el-dialog title="修改" :visible.sync="dialogVisible" size="small">
+    
+            <table class='baseNews' :model="modify">
+                <thead class="base-head">课程信息</thead>
+                <tr>
+                    <td class='tr'>架构师：</td>
+                    <td>
+                        <el-select v-model="modify.jiagoushi" placeholder="全部架构师" v-for="teacher in teacherList" :key="teacher.pxTeacherId" @change="get_teacherOne(teacher.pxTeacherId)">
+                            <el-option :label="teacher.pxTeacherName" :value="teacher.pxTeacherName"></el-option>
+                        </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tr">
+                        项目经理：
+                    </td>
+                    <td>
+                        <el-select v-model="modify.PM" placeholder="全部项目经理" v-for="teacher in pmList" :key="teacher.pxTeacherId" @change="get_teacherTwo(teacher.pxTeacherId)">
+                            <el-option :label="teacher.pxTeacherName" :value="teacher.pxTeacherName"></el-option>
+                        </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='tr'>班级状态：</td>
+                    <td>
+                        <el-select v-model="modify.status" placeholder="全部状态">
+                            <el-option :label="key" :value="key" v-for="(val,key) in classStatus" :key="val"></el-option>
+                        </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='tr'>班级名称：</td>
+                    <td>
+                        <el-input v-model="modify.name"></el-input>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='tr'>选择课程：</td>
+                    <td>
+                        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+                        <el-checkbox v-model="Recheck" @change="handleCheckNotChange">反选</el-checkbox>
+                        <div style="margin: 15px 0;"></div>
+                        <el-checkbox-group @change="handleCheckedCitiesChange" fill="#0491cd" v-model="checkedCourse">
+                            <el-checkbox v-for="course in courseList" :label="course.courseId" :key="course">{{course.courseName}}</el-checkbox>
+                        </el-checkbox-group>
+                    </td>
+                </tr>
+            </table>
+            <span slot="footer" class="dialog-footer">
+                                <el-button @click="dialogVisible = false">取 消</el-button>
+                                <el-button type="primary" @click="changeClass">确 定</el-button>
+                            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
-import {courseStatus} from '../filters'
+import { classStatus } from '../filters'
+import qs from "qs"
 export default {
     name: 'course',
     data() {
@@ -89,7 +142,14 @@ export default {
                 professional: '',
                 status: '',
                 jiagoushi: '',
-                PM: ''
+                PM: '',
+            },
+            modify: {
+                jiagoushi: '',
+                PM: '',
+                status: '',
+                name: '',
+                courseIdList: []
             },
             username: '',
             password: '',
@@ -98,10 +158,23 @@ export default {
             professionList: '',
             professionCode: '',
             teacherList: '',
-            teacherCode:'',
+            teacherCode: '',
             pmList: '',
-            pmCode:'',
-            classList:[]
+            pmCode: '',
+            classStatus: {
+                '准备开课': "W",
+                '开课': "S",
+                '结课': "E",
+                '无效': "N"
+            },
+            classList: [],
+            classId: '',
+            dialogVisible: false,
+            checkAll: true,
+            Recheck: false,
+            checkedCourse: [],
+            isIndeterminate: true,
+            courseList:[]
         }
     },
     created() {
@@ -113,8 +186,8 @@ export default {
         this.getpmList()
         this.getAllClass()
     },
-    filters:{
-        courseStatus
+    filters: {
+        classStatus
     },
     methods: {
         //获取所有学校
@@ -129,9 +202,9 @@ export default {
                 this.professionList = res.data.professionList;
             })
         },
-          //获取所有班级
-        getAllClass(){
-             this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+        //获取所有班级
+        getAllClass() {
+            this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.classList = res.data.classList
             })
         },
@@ -149,8 +222,17 @@ export default {
         },
         // 按条件查询班级
         onSubmit() {
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classState=" + this.formInline.status + "&classCode=" + this.formInline.bianma+ "&teacherOne=" + this.formInline.bianma+ "&teacherTwo=" + this.formInline.bianma).then(res => {
+            if (this.formInline.status === "") {
+                this.classStatus[this.formInline.status] = ""
+            }
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.formInline.bianma + "&teacherTwo=" + this.formInline.bianma).then(res => {
                 this.classList = res.data.classList
+            })
+        },
+        //获取所有课程
+         getAllCourse() {
+            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+                this.courseList = res.data.courseList
             })
         },
         get_schoolCode(a) {
@@ -159,17 +241,72 @@ export default {
         get_professionCode(b) {
             this.professionCode = b;
         },
-        get_teacherOne(c){
+        get_teacherOne(c) {
             this.teacherCode = c;
         },
-        get_teacherTwo(d){
+        get_teacherTwo(d) {
             this.pmCode = d;
         },
-        newClass(){
+        newClass() {
             this.$router.push({ path: 'newclass' })
         },
-        handleClick(){
+        modiClass(classId) {
+            this.dialogVisible = true;
+            this.classId = classId;
+            this.getAllCourse()
+        },
+        handleClick() {
 
+        },
+        changeClass() {
+            // if (this.formInline.ClassStatus === "") {
+            //     this.classStatus[this.formInline.ClassStatus] = "";
+            // }
+            // if (this.formInline.courseName === "" && this.formInline.courseStatus === "" && this.formInline.courseContent === "") {
+            //     this.dialogVisible = false;
+            // } else {
+                this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+                    userid: this.username,
+                    accesstoken: this.password,
+                    classId: this.classId,
+                    teacherOne: this.teacherCode,
+                    teacherTwo: this.pmCode,
+                    classState: this.classStatus[this.modify.status],
+                    className: this.modify.name,
+                    courseIdListStr: JSON.stringify(this.checkedCourse)
+
+                })).then(res => {
+                    if (res.data.updateClassFlag === "success") {
+                        this.dialogVisible = false;
+                        this.getAllClass()
+                    }
+
+                })
+            // }
+        },
+        handleCheckAllChange(event) {
+            let courseArr = []
+            this.courseList.forEach(function (val) {
+                courseArr.push(val.courseId)
+            })
+            this.checkedCourse = event.target.checked ? courseArr : [];
+            this.isIndeterminate = false;
+        },
+        handleCheckNotChange(event) {
+            let courseArr = []
+            let that = this;
+            this.courseList.forEach(function (val) {
+                if (that.checkedCourse.indexOf(val.courseId) === -1) {
+                    courseArr.push(val.courseId)
+                }
+            })
+            this.checkedCourse = event.target.checked ? courseArr : [];
+            this.isIndeterminate = false;
+        },
+        handleCheckedCitiesChange(value) {
+            let checkedCount = value.length;
+            this.checkAll = checkedCount === this.courseList.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.courseList.length;
         }
     }
 }
@@ -194,7 +331,7 @@ export default {
             font-size: 16px;
         }
     }
-    .class-list{
+    .class-list {
         margin-top: 20px;
     }
 }

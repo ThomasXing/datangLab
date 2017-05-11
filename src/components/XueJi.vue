@@ -40,11 +40,11 @@
                 </el-form-item>
                 <br>
                 <el-form-item label='入学日期' class="datePicker">
-                    <el-date-picker v-model="formInline.startTime" type="date" format="yyyy-MM-dd" placeholder="选择日期" @change="creDate(formInline.startTime)">
+                    <el-date-picker v-model="formInline.startTime" type="date" placeholder="选择日期" @change="creDate(formInline.startTime)">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label='至' class="datePicker">
-                    <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期"  @change="creDate(formInline.endTime)">
+                    <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期" @change="endDate(formInline.endTime)">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -53,7 +53,6 @@
             </el-form>
     
         </div>
-        <div>{{"Thu May 25 2017 00:00:00 GMT+0800 (中国标准时间)" | normalTime}}</div>
         <div class="class-list">
             <el-button class="btn" type="primary" @click="addXuJi">新建学籍</el-button>
             <el-table :data="stuManagementList" border style="width: 100%" class='course-list' v-show='stuManagementList.length!==0'>
@@ -63,7 +62,8 @@
                 </el-table-column>
                 <el-table-column prop="stuTrueName" label="学员姓名" width="180">
                 </el-table-column>
-                <el-table-column prop="stuSex" label="性别" width="180">
+                <el-table-column label="性别" width="180">
+                    <template scope="scope">{{scope.row.stuSex | sex}}</template>
                 </el-table-column>
                 <el-table-column prop="className" label="班级名称" width="180">
                 </el-table-column>
@@ -73,7 +73,8 @@
                 </el-table-column>
                 <el-table-column prop="stuPhone" label="联系电话" width="120">
                 </el-table-column>
-                <el-table-column prop="managementState" label="学籍状态" width="120">
+                <el-table-column label="学籍状态" width="120">
+                     <template scope="scope">{{scope.row.managementState | managementState}}</template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
@@ -87,7 +88,7 @@
     </div>
 </template>
 <script>
-import { normalTime } from '../filters'
+import {sex,managementState} from "../filters"
 export default {
     data() {
         return {
@@ -132,9 +133,6 @@ export default {
         this.getAllProfession()
         this.getAllStuManagement()
     },
-    filters: {
-        normalTime
-    },
     methods: {
         //获取所有学校
         getSchoolList() {
@@ -160,23 +158,30 @@ export default {
         get_professionCode(b) {
             this.professionCode = b;
         },
-        creDate(time) {  
-                let d = new Date(time);
-                time =  d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-                console.log(time)
+        creDate(time) {
+            let d = new Date(time);
+            this.formInline.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        },
+        endDate(time) {
+            let d = new Date(time);
+            this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
         },
         handleClick() {
 
         },
         onSubmit() {
-            console.log(this.formInline.startTime,this.formInline.endTime)
-            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(this.formInline.firstname) + "&creDate=" + (this.formInline.startTime | normalTime) + "&endDate=" + (this.formInline.endTime | normalTime) + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
+            console.log(this.formInline.startTime, this.formInline.endTime)
+            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(this.formInline.firstname) + "&creDate=" + this.formInline.startTime+ "&endDate=" + this.formInline.endTime+ "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
                 console.log(res)
             })
         },
         addXuJi() {
-
+             this.$router.push({ path: 'newXueJi' })
         }
+    },
+    filters:{
+        sex,
+        managementState
     }
 }
 </script>
