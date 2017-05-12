@@ -42,9 +42,8 @@
                 <el-form-item label='入学日期' class="datePicker">
                     <el-date-picker v-model="formInline.startTime" type="date" placeholder="选择日期" @change="creDate(formInline.startTime)">
                     </el-date-picker>
-                </el-form-item>
-                <el-form-item label='至' class="datePicker">
-                    <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期" @change="endDate(formInline.endTime)">
+                    <label class="el-form-item__label">至</label>
+                      <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期" @change="endDate(formInline.endTime)">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -74,7 +73,7 @@
                 <el-table-column prop="stuPhone" label="联系电话" width="120">
                 </el-table-column>
                 <el-table-column label="学籍状态" width="120">
-                     <template scope="scope">{{scope.row.managementState | managementState}}</template>
+                    <template scope="scope">{{scope.row.managementState | managementState}}</template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
@@ -88,7 +87,7 @@
     </div>
 </template>
 <script>
-import {sex,managementState} from "../filters"
+import { sex, managementState } from "../filters"
 export default {
     data() {
         return {
@@ -159,27 +158,40 @@ export default {
             this.professionCode = b;
         },
         creDate(time) {
-            let d = new Date(time);
-            this.formInline.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            if (time) {
+                let d = new Date(time);
+                this.formInline.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }
         },
         endDate(time) {
-            let d = new Date(time);
-            this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            if (time) {
+                let d = new Date(time);
+                this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }
         },
         handleClick() {
 
         },
         onSubmit() {
-            console.log(this.formInline.startTime, this.formInline.endTime)
-            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(this.formInline.firstname) + "&creDate=" + this.formInline.startTime+ "&endDate=" + this.formInline.endTime+ "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
+            console.log(this.formInline.startTime, this.formInline.endTime, this.formInline.xujiRecord)
+            if (this.formInline.xujiStatus === "") {
+                this.xujiStatus[this.formInline.xujiStatus] = "";
+            }
+            if (this.formInline.xujiRecord === "") {
+                this.xujiRecord[this.formInline.xujiRecord] = "";
+            }
+            // if (this.formInline.xujiRecord === "") {
+            //     this.xujiRecord[this.formInline.xujiRecord] = "";
+            // }
+            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(this.formInline.firstname) + "&creDate=" + this.formInline.startTime + "&endDate=" + this.formInline.endTime + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
                 console.log(res)
             })
         },
         addXuJi() {
-             this.$router.push({ path: 'newXueJi' })
+            this.$router.push({ path: 'newXueJi' })
         }
     },
-    filters:{
+    filters: {
         sex,
         managementState
     }

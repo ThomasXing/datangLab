@@ -161,20 +161,134 @@
                 <thead class="base-head">学籍记录</thead>
                 <tr>
                     <td class='tr'>
-                        <el-popover ref="addxueji" placement="left" width="400" v-model="visible3">
+                        <el-popover ref="addxueji" placement="left" v-model="visible3">
                             <tr class="addxueji">
                                 <td class='choClass'>添加事件：</td>
                                 <td>
-                                    <el-select v-model="formInline.stuEventName" placeholder="请选择" @change="get_stuEvent">
+                                    <el-select v-model="stuEventList.stuEventName" placeholder="请选择" @change="get_stuEvent">
                                         <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
                                     </el-select>
                                 </td>
                             </tr>
-                            <tr class="addxueji" v-html="instructions">
+                            <tr class="addxueji" v-show="stuEvent.ruxue">
+                                <td class="choClass">说明：</td>
+                                <td>
+                                    <el-input type="textarea" v-model="stuEventList.instructions"></el-input>
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.jilv">
+                                <td class="choClass">说明：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.jilv" placeholder="请选择">
+                                        <el-option label="-1" value="-1"></el-option>
+                                        <el-option label="-2" value="-2"></el-option>
+                                        <el-option label="-5" value="-5"></el-option>
+                                        <el-option label="-10" value="-10"></el-option>
+                                    </el-select>
     
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写扣除纪律分的原因" v-model="stuEventList.instructions"></el-input>
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.pangting">
+                                <td class="choClass">说明：</td>
+                                <td>
+                                    <el-input type="textarea" v-model="stuEventList.pangtingInstructions"></el-input>
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.xiuxue" :model="stuEventList">
+                                <td class="choClass">休学时段：</td>
+                                <td>
+                                    <el-form :inline="true" class="demo-form-inline" :model="stuEventList">
+                                        <el-date-picker v-model="stuEventList.startTime" type="date" placeholder="选择日期" @change="creDate(stuEventList.startTime)">
+                                        </el-date-picker>
+                                        <label class="el-form-item__label">至</label>
+                                        <el-date-picker v-model="stuEventList.endTime" type="date" placeholder="选择日期" @change="endDate(stuEventList.endTime)">
+                                        </el-date-picker>
+                                    </el-form>
+                                    <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
+                                        </el-date-picker>-->
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.fuxue" >
+                                <td class="choClass">复学时间：</td>
+                                <td>
+                                    <el-date-picker v-model="stuEventList.fuxueTime" type="date" placeholder="选择日期" @change="creDate(stuEventList.fuxueTime)">
+                                    </el-date-picker>
+                                </td>
+                            </tr>
+    
+                            <tr class="addxueji" v-show="stuEvent.fuxue">
+                                <td class="choClass">选择班级：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.fuxue"  placeholder="请选择">
+                                        <el-option v-for="(val,key) in myClassList" :key="val" :label="val" :value="key">
+                                        </el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写复学原因" v-model="stuEventList.fuxuIinstructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.liuji">
+                                <td class="choClass">选择班级：</td>
+                                <td>
+                                   <el-select v-model="stuEventList.liuji"  placeholder="请选择">
+                                        <el-option v-for="(val,key) in myClassList" :key="val" :label="val" :value="key">
+                                        </el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写留级原因" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.biye">
+                                <td class="choClass">就业方式：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.biye" placeholder="请选择">
+                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写所选就业方式的原因" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.jieye">
+                                <td class="choClass">结业原因：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.jieye" placeholder="请选择">
+                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写结业的详细原因" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.chongdu">
+                                <td class="choClass">选择班级：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.chongdu" placeholder="请选择">
+                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写重读的详细原因" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.tuixue">
+                                <td class="choClass">退学原因：</td>
+                                <td>
+                                    <el-select v-model="stuEventList.tuixue" placeholder="请选择">
+                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                    </el-select>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写退学的详细原因" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
+                            </tr>
+                            <tr class="addxueji" v-show="stuEvent.zigeFail">
+                                <td class="choClass">说明：</td>
+                                <td>
+                                    <el-input type="textarea" placeholder="" v-model="stuEventList.instructions"></el-input>
+    
+                                </td>
                             </tr>
                             <div style="text-align: center; margin: 0">
-                                <el-button class="btn-q" type="primary" size="small" @click=''>确定</el-button>
+                                <el-button class="btn-q" type="primary" size="small" @click='addStuEvent()'>确定</el-button>
     
                                 <el-button class='btn-w' type="text" size="small" @click="visible3 = false">取消</el-button>
                             </div>
@@ -182,6 +296,10 @@
                         <el-button class="btn" type="primary" v-popover:addxueji @click="">添加事件</el-button>
                     </td>
     
+                </tr>
+                <tr v-for="(newEvent,keyTime) in newStuEvent">
+                    <td class="tr">{{keyTime}}</td>
+                    <td v-for="item in newEvent">{{item}}</td>
                 </tr>
             </table>
         </div>
@@ -195,6 +313,7 @@
 </template>
 <script>
 import qs from "qs"
+import { normalTime } from "../filters"
 export default {
     data() {
         return {
@@ -209,8 +328,51 @@ export default {
                 stuPhone: '',
                 product: '',
                 className: '',
-                stuEventName: '',
-                instructions: ''
+                stuEventName: ''
+
+            },
+
+            stuEvent: {
+                ruxue: false,
+                jilv: false,
+                pangting: false,
+                xiuxue: false,
+                fuxue: false,
+                liuji: false,
+                biye: false,
+                jieye: false,
+                chongdu: false,
+                tuixue: false,
+                zigeFail: false
+            },
+            stuEventList: {
+                stuEventName: null,
+                jilv: null,
+                xiuxue: null,
+                startTime: null,
+                endTime: null,
+                fuxueTime: null,
+                fuxue:null,
+                liuji:null,
+                biye: null,
+                jieye: null,
+                chongdu: null,
+                tuixue: null,
+                instructions: null
+                // ruxueInstructions:null,
+                // jilvInstructions:null,
+                // xiuxueInstructions:null,
+                // pangtingInstructions:null,
+                // fuxuIinstructions:null,
+                // liujiInstructions:null,
+                // biyeInstructions:null,
+                // jieyeInstructions:null,
+                // chongduInstructions:null,
+                // tuixueInstructions:null,
+                // zigeFailInstructions:null
+            },
+            newStuEvent: {
+
             },
             classState: {
                 "等待开课": "W",
@@ -250,8 +412,7 @@ export default {
             visible3: false,
             teacherList: '',
             classList: [],
-            myClassList: {},
-            instructions: ''
+            myClassList: {}
 
         }
     },
@@ -262,6 +423,9 @@ export default {
         this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
+    },
+    filters: {
+        normalTime
     },
     methods: {
         //获取所有学校
@@ -305,28 +469,62 @@ export default {
             this.$set(this.myClassList, new Date().toLocaleString(), this.formInline.className)
             this.visible2 = false;
         },
+        creDate(time) {
+            if (time) {
+                let d = new Date(time);
+                this.formInline.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }
+        },
+        endDate(time) {
+            if (time) {
+                let d = new Date(time);
+                this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }
+        },
         get_stuEvent() {
-            let stuEvent = this.stuEventName[this.formInline.stuEventName];
-            switch (stuEvent) {
+
+            let stuEv = this.stuEventName[this.stuEventList.stuEventName];
+            for (let list of Object.keys(this.stuEvent)) {
+                this.stuEvent[list] = false;
+            }
+            for (let key of Object.keys(this.stuEventList)) {
+                if (key !== "stuEventName") {
+                    this.stuEventList[key] = null;
+                }
+            }
+            switch (stuEv) {
                 case 1:
-                    this.instructions = `<td class="choClass">说明：</td><td><textarea class="instructions" v-model='${this.formInline.instructions}'></textarea></td>`
+                    this.stuEvent.ruxue = true;
                     break
                 case 2:
-                    this.instructions = `<td class="choClass">说明：</td><td></td>`
+                    this.stuEvent.jilv = true;
                     break
                 case 3:
+                    this.stuEvent.pangting = true;
+                    break
                 case 4:
-                    this.bottomNav = 'player'
+                    this.stuEvent.xiuxue = true;
                     break
                 case 5:
+                    this.stuEvent.fuxue = true;
+                    break
                 case 6:
-                    this.bottomNav = 'championList'
+                    this.stuEvent.liuji = true;
                     break
-                case 'video':
-                    this.bottomNav = 'video'
+                case 7:
+                    this.stuEvent.biye = true;
                     break
-                case 'speakers':
-                    this.bottomNav = 'speakers'
+                case 8:
+                    this.stuEvent.jieye = true;
+                    break
+                case 9:
+                    this.stuEvent.chongdu = true;
+                    break
+                case 10:
+                    this.stuEvent.tuixue = true;
+                    break
+                case 11:
+                    this.stuEvent.zigeFail = true;
                     break
             }
         },
@@ -344,11 +542,28 @@ export default {
         },
         get_teacherTwo(e) {
             this.pmCode = e;
-        },   
+        },
         getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
             })
+        },
+        addStuEvent() {
+            // console.log(this.stuEventList)
+            let time = new Date().toLocaleString();
+            this.$set(this.newStuEvent, time, this.stuEventList)
+            let stuEventList = []
+
+            for (let stuEvent of Object.keys(this.newStuEvent[time])) {
+                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined) {
+                    delete this.newStuEvent[time][stuEvent]
+                } else {
+                    stuEventList.push(this.newStuEvent[time][stuEvent])
+                }
+            }
+
+            this.$set(this.newStuEvent, time, stuEventList)
+            this.visible3 = false;
         },
         addXueJi() {
             this.$http.post("/api/yzh/research/inter/addStuManagement", qs.stringify({
@@ -449,8 +664,7 @@ export default {
 
 .addxueji {
     margin: 20px auto;
-    display: block;
-    width: 253px;
+    display: block; // width: 253px;
     .choClass {
         width: 80px;
         font-size: 16px;
