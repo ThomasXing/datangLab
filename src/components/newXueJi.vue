@@ -195,10 +195,10 @@
                                     <el-input type="textarea" v-model="stuEventList.pangtingInstructions"></el-input>
                                 </td>
                             </tr>
-                            <tr class="addxueji" v-show="stuEvent.xiuxue" :model="stuEventList">
+                            <tr class="addxueji" v-show="stuEvent.xiuxue">
                                 <td class="choClass">休学时段：</td>
                                 <td>
-                                    <el-form :inline="true" class="demo-form-inline" :model="stuEventList">
+                                    <el-form :inline="true" class="demo-form-inline" >
                                         <el-date-picker v-model="stuEventList.startTime" type="date" placeholder="选择日期" @change="creDate(stuEventList.startTime)">
                                         </el-date-picker>
                                         <label class="el-form-item__label">至</label>
@@ -213,7 +213,7 @@
                             <tr class="addxueji" v-show="stuEvent.fuxue" >
                                 <td class="choClass">复学时间：</td>
                                 <td>
-                                    <el-date-picker v-model="stuEventList.fuxueTime" type="date" placeholder="选择日期" @change="creDate(stuEventList.fuxueTime)">
+                                    <el-date-picker  v-model="stuEventList.fuxueTime" type="date" placeholder="选择日期" @change="fuxueTime(stuEventList.fuxueTime)">
                                     </el-date-picker>
                                 </td>
                             </tr>
@@ -221,11 +221,11 @@
                             <tr class="addxueji" v-show="stuEvent.fuxue">
                                 <td class="choClass">选择班级：</td>
                                 <td>
-                                    <el-select v-model="stuEventList.fuxue"  placeholder="请选择">
-                                        <el-option v-for="(val,key) in myClassList" :key="val" :label="val" :value="key">
+                                    <el-select v-model="stuEventList.fuxueClass"  placeholder="请选择">
+                                        <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
                                         </el-option>
                                     </el-select>
-                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写复学原因" v-model="stuEventList.fuxuIinstructions"></el-input>
+                                    <el-input style="margin-top:20px;" type="textarea" placeholder="请填写复学原因" v-model="stuEventList.instructions"></el-input>
     
                                 </td>
                             </tr>
@@ -233,7 +233,7 @@
                                 <td class="choClass">选择班级：</td>
                                 <td>
                                    <el-select v-model="stuEventList.liuji"  placeholder="请选择">
-                                        <el-option v-for="(val,key) in myClassList" :key="val" :label="val" :value="key">
+                                        <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
                                         </el-option>
                                     </el-select>
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写留级原因" v-model="stuEventList.instructions"></el-input>
@@ -352,7 +352,7 @@ export default {
                 startTime: null,
                 endTime: null,
                 fuxueTime: null,
-                fuxue:null,
+                fuxueClass:null,
                 liuji:null,
                 biye: null,
                 jieye: null,
@@ -472,14 +472,27 @@ export default {
         creDate(time) {
             if (time) {
                 let d = new Date(time);
-                this.formInline.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                this.stuEventList.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }else{
+                 this.stuEventList.startTime=null;
             }
         },
         endDate(time) {
             if (time) {
                 let d = new Date(time);
-                this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                this.stuEventList.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }else{
+                 this.stuEventList.endTime=null;
             }
+        },
+        fuxueTime(time){
+             if (time) {
+                let d = new Date(time);
+                this.stuEventList.fuxueTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }else{
+                this.stuEventList.fuxueTime=null;
+            }
+
         },
         get_stuEvent() {
 
@@ -492,6 +505,7 @@ export default {
                     this.stuEventList[key] = null;
                 }
             }
+            console.log(this.stuEventList)
             switch (stuEv) {
                 case 1:
                     this.stuEvent.ruxue = true;
@@ -555,13 +569,14 @@ export default {
             let stuEventList = []
 
             for (let stuEvent of Object.keys(this.newStuEvent[time])) {
-                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined) {
+                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined ||this.newStuEvent[time][stuEvent]==="") {
                     delete this.newStuEvent[time][stuEvent]
                 } else {
+                    console.log(this.newStuEvent[time])
                     stuEventList.push(this.newStuEvent[time][stuEvent])
                 }
             }
-
+            console.log(stuEventList)
             this.$set(this.newStuEvent, time, stuEventList)
             this.visible3 = false;
         },
