@@ -42,8 +42,8 @@
         </div>
         <div class="class-list">
             <el-button class="btn" type="primary" @click="newClass">新建班级</el-button>
-            <el-table :data="classList" border style="width: 100%" class='course-list' v-show='classList.length!==0'>
-                <el-table-column fixed prop="index" label="序号" width="80">
+            <el-table :data="classList" border style="width: 100%" class='class-list' v-show='classList.length!==0'>
+                <el-table-column fixed type="index" label="序号" width="80">
                 </el-table-column>
                 <el-table-column prop="classCode" label="班级编码" width="140">
                 </el-table-column>
@@ -184,7 +184,7 @@ export default {
         this.getAllProfession()
         this.getTeacherList()
         this.getpmList()
-        this.getAllClass()
+        this.onSubmit()
     },
     filters: {
         classStatus
@@ -227,12 +227,13 @@ export default {
             }
             this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.formInline.bianma + "&teacherTwo=" + this.formInline.bianma).then(res => {
                 this.classList = res.data.classList
-            })
+            }).catch(err=>console.log(err))
         },
         //获取所有课程
          getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
+                console.log(res)
             })
         },
         get_schoolCode(a) {
@@ -276,9 +277,10 @@ export default {
                     courseIdListStr: JSON.stringify(this.checkedCourse)
 
                 })).then(res => {
+                    
                     if (res.data.updateClassFlag === "success") {
                         this.dialogVisible = false;
-                        this.getAllClass()
+                        this.onSubmit()
                     }
 
                 })
@@ -311,7 +313,7 @@ export default {
     }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .course {
     margin-left: 20px;
     width: 88%;
@@ -333,6 +335,34 @@ export default {
     }
     .class-list {
         margin-top: 20px;
+    }
+}
+.baseNews {
+    font-family: '微软雅黑';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 28px;
+    color: #111;
+    .base-head {
+        font-size: 18px;
+        color: #44aee0;
+    }
+    tr {
+        height: 61px;
+        .el-select {
+            width: 247px;
+            height: 32px;
+        }
+        .el-input {
+            width: 247px;
+            height: 32px;
+        }
+    }
+
+    .tr {
+        text-align: right;
+        width: 160px;
     }
 }
 </style>

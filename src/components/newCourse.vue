@@ -27,7 +27,7 @@
     
                         </td>
                     </tr>
-                     <tr v-show='productList.length>1'>
+                    <tr v-show='productList.length>1'>
                         <td class='tr'>
                             所属产品：
                         </td>
@@ -84,14 +84,14 @@ export default {
                 professional: '',
                 courseName: '',
                 courseContent: '',
-                product:''
+                product: ''
             },
             schoolList: '',
-            productList:'',
+            productList: '',
             professionList: '',
             schoolCode: '',
             professionCode: '',
-            productCode:''
+            productCode: ''
 
         }
     },
@@ -119,7 +119,7 @@ export default {
         get_professionCode(b) {
             this.professionCode = b;
         },
-        get_productCode(c){
+        get_productCode(c) {
             this.productCode = c;
         },
         getAllProduct() {
@@ -136,23 +136,23 @@ export default {
                 professionCode: this.professionCode,
                 courseName: this.formInline.courseName,
                 courseContent: this.formInline.courseContent,
-                productCode:  this.productCode
+                productCode: this.productCode
             })).then(res => {
-                if(res.data.addCourseFlag==="success"){
-                     this.$alert('课程添加成功', '提示信息', {
+                if (res.data.addCourseFlag === "success") {
+                    this.$alert('课程添加成功', '提示信息', {
                         confirmButtonText: '确定',
                     });
                 }
             })
         },
-        back(){
+        back() {
             this.$router.go(-1)
         }
     }
 }
 
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .baseNews {
     font-family: '微软雅黑';
     font-weight: 400;
@@ -166,10 +166,13 @@ export default {
     }
     tr {
         height: 61px;
-        input {
-            width: 245px;
-            height: 34px;
-            border-radius: inherit;
+        .el-select {
+            width: 247px;
+            height: 32px;
+        }
+        .el-input {
+            width: 247px;
+            height: 32px;
         }
     }
 

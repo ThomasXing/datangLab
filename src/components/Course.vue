@@ -34,9 +34,9 @@
         <div class="course-list">
             <el-button class="btn" type="primary" @click="newCourse">新建课程</el-button>
             <el-table :data="courseList" border style="width: 100%" class='course-list' v-show='courseList.length!==0' row-key='courseList.courseId' current-row-key>
-                <el-table-column fixed prop="index" label="序号" width="80">
+                <el-table-column fixed prop="index" label="序号" width="52"c class="course-index">
                 </el-table-column>
-                <el-table-column prop="courseCode" label="课程编码" width="140">
+                <el-table-column prop="courseCode" label="课程编码" width="218">
                 </el-table-column>
                 <el-table-column prop="courseName" label="课程名称" width="180">
                 </el-table-column>
@@ -51,8 +51,8 @@
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
-                        <el-button @click="handleClick(scope.row.courseId,scope.row.courseState)" type="text" size="small"> {{scope.row.courseState |courseFilter}}</el-button>
-                        <el-button type="text" size="small" @click='modiCourse(scope.row.courseId)'>修改</el-button>
+                        <el-button @click="handleClick(scope.row.courseId,scope.row.courseState)" class="my-btn"> {{scope.row.courseState |courseFilter}}</el-button>
+                        <el-button @click='modiCourse(scope.row.courseId)' class="my-btn">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -145,7 +145,10 @@ export default {
             if (this.formInline.status === "") {
                 this.courseState[this.formInline.status] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(this.formInline.name) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma).then(res => {
+            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(this.formInline.name) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma,{
+                headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"}
+            }).then(res => {
+                console.log(res)
                 this.courseList = res.data.courseList
             })
         },
@@ -164,7 +167,7 @@ export default {
             })).then(res => {
                 if (res.data.updateCourseFlag === "success") {
                     this.dialogVisible = false;
-                    this.getAllCourse()
+                    this. onSubmit()
                 }
 
             })
@@ -233,7 +236,7 @@ export default {
 }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .course {
     margin-left: 20px;
     width: 88%;
@@ -255,6 +258,38 @@ export default {
     }
     .course-list {
         margin-top: 20px;
+      
+    }
+    .el-table th>div{
+            padding: 0;
+        }
+}
+.baseNews {
+    font-family: '微软雅黑';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 28px;
+    color: #111;
+    .base-head {
+        font-size: 18px;
+        color: #44aee0;
+    }
+    tr {
+        height: 61px;
+        .el-select {
+            width: 247px;
+            height: 32px;
+        }
+        .el-input {
+            width: 247px;
+            height: 32px;
+        }
+    }
+
+    .tr {
+        text-align: right;
+        width: 160px;
     }
 }
 </style>

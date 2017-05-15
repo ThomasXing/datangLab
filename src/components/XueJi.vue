@@ -52,9 +52,9 @@
             </el-form>
     
         </div>
-        <div class="class-list">
+        <div class="xueji-list">
             <el-button class="btn" type="primary" @click="addXuJi">新建学籍</el-button>
-            <el-table :data="stuManagementList" border style="width: 100%" class='course-list' v-show='stuManagementList.length!==0'>
+            <el-table :data="stuManagementList" border style="width: 100%" class='xueji-list' v-show='stuManagementList.length!==0'>
                 <el-table-column fixed type='index' label="序号" width="80">
                 </el-table-column>
                 <el-table-column prop="stuCode" label="学员学号" width="140">
@@ -173,7 +173,6 @@ export default {
 
         },
         onSubmit() {
-            console.log(this.formInline.startTime, this.formInline.endTime, this.formInline.xujiRecord)
             if (this.formInline.xujiStatus === "") {
                 this.xujiStatus[this.formInline.xujiStatus] = "";
             }
@@ -220,7 +219,7 @@ export default {
     .datePicker .el-input__icon {
         right: 20px;
     }
-    .class-list {
+    .xueji-list {
         margin-top: 20px;
     }
 }

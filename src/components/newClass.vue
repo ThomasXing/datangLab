@@ -241,7 +241,7 @@ export default {
             this.isIndeterminate = false;
         },
         handleCheckNotChange(event) {
-            let courseArr = []
+            let courseArr = [];
             let that = this;
             this.courseList.forEach(function (val) {
                 if (that.checkedCourse.indexOf(val.courseId) === -1) {
@@ -263,7 +263,7 @@ export default {
 }
 
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .baseNews {
     font-family: '微软雅黑';
     font-weight: 400;
@@ -277,10 +277,13 @@ export default {
     }
     tr {
         height: 61px;
-        input {
-            width: 245px;
-            height: 34px;
-            border-radius: inherit;
+        .el-select {
+            width: 247px;
+            height: 32px;
+        }
+        .el-input {
+            width: 247px;
+            height: 32px;
         }
     }
 

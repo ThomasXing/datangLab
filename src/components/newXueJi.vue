@@ -87,17 +87,17 @@
                             <el-input placeholder="" v-model="formInline.stuMail"></el-input>
                         </td>
                     </tr>
-                    <tr v-show='productList.length>1'>
-                        <td class='tr'>
-                            所属产品：
-                        </td>
-                        <td>
-                            <el-select v-model="formInline.product" placeholder="全部产品" v-for='list in productList' :key='list.productCode' @change="get_productCode(list.productCode)">
-                                <el-option :label="list.productName" :value="list.productName"></el-option>
-                            </el-select>
-    
-                        </td>
-                    </tr>
+                    <!--<tr v-show='productList.length>1'>
+                                <td class='tr'>
+                                    所属产品：
+                                </td>
+                                <td>
+                                    <el-select v-model="formInline.product" placeholder="全部产品" v-for='list in productList' :key='list.productCode' @change="get_productCode(list.productCode)">
+                                        <el-option :label="list.productName" :value="list.productName"></el-option>
+                                    </el-select>
+            
+                                </td>
+                            </tr>-->
                 </el-form>
             </table>
         </div>
@@ -110,7 +110,7 @@
                             <tr class="addxueji">
                                 <td class='tr choClass'>选择班级：</td>
                                 <td>
-                                    <el-select v-model="formInline.className" placeholder="请选择">
+                                    <el-select v-model="formInline.className" placeholder="请选择" @change="get_classId">
                                         <el-option :label="item.className" :value="item.className" v-for="item in classList" :key="item"></el-option>
                                     </el-select>
                                 </td>
@@ -192,13 +192,13 @@
                             <tr class="addxueji" v-show="stuEvent.pangting">
                                 <td class="choClass">说明：</td>
                                 <td>
-                                    <el-input type="textarea" v-model="stuEventList.pangtingInstructions"></el-input>
+                                    <el-input type="textarea" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
                             <tr class="addxueji" v-show="stuEvent.xiuxue">
                                 <td class="choClass">休学时段：</td>
                                 <td>
-                                    <el-form :inline="true" class="demo-form-inline" >
+                                    <el-form :inline="true" class="demo-form-inline">
                                         <el-date-picker v-model="stuEventList.startTime" type="date" placeholder="选择日期" @change="creDate(stuEventList.startTime)">
                                         </el-date-picker>
                                         <label class="el-form-item__label">至</label>
@@ -206,14 +206,14 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                        </el-date-picker>-->
+                                                    </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
-                            <tr class="addxueji" v-show="stuEvent.fuxue" >
+                            <tr class="addxueji" v-show="stuEvent.fuxue">
                                 <td class="choClass">复学时间：</td>
                                 <td>
-                                    <el-date-picker  v-model="stuEventList.fuxueTime" type="date" placeholder="选择日期" @change="fuxueTime(stuEventList.fuxueTime)">
+                                    <el-date-picker v-model="stuEventList.fuxueTime" type="date" placeholder="选择日期" @change="fuxueTime(stuEventList.fuxueTime)">
                                     </el-date-picker>
                                 </td>
                             </tr>
@@ -221,7 +221,7 @@
                             <tr class="addxueji" v-show="stuEvent.fuxue">
                                 <td class="choClass">选择班级：</td>
                                 <td>
-                                    <el-select v-model="stuEventList.fuxueClass"  placeholder="请选择">
+                                    <el-select v-model="stuEventList.fuxueClass" placeholder="请选择">
                                         <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
                                         </el-option>
                                     </el-select>
@@ -232,7 +232,7 @@
                             <tr class="addxueji" v-show="stuEvent.liuji">
                                 <td class="choClass">选择班级：</td>
                                 <td>
-                                   <el-select v-model="stuEventList.liuji"  placeholder="请选择">
+                                    <el-select v-model="stuEventList.liuji" placeholder="请选择">
                                         <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
                                         </el-option>
                                     </el-select>
@@ -352,24 +352,13 @@ export default {
                 startTime: null,
                 endTime: null,
                 fuxueTime: null,
-                fuxueClass:null,
-                liuji:null,
+                fuxueClass: null,
+                liuji: null,
                 biye: null,
                 jieye: null,
                 chongdu: null,
                 tuixue: null,
                 instructions: null
-                // ruxueInstructions:null,
-                // jilvInstructions:null,
-                // xiuxueInstructions:null,
-                // pangtingInstructions:null,
-                // fuxuIinstructions:null,
-                // liujiInstructions:null,
-                // biyeInstructions:null,
-                // jieyeInstructions:null,
-                // chongduInstructions:null,
-                // tuixueInstructions:null,
-                // zigeFailInstructions:null
             },
             newStuEvent: {
 
@@ -402,6 +391,51 @@ export default {
                 "退学": 10,
                 "毕业资格无效": 11
             },
+            stuEventIntro: {
+                stuEvent1: {
+                    stuEvent1Intro: "",
+                },
+                stuEvent2: {
+                    stuEvent2Intro: "",
+                    stuEvent2Score: ""
+                },
+                stuEvent3: {
+                    stuEvent3Intro: "",
+                },
+                stuEvent4: {
+                    stuEvent4Intro: "",
+                    stuEvent4StartDate: "",
+                    stuEvent4EndDate: ""
+                },
+                stuEvent5: {
+                    stuEvent5Intro: "",
+                    stuEvent5Date: "",
+                    stuEvent5ClassId: ""
+                },
+                stuEvent6: {
+                    stuEvent6Intro: "",
+                    stuEvent6ClassId: ""
+                },
+                stuEvent7: {
+                    stuEvent7Intro: "",
+                    stuEvent7Way: ""
+                },
+                stuEvent8: {
+                    stuEvent8Intro: "",
+                    stuEvent8Reason: ""
+                },
+                stuEvent9: {
+                    stuEvent9Intro: "",
+                    stuEvent9ClassId: ""
+                },
+                stuEvent10: {
+                    stuEvent10Intro: "",
+                    stuEvent10Reason: ""
+                },
+                stuEvent11: {
+                    stuEvent11Intro: ""
+                }
+            },
             schoolList: '',
             professionList: '',
             schoolCode: '',
@@ -412,7 +446,10 @@ export default {
             visible3: false,
             teacherList: '',
             classList: [],
-            myClassList: {}
+            myClassList: {},
+            classId: [],
+            eventListStr: [],
+            stuEventInfo: null
 
         }
     },
@@ -461,41 +498,51 @@ export default {
         },
         //获取所有班级
         getAllClass() {
-            this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.classList = res.data.classList
             })
         },
         addClassList() {
-            this.$set(this.myClassList, new Date().toLocaleString(), this.formInline.className)
-            this.visible2 = false;
+            if (this.formInline.className) {
+                this.$set(this.myClassList, new Date().toLocaleString(), this.formInline.className)
+                this.visible2 = false;
+            }
         },
         creDate(time) {
             if (time) {
                 let d = new Date(time);
                 this.stuEventList.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            }else{
-                 this.stuEventList.startTime=null;
+            } else {
+                this.stuEventList.startTime = null;
             }
         },
         endDate(time) {
             if (time) {
                 let d = new Date(time);
                 this.stuEventList.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            }else{
-                 this.stuEventList.endTime=null;
+            } else {
+                this.stuEventList.endTime = null;
             }
         },
-        fuxueTime(time){
-             if (time) {
+        fuxueTime(time) {
+            if (time) {
                 let d = new Date(time);
                 this.stuEventList.fuxueTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            }else{
-                this.stuEventList.fuxueTime=null;
+            } else {
+                this.stuEventList.fuxueTime = null;
             }
 
         },
+        get_classId() {
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + this.formInline.className).then(res => {
+                // this.classId = res.data.classList;
+                console.log(res)
+                for (let id = 0; id < res.data.classList.length; id++) {
+                    this.classId.push(res.data.classList[id]['classId'])
+                }
+            })
+        },
         get_stuEvent() {
-
             let stuEv = this.stuEventName[this.stuEventList.stuEventName];
             for (let list of Object.keys(this.stuEvent)) {
                 this.stuEvent[list] = false;
@@ -505,25 +552,29 @@ export default {
                     this.stuEventList[key] = null;
                 }
             }
-            console.log(this.stuEventList)
             switch (stuEv) {
                 case 1:
                     this.stuEvent.ruxue = true;
                     break
                 case 2:
                     this.stuEvent.jilv = true;
+
                     break
                 case 3:
                     this.stuEvent.pangting = true;
+
                     break
                 case 4:
                     this.stuEvent.xiuxue = true;
+
                     break
                 case 5:
                     this.stuEvent.fuxue = true;
+
                     break
                 case 6:
                     this.stuEvent.liuji = true;
+
                     break
                 case 7:
                     this.stuEvent.biye = true;
@@ -541,6 +592,7 @@ export default {
                     this.stuEvent.zigeFail = true;
                     break
             }
+
         },
         get_schoolCode(a) {
             this.schoolCode = a;
@@ -563,20 +615,89 @@ export default {
             })
         },
         addStuEvent() {
-            // console.log(this.stuEventList)
+            let stuEv = this.stuEventName[this.stuEventList.stuEventName];
+            switch (stuEv) {
+                case 1:
+                    this.stuEventIntro.stuEvent1.stuEvent1Intro = this.stuEventList.instructions;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent1;
+                    break
+                case 2:
+                    this.stuEventIntro.stuEvent2.stuEvent2Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent2.stuEvent2Score = this.stuEventList.jilv;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent2;
+                    break
+                case 3:
+                    this.stuEventIntro.stuEvent3.stuEvent3Intro = this.stuEventList.instructions;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent3;
+                    break
+                case 4:
+                    this.stuEventIntro.stuEvent4.stuEvent4Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent4.stuEvent4StartDate = this.stuEventList.startTime;
+                    this.stuEventIntro.stuEvent4.stuEvent4EndDate = this.stuEventList.endTime;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent4;
+                    break
+                case 5:
+                    stuEvent5Date
+                    this.stuEventIntro.stuEvent5.stuEvent5Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent5.stuEvent5Date = this.stuEventList.fuxueTime;
+                    this.stuEventIntro.stuEvent5.stuEvent5ClassId = this.stuEventList.fuxueClass;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent5;
+                    break
+                case 6:
+                    this.stuEventIntro.stuEvent6.stuEvent6Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent6.stuEvent6ClassId = this.stuEventList.liuji;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent6;
+                    break
+                case 7:
+                    this.stuEventIntro.stuEvent7.stuEvent7Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent7.stuEvent7Way = this.stuEventList.biye;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent7;
+                    break
+                case 8:
+                    this.stuEventIntro.stuEvent8.stuEvent8Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent8.stuEvent8Reason = this.stuEventList.jieye;
+
+                    this.stuEventInfo = this.stuEventIntro.stuEvent8;
+                    break
+                case 9:
+                    this.stuEventIntro.stuEvent9.stuEvent9Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent9.stuEvent9ClassId = this.stuEventList.chongdu;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent9;
+                    break
+                case 10:
+                    this.stuEventIntro.stuEvent10.stuEvent10Intro = this.stuEventList.instructions;
+                    this.stuEventIntro.stuEvent10.stuEvent10Reason = this.stuEventList.tuixue;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent10;
+                    break
+                case 11:
+                    this.stuEventIntro.stuEvent11.stuEvent11Intro = this.stuEventList.instructions;
+                    this.stuEventInfo = this.stuEventIntro.stuEvent11;
+                    break
+            }
+
+
+            console.log(this.stuEventInfo)
             let time = new Date().toLocaleString();
+            let stuEventObj = { "classId": this.classId, "stuEventName": this.stuEventName[this.stuEventList.stuEventName] };
             this.$set(this.newStuEvent, time, this.stuEventList)
-            let stuEventList = []
+            let stuEventList = [];
+            for (let key of Object.keys(this.stuEventInfo)) {
+                this.$set(stuEventObj, key, this.stuEventInfo[key])
+            }
+            this.eventListStr = JSON.stringify(stuEventObj).split();
+            console.log(JSON.stringify(stuEventObj), this.eventListStr)
+            // console.log(this.stuEventInfo, this.stuEventIntro.stuEvent1Intro)
+
+            // console.log(this.stuEventList.instructions)
+
 
             for (let stuEvent of Object.keys(this.newStuEvent[time])) {
-                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined ||this.newStuEvent[time][stuEvent]==="") {
+                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined || this.newStuEvent[time][stuEvent] === "") {
                     delete this.newStuEvent[time][stuEvent]
                 } else {
-                    console.log(this.newStuEvent[time])
                     stuEventList.push(this.newStuEvent[time][stuEvent])
                 }
             }
-            console.log(stuEventList)
             this.$set(this.newStuEvent, time, stuEventList)
             this.visible3 = false;
         },
@@ -586,18 +707,17 @@ export default {
                 accesstoken: sessionStorage.getItem("keyToken"),
                 stuName: this.formInline.stuName,
                 stuIDCard: this.formInline.stuIDCard,
-                stuSex: '',
-                stuQualification: '',
-                stuSelfSchoolName: '',
-                stuSelfProfessionName: '',
-                stuPhone: '',
-                stuMail: '',
-                classId: this.formInline.className,
-                eventListStr: this.classState[this.formInline.status],
-                stuEventName: this.productCode,
+                stuSex: this.formInline.stuSex,
+                stuQualification: this.formInline.stuQualification,
+                stuSelfSchoolName: this.formInline.stuSelfSchoolName,
+                stuSelfProfessionName: this.formInline.stuSelfProfessionName,
+                stuPhone: this.formInline.stuPhone,
+                stuMail: this.formInline.stuMail,
+                // classId: JSON.stringify(this.classId),
+                eventListStr: JSON.stringify(this.eventListStr),
+                // stuEventName: this.stuEventName[this.stuEventList.stuEventName],
                 schoolCode: this.schoolCode,
                 professionCode: this.professionCode,
-                stuEvent1Intro: ""
             })).then(res => {
                 console.log(res)
                 if (res.data.addClassFlag === "success") {
@@ -617,7 +737,7 @@ export default {
 }
 
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .baseNews {
     font-family: '微软雅黑';
     font-weight: 400;
@@ -635,11 +755,13 @@ export default {
         td {
             padding-right: 10px;
         }
-
-        input {
-            width: 245px;
-            height: 34px;
-            border-radius: inherit;
+       .el-select {
+            width: 247px;
+            height: 32px;
+        }
+        .el-input {
+            width: 247px;
+            height: 32px;
         }
     }
 
@@ -699,6 +821,7 @@ export default {
         transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
         font-size: 14px;
         box-sizing: border-box;
+        
     }
 }
 </style>
