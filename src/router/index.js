@@ -45,11 +45,11 @@ export default new Router({
       component: LabMan,
       children:[
         {path:'course',component:Course},
-        {path:'newCourse',component:NewCourse},
+        {path:'newCourse',name:'newCourse',component:NewCourse},
         {path:'classs',component:Classs},
-        {path:'newclass',component:NewClass},
+        {path:'newclass',name:'newClass',component:NewClass},
         {path:'xueji',component:XueJi},
-        {path:'newXueJi',component:NewXueJi}
+        {path:'newXueJi',name:'newXuJi',component:NewXueJi}
       ]
     },
     {path:'/cultivate',component:Cultivate,

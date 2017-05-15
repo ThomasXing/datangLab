@@ -4,18 +4,18 @@
         <div>
     
             <ul class='labman-menu'>
-                <li>
-                    <router-link to='/labman/course' class='labman-menu-item'>
+                <li :class="{active:courseActive}">
+                    <router-link to='/labman/course' active-class="active" class='labman-menu-item'>
                         课程管理
                     </router-link>
                 </li>
-                <li>
-                    <router-link to='/labman/classs' class='labman-menu-item'>
+                <li :class="{active:classActive}">
+                    <router-link to='/labman/classs' active-class="active" class='labman-menu-item'>
                         班级管理
                     </router-link>
                 </li>
-                <li>
-                    <router-link to='/labman/xueji' class='labman-menu-item'>
+                <li :class="{active:xuejiActive}">
+                    <router-link to='/labman/xueji' active-class="active" class='labman-menu-item'>
                         学籍管理
                     </router-link>
                 </li>
@@ -33,20 +33,36 @@ export default {
     name: 'labman',
     data() {
         return {
-
+            courseActive:false,
+            classActive:false,
+            xuejiActive:false
         }
     },
     created() {
         this.$store.dispatch('SET_TITLE', '实验室管理平台')
     },
-    components: {
-        HeadView
-    },
     watch:{
         $route(to,from){
-        // console.log(to,from)
+            let router_path = to.path.replace(/\/labman\//,"");
+            this.courseActive=false;
+            this.classActive=false;
+            this.xuejiActive=false;
+            switch(router_path) {
+                case "newCourse" :
+                this.courseActive=true;
+                break;
+                 case "newclass" :
+                this.classActive=true;
+                break;
+                 case "newXueJi" :
+                this.xuejiActive=true;
+                break;
+            }
+        }
+    },
+    components: {
+        HeadView
     }
-}
 }
 </script>
 <style lang='less'>
@@ -67,11 +83,11 @@ export default {
             line-height: 50px;
             color: #ffffff;
         }
-        .router-link-active {
+        .active{
             background: #1e222d;
             position: relative;
         }
-        &-item.router-link-active:before {
+        .active:before {
             content: '';
             width: 10px;
             height: 50px;
@@ -79,6 +95,7 @@ export default {
             position: absolute;
             left: 0;
         }
+       
     }
     &-box {
         float: left;

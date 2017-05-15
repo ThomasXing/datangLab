@@ -66,8 +66,8 @@
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
-                        <el-button @click="handleClick" type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small" @click="modiClass(scope.row.classId)">修改</el-button>
+                        <el-button @click="handleClick(scope.row.classId,scope.row.classState)" class="my-btn"> {{scope.row.classState |classFilter}}</el-button>
+                        <el-button class="my-btn"  @click="modiClass(scope.row.classId)">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -129,7 +129,7 @@
     </div>
 </template>
 <script>
-import { classStatus } from '../filters'
+import { classStatus,classFilter } from '../filters'
 import qs from "qs"
 export default {
     name: 'course',
@@ -187,7 +187,8 @@ export default {
         this.onSubmit()
     },
     filters: {
-        classStatus
+        classStatus,
+        classFilter
     },
     methods: {
         //获取所有学校
@@ -225,13 +226,13 @@ export default {
             if (this.formInline.status === "") {
                 this.classStatus[this.formInline.status] = ""
             }
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.formInline.bianma + "&teacherTwo=" + this.formInline.bianma).then(res => {
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + this.username + "&accesstoken=" +this.password + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.teacherCode + "&teacherTwo=" +  this.pmCode).then(res => {
                 this.classList = res.data.classList
             }).catch(err=>console.log(err))
         },
         //获取所有课程
          getAllCourse() {
-            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" +  this.username  + "&accesstoken=" + this.password).then(res => {
                 this.courseList = res.data.courseList
                 console.log(res)
             })
@@ -256,7 +257,24 @@ export default {
             this.classId = classId;
             this.getAllCourse()
         },
-        handleClick() {
+         handleClick(classId,classState) {
+            if(classState==="N"){
+                classState="S"
+            }else{
+                classState="N"
+            }
+            this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+                userid: this.username,
+                accesstoken: this.password,
+                classId: classId,
+                classState: classState,
+
+            })).then(res => {
+                if (res.data.updateClassFlag === "success") {
+                    this.onSubmit()
+                }
+
+            })
 
         },
         changeClass() {

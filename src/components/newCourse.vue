@@ -77,6 +77,7 @@
 <script>
 import qs from "qs"
 export default {
+    name:'newCourse',
     data() {
         return {
             formInline: {
@@ -99,6 +100,9 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getAllProduct()
+        // if(this.$route.name){
+        //      this.$store.dispatch('SET_LINK_ACTIVE', '竞争力培养')
+        // }
     },
     methods: {
         //获取所有学校

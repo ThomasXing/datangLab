@@ -201,9 +201,6 @@ export default {
         get_teacherTwo(e) {
             this.pmCode = e;
         },
-        get_classState(f){
-            console.log(f)
-        },
         getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList

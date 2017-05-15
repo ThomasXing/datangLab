@@ -8,6 +8,12 @@ const classState = {
 	E:'结课',
 	N:'无效'
 }
+const classState1 = {
+	W:'无效',
+	S:'无效',
+	E:'无效',
+	N:'启用'
+}
 const get_courseState={
 	"N":"启用",
 	"Y":"失效"
@@ -38,6 +44,9 @@ export const sex = function(type){
 }
 export const managementState = function(type){
 	return get_managementState[type]
+}
+export const classFilter = function(type){	
+	return classState1[type]
 }
 export const normalTime = (time) => {
 	// if(time){

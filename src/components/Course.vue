@@ -145,7 +145,7 @@ export default {
             if (this.formInline.status === "") {
                 this.courseState[this.formInline.status] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(this.formInline.name) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma,{
+            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma,{
                 headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"}
             }).then(res => {
                 console.log(res)
