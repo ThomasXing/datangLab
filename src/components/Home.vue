@@ -2,8 +2,8 @@
     <div id="home">
         <div class="home-header con">
             <h1 class="home-header-title"><a href="" >
-                                        <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
-                                    </a></h1>
+                                                <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
+                                            </a></h1>
         </div>
         <div class="home-login" @keyup.enter='login'>
             <div class="home-login-con">
@@ -43,7 +43,7 @@ export default {
             alertMiss: false
         }
     },
-    created(){
+    created() {
         this.doremmberpass()
     },
     methods: {
@@ -61,14 +61,23 @@ export default {
                         sessionStorage.setItem('userid', this.userid)
                         this.$router.push({ name: 'lab', params: { userId: this.userid } })
                     }
-                }).catch(err => {
-                    this.open()
+                }, error => {
+                    // console.log(err)
+                    if (error.message === "Network Error") {
+                        this.$alert('网络错误', '提示信息', {
+                            confirmButtonText: '确定',
+                        });
+                    } else {
+
+                        this.open()
+                    }
+
                 })
             }
 
         },
         rempw() {
-          
+
             if (this.checked === true) {
                 localStorage.setItem('un', this.userid)
                 localStorage.setItem('pw', this.password)
@@ -77,14 +86,14 @@ export default {
                 localStorage.removeItem("passWord")
             }
         },
-        doremmberpass() {  
+        doremmberpass() {
             let nameVal = localStorage.getItem("un")
             let passVal = localStorage.getItem("pw")
             if (nameVal) {
                 this.userid = nameVal
             } if (passVal) {
                 this.password = passVal
-                this.checked=true;
+                this.checked = true;
             }
         },
         open() {

@@ -153,6 +153,8 @@ export default {
         this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
+        this.$store.dispatch('SHOW_ACTIVECLASS',"classActive") 
+
     },
     methods: {
         //获取所有学校

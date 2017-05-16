@@ -88,16 +88,16 @@
                         </td>
                     </tr>
                     <!--<tr v-show='productList.length>1'>
-                                <td class='tr'>
-                                    所属产品：
-                                </td>
-                                <td>
-                                    <el-select v-model="formInline.product" placeholder="全部产品" v-for='list in productList' :key='list.productCode' @change="get_productCode(list.productCode)">
-                                        <el-option :label="list.productName" :value="list.productName"></el-option>
-                                    </el-select>
-            
-                                </td>
-                            </tr>-->
+                                                    <td class='tr'>
+                                                        所属产品：
+                                                    </td>
+                                                    <td>
+                                                        <el-select v-model="formInline.product" placeholder="全部产品" v-for='list in productList' :key='list.productCode' @change="get_productCode(list.productCode)">
+                                                            <el-option :label="list.productName" :value="list.productName"></el-option>
+                                                        </el-select>
+                                
+                                                    </td>
+                                                </tr>-->
                 </el-form>
             </table>
         </div>
@@ -110,7 +110,7 @@
                             <tr class="addxueji">
                                 <td class='tr choClass'>选择班级：</td>
                                 <td>
-                                    <el-select v-model="formInline.className" placeholder="请选择" @change="get_classId">
+                                    <el-select v-model="formInline.className" placeholder="请选择" @change="get_classId(formInline.className)">
                                         <el-option :label="item.className" :value="item.className" v-for="item in classList" :key="item"></el-option>
                                     </el-select>
                                 </td>
@@ -134,8 +134,8 @@
                     <td class="text-ddd">{{key}}</td>
                 </tr>
                 <tr>
-                    <td v-for="list in myClassList" class="tr">
-                        <el-button type="primary" @click=""> {{list}}</el-button>
+                    <td v-for="(list,key,index) in myClassList" class="tr">
+                        <el-button type="primary" @click="get_activeClass(list)">{{list}}</el-button>
                     </td>
     
                 </tr>
@@ -206,7 +206,7 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                                    </el-date-picker>-->
+                                                                        </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
@@ -297,23 +297,32 @@
                     </td>
     
                 </tr>
-                <tr v-for="(newEvent,keyTime) in newStuEvent">
-                    <td class="tr">{{keyTime}}</td>
-                    <td v-for="item in newEvent">{{item}}</td>
+                <tr v-for="(newEvent,key) in classEvent[this.classId]">
+    
+                    <div v-for="(evitem,keyTime) in newEvent" style="display:inline-block">
+    
+                        <td class="tr">{{keyTime}}</td>
+                        <td v-for="item in evitem">{{item}}</td>
+                    </div>
                 </tr>
             </table>
         </div>
         <div class="sub">
             <el-button class="btn-q" type="primary" size="large" @click='addXueJi'>确定</el-button>
-    
             <el-button class='btn-w' type="primary" size="large" @click="back">取消</el-button>
         </div>
-    
+        <div>{{stuManagementQB}}</div>
     </div>
 </template>
 <script>
 import qs from "qs"
 import { normalTime } from "../filters"
+import { mapGetters } from "vuex"
+const get_stuQualification = {
+    A: '硕士及以上',
+    B: '本科',
+    C: '专科'
+}
 export default {
     data() {
         return {
@@ -360,7 +369,7 @@ export default {
                 tuixue: null,
                 instructions: null
             },
-            newStuEvent: {
+            classEvent: {
 
             },
             classState: {
@@ -447,9 +456,10 @@ export default {
             teacherList: '',
             classList: [],
             myClassList: {},
-            classId: [],
+            classId: "",
             eventListStr: [],
-            stuEventInfo: null
+            stuEventInfo: null,
+            newStuEvent: []
 
         }
     },
@@ -460,6 +470,17 @@ export default {
         this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
+        this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
+    },
+    mounted() {
+        console.log(this.$store.state.stuManagementQB)
+        if (this.$store.state.stuManagementQB !== null) {
+            
+            this.get_newXueJI()
+        }
+    },
+    computed: {
+        ...mapGetters(['stuManagementQB'])
     },
     filters: {
         normalTime
@@ -499,7 +520,7 @@ export default {
         //获取所有班级
         getAllClass() {
             this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.classList = res.data.classList
+                this.classList = res.data.classList;
             })
         },
         addClassList() {
@@ -533,14 +554,13 @@ export default {
             }
 
         },
-        get_classId() {
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + this.formInline.className).then(res => {
-                // this.classId = res.data.classList;
-                console.log(res)
-                for (let id = 0; id < res.data.classList.length; id++) {
-                    this.classId.push(res.data.classList[id]['classId'])
-                }
+        get_classId(list) {
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + encodeURIComponent(encodeURIComponent(list))).then(res => {
+                this.classId = res.data.classList[0].classId;
             })
+        },
+        get_activeClass(list) {
+            this.get_classId(list)
         },
         get_stuEvent() {
             let stuEv = this.stuEventName[this.stuEventList.stuEventName];
@@ -551,6 +571,11 @@ export default {
                 if (key !== "stuEventName") {
                     this.stuEventList[key] = null;
                 }
+            }
+            if (this.classId === "") {
+                this.$alert('请选择班级', '提示信息', {
+                    confirmButtonText: '确定',
+                });
             }
             switch (stuEv) {
                 case 1:
@@ -593,6 +618,21 @@ export default {
                     break
             }
 
+        },
+        get_newXueJI() {
+            console.log(this.$store.state.stuManagementQB, get_stuQualification)
+            this.formInline.school = this.stuManagementQB.schoolName;
+            this.formInline.professional = this.stuManagementQB.professionName;
+            this.formInline.stuName = this.stuManagementQB.stuTrueName;
+            this.formInline.stuIDCard = this.stuManagementQB.stuIdCard;
+            this.stuManagementQB.stuSex === "F" ? this.stuManagementQB.stuSex = "女" : this.stuManagementQB.stuSex = "男";
+            this.formInline.stuSex = this.stuManagementQB.stuSex;
+            this.formInline.stuQualification = get_stuQualification[this.stuManagementQB.stuQualification];
+            this.formInline.stuSelfSchoolName = this.stuManagementQB.stuSelfSchoolName;
+            this.formInline.stuSelfProfessionName = this.stuManagementQB.stuSelfProfessionName;
+            this.formInline.stuPhone = this.stuManagementQB.stuPhone;
+            this.formInline.stuMail = this.stuManagementQB.stuMail;
+            // this.classList = this.stuManagementQB.classRefList;
         },
         get_schoolCode(a) {
             this.schoolCode = a;
@@ -637,7 +677,7 @@ export default {
                     this.stuEventInfo = this.stuEventIntro.stuEvent4;
                     break
                 case 5:
-                    stuEvent5Date
+
                     this.stuEventIntro.stuEvent5.stuEvent5Intro = this.stuEventList.instructions;
                     this.stuEventIntro.stuEvent5.stuEvent5Date = this.stuEventList.fuxueTime;
                     this.stuEventIntro.stuEvent5.stuEvent5ClassId = this.stuEventList.fuxueClass;
@@ -645,7 +685,7 @@ export default {
                     break
                 case 6:
                     this.stuEventIntro.stuEvent6.stuEvent6Intro = this.stuEventList.instructions;
-                    this.stuEventIntro.stuEvent6.stuEvent6ClassId = this.stuEventList.liuji;
+                    this.stuEventIntro.stuEvent6.stuEvent6ClassId = this.classId;
                     this.stuEventInfo = this.stuEventIntro.stuEvent6;
                     break
                 case 7:
@@ -675,30 +715,34 @@ export default {
                     break
             }
 
+            if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
+                this.newStuEvent = [];
+            }
 
-            console.log(this.stuEventInfo)
+
             let time = new Date().toLocaleString();
             let stuEventObj = { "classId": this.classId, "stuEventName": this.stuEventName[this.stuEventList.stuEventName] };
-            this.$set(this.newStuEvent, time, this.stuEventList)
+            let newStuEvent = {};
             let stuEventList = [];
             for (let key of Object.keys(this.stuEventInfo)) {
                 this.$set(stuEventObj, key, this.stuEventInfo[key])
             }
-            this.eventListStr = JSON.stringify(stuEventObj).split();
-            console.log(JSON.stringify(stuEventObj), this.eventListStr)
-            // console.log(this.stuEventInfo, this.stuEventIntro.stuEvent1Intro)
 
-            // console.log(this.stuEventList.instructions)
-
-
-            for (let stuEvent of Object.keys(this.newStuEvent[time])) {
-                if (this.newStuEvent[time][stuEvent] === null || this.newStuEvent[time][stuEvent] === undefined || this.newStuEvent[time][stuEvent] === "") {
-                    delete this.newStuEvent[time][stuEvent]
+            this.eventListStr = [stuEventObj];
+            this.$set(this.classEvent, this.classId, newStuEvent)
+            this.$set(newStuEvent, time, this.stuEventList)
+            for (let stuEvent of Object.keys(newStuEvent[time])) {
+                if (newStuEvent[time][stuEvent] === null || newStuEvent[time][stuEvent] === undefined || newStuEvent[time][stuEvent] === "") {
+                    delete newStuEvent[time][stuEvent]
                 } else {
-                    stuEventList.push(this.newStuEvent[time][stuEvent])
+                    stuEventList.push(newStuEvent[time][stuEvent])
+
                 }
             }
-            this.$set(this.newStuEvent, time, stuEventList)
+            this.$set(newStuEvent, time, stuEventList)
+            this.newStuEvent.push(newStuEvent)
+
+            this.$set(this.classEvent, this.classId, this.newStuEvent)
             this.visible3 = false;
         },
         addXueJi() {
@@ -707,21 +751,19 @@ export default {
                 accesstoken: sessionStorage.getItem("keyToken"),
                 stuName: this.formInline.stuName,
                 stuIDCard: this.formInline.stuIDCard,
-                stuSex: this.formInline.stuSex,
-                stuQualification: this.formInline.stuQualification,
+                stuSex: this.stuSex[this.formInline.stuSex],
+                stuQualification: this.stuQualification[this.formInline.stuQualification],
                 stuSelfSchoolName: this.formInline.stuSelfSchoolName,
                 stuSelfProfessionName: this.formInline.stuSelfProfessionName,
                 stuPhone: this.formInline.stuPhone,
                 stuMail: this.formInline.stuMail,
-                // classId: JSON.stringify(this.classId),
                 eventListStr: JSON.stringify(this.eventListStr),
-                // stuEventName: this.stuEventName[this.stuEventList.stuEventName],
                 schoolCode: this.schoolCode,
                 professionCode: this.professionCode,
             })).then(res => {
-                console.log(res)
-                if (res.data.addClassFlag === "success") {
-                    this.$alert('班级添加成功', '提示信息', {
+
+                if (res.data.addStuManagementFlag === "success") {
+                    this.$alert('学籍添加成功', '提示信息', {
                         confirmButtonText: '确定',
                     });
                 }
@@ -755,7 +797,7 @@ export default {
         td {
             padding-right: 10px;
         }
-       .el-select {
+        .el-select {
             width: 247px;
             height: 32px;
         }
@@ -821,7 +863,6 @@ export default {
         transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
         font-size: 14px;
         box-sizing: border-box;
-        
     }
 }
 </style>

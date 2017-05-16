@@ -43,7 +43,7 @@
                     <el-date-picker v-model="formInline.startTime" type="date" placeholder="选择日期" @change="creDate(formInline.startTime)">
                     </el-date-picker>
                     <label class="el-form-item__label">至</label>
-                      <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期" @change="endDate(formInline.endTime)">
+                    <el-date-picker v-model="formInline.endTime" type="date" placeholder="选择日期" @change="endDate(formInline.endTime)">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -77,8 +77,8 @@
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
-                        <el-button @click="handleClick" type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small">修改</el-button>
+                        <el-button @click="handleClick(scope.row)" class="my-btn"> 重置密码</el-button>
+                        <el-button @click='modiXuJi(scope.row.stuId)' class="my-btn">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -88,6 +88,7 @@
 </template>
 <script>
 import { sex, managementState } from "../filters"
+import qs from "qs"
 export default {
     data() {
         return {
@@ -131,6 +132,7 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getAllStuManagement()
+        this.$store.dispatch('SHOW_ACTIVECLASS','xuejiActive') 
     },
     methods: {
         //获取所有学校
@@ -169,7 +171,33 @@ export default {
                 this.formInline.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             }
         },
-        handleClick() {
+        handleClick(list) {
+            this.$http.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + list.stuId).then(res => {
+                let pass = res.data.stuManagementQB.stuIdCard.slice(-6);
+                this.$confirm('确定要为选中的学生，重置密码吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    this.$http.post("/api/yzh/research/inter/updateStuPassword", qs.stringify({
+                        userid: sessionStorage.getItem("keyId"),
+                        accesstoken: sessionStorage.getItem("keyToken"),
+                        stuId: list.stuId
+                    })).then(res => {
+                        if (res.data.updateStuManagementFlag === "success") {
+                            // this.$alert("密码重置成功!\n重置后的新密码：学生的身份证后六位", '提示', {
+                            //     confirmButtonText: '确定',
+                            // });
+                            this.$message({
+                                type: 'info',
+                                message: '密码重置成功,重置后的新密码：学生的身份证后六位!'
+                            });
+                        }
+                    }).catch(err => console.log(err))
+                })
+
+
+            }, err => console.log(err))
 
         },
         onSubmit() {
@@ -179,15 +207,16 @@ export default {
             if (this.formInline.xujiRecord === "") {
                 this.xujiRecord[this.formInline.xujiRecord] = "";
             }
-            // if (this.formInline.xujiRecord === "") {
-            //     this.xujiRecord[this.formInline.xujiRecord] = "";
-            // }
-            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(this.formInline.firstname) + "&creDate=" + this.formInline.startTime + "&endDate=" + this.formInline.endTime + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
-                console.log(res)
-            })
+            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(encodeURIComponent(this.formInline.firstname)) + "&creDate=" + this.formInline.startTime + "&endDate=" + this.formInline.endTime + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
+                this.stuManagementList = res.data.stuManagementList;
+            }, err => console.log(err))
         },
         addXuJi() {
             this.$router.push({ path: 'newXueJi' })
+        },
+        modiXuJi(xujiList){
+            this.$store.dispatch("Modify_XuJi",xujiList)
+            this.$router.push({ path: 'newXueJi' ,params:xujiList})
         }
     },
     filters: {

@@ -100,6 +100,7 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getAllProduct()
+        this.$store.dispatch('SHOW_ACTIVECLASS',"courseActive") 
         // if(this.$route.name){
         //      this.$store.dispatch('SET_LINK_ACTIVE', '竞争力培养')
         // }

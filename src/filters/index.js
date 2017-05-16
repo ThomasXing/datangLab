@@ -30,6 +30,11 @@ const get_managementState = {
 	E:'已毕业',
 	F:'已结业'
 }
+const get_stuQualification = {
+	A:'硕士及以上',
+	B:'本科',
+	C:'专科'
+}
 export const courseStatus = function (type) {
 	return courseState[type]
 }

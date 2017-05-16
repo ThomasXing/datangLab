@@ -1,5 +1,5 @@
 <template >
-    <div id="login" >
+    <div id="login">
         <div class="login-title">
             <img src="../assets/images/logo_1.png" alt="logo">
             <h2>{{$route.params.id}}</h2>
@@ -36,7 +36,7 @@ export default {
             alertMiss: false
         }
     },
-    created(){
+    created() {
         this.doremmberpass()
     },
     computed: {
@@ -53,17 +53,23 @@ export default {
                     userName: this.userid,
                     passWord: this.accesstoken
                 })).then(res => {
-                    sessionStorage.setItem('userid',this.userid)
+                    sessionStorage.setItem('userid', this.userid)
                     this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
-                     sessionStorage.setItem('keyId', res.data.userid)
-                     sessionStorage.setItem('keyToken', res.data.accesstoken)
-                }).catch(err => {
-                    this.$alert('用户名或密码输入错误', '提示信息', {
-                        confirmButtonText: '确定',
-                    });
+                    sessionStorage.setItem('keyId', res.data.userid)
+                    sessionStorage.setItem('keyToken', res.data.accesstoken)
+                }, error => {
+                    // console.log(err)
+                    if (error.message === "Network Error") {
+                        this.$alert('网络错误', '提示信息', {
+                            confirmButtonText: '确定',
+                        });
+                    } else {
+                        this.$alert('用户名或密码输入错误', '提示信息', {
+                            confirmButtonText: '确定',
+                        })
+                    }
                 })
             }
-
         },
         rempw() {
             if (this.checked === true) {
@@ -74,14 +80,14 @@ export default {
                 localStorage.removeItem("keyPass")
             }
         },
-        doremmberpass() {  
+        doremmberpass() {
             let nameVal = localStorage.getItem("keyName")
             let passVal = localStorage.getItem("keyPass")
             if (nameVal) {
                 this.userid = nameVal
             } if (passVal) {
                 this.accesstoken = passVal
-                this.checked=true;
+                this.checked = true;
             }
         }
     }
