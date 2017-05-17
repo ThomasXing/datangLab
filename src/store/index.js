@@ -1,15 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-// import qs from 'qs'
+import qs from 'qs'
 Vue.use(Vuex)
 const state = {
     userid: null,
     title: null,
-    stuManagementQB: null,
+    stuManagementQB: {},
     xuejiActive: null,
     courseActive: null,
-    classActive: null
+    classActive: null,
+    xueji:null,
+    isXiugai:false
 }
 
 const actions = {
@@ -22,25 +24,30 @@ const actions = {
     // showLoading:({commit})=>{
     // 	commit(types.SHOW_LOADING)
     // },
-    Modify_XuJi({ commit }, stuId) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                commit("modify_xuJi", stuId)
-                resolve()
-            }, 1000)
-        })
+    Modify_XuJi(context,stuId) {
+          axios.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + stuId).then(res => {
+                context.commit("modify_xuJi",res.data.stuManagementQB)
+        }, err => console.log(err))
     },
+    addXuJi:({commit}) => commit("add_xueji"),
     SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val)
 }
-
+const get_stuQualification = {
+	A:'硕士及以上',
+	B:'本科',
+	C:'专科'
+}
 const mutations = {
     set_title(state, val) {
         state.title = val
     },
-    modify_xuJi(state, stuId) {
-        axios.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + stuId).then(res => {
-            state.stuManagementQB = res.data.stuManagementQB
-        }, err => console.log(err))
+    modify_xuJi(state, data) {
+            data.stuSex==="F"? data.stuSex="女" : data.stuSex="男";
+            let stuQualification =  data.stuQualification;
+            data.stuQualification=get_stuQualification[stuQualification] 
+            state.stuManagementQB = data;
+            console.log("state.stuManagementQB",state.stuManagementQB)
+            state.isXiugai=true;
     },
     show_activeClass: (state, val) => {
         state.xuejiActive = false;
@@ -57,10 +64,10 @@ const mutations = {
                 state.classActive = true;
                 break;
         }
+    },
+    add_xueji:(state)=>{
+        state.isXiugai=false;
     }
-    // set_userid(state,val){
-    //     state.userid = val
-    // }
 }
 const getters = {
     title: state => state.title,
@@ -68,7 +75,8 @@ const getters = {
     stuManagementQB: state => state.stuManagementQB,
     xuejiActive: state => state.xuejiActive,
     courseActive: state => state.courseActive,
-    classActive: state => state.classActive
+    classActive: state => state.classActive,
+    isXiugai:state => state.isXiugai
 }
 export default new Vuex.Store({
     state,

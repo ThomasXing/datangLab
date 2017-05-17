@@ -88,6 +88,7 @@
 </template>
 <script>
 import { sex, managementState } from "../filters"
+import { mapActions } from "vuex"
 import qs from "qs"
 export default {
     data() {
@@ -132,7 +133,7 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getAllStuManagement()
-        this.$store.dispatch('SHOW_ACTIVECLASS','xuejiActive') 
+        this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
     },
     methods: {
         //获取所有学校
@@ -200,6 +201,9 @@ export default {
             }, err => console.log(err))
 
         },
+        ...mapActions([
+            'Modify_XuJi' // 映射 this.increment() 为 this.$store.dispatch('increment')
+        ]),
         onSubmit() {
             if (this.formInline.xujiStatus === "") {
                 this.xujiStatus[this.formInline.xujiStatus] = "";
@@ -212,11 +216,11 @@ export default {
             }, err => console.log(err))
         },
         addXuJi() {
+            this.$store.dispatch("addXuJi")
             this.$router.push({ path: 'newXueJi' })
         },
-        modiXuJi(xujiList){
-            this.$store.dispatch("Modify_XuJi",xujiList)
-            this.$router.push({ path: 'newXueJi' ,params:xujiList})
+        modiXuJi(stuId) {
+            this.$router.push({ path: 'newXueJi/'+stuId,params:{stuId:stuId} })
         }
     },
     filters: {

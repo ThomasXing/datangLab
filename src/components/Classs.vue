@@ -66,13 +66,15 @@
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="200">
                     <template scope="scope">
-                        <el-button @click="handleClick" type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small" @click="modiClass(scope.row.classId)">修改</el-button>
+                        <el-button @click="handleClick(scope.row.classId,scope.row.classState,scope.row.teacherOne)" class="my-btn"> {{scope.row.classState |classFilter}}</el-button>
+                        <el-button @click='modiClass(scope.row.classId)' class="my-btn">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
     
         </div>
+
+
         <el-dialog title="修改" :visible.sync="dialogVisible" size="small">
     
             <table class='baseNews' :model="modify">
@@ -122,14 +124,14 @@
                 </tr>
             </table>
             <span slot="footer" class="dialog-footer">
-                                <el-button @click="dialogVisible = false">取 消</el-button>
-                                <el-button type="primary" @click="changeClass">确 定</el-button>
-                            </span>
+                                    <el-button @click="dialogVisible = false">取 消</el-button>
+                                    <el-button type="primary" @click="changeClass">确 定</el-button>
+                                </span>
         </el-dialog>
     </div>
 </template>
 <script>
-import { classStatus } from '../filters'
+import { classStatus,classFilter } from '../filters'
 import qs from "qs"
 export default {
     name: 'course',
@@ -174,7 +176,7 @@ export default {
             Recheck: false,
             checkedCourse: [],
             isIndeterminate: true,
-            courseList:[]
+            courseList: []
         }
     },
     created() {
@@ -185,10 +187,11 @@ export default {
         this.getTeacherList()
         this.getpmList()
         this.onSubmit()
-        this.$store.dispatch('SHOW_ACTIVECLASS',"classActive") 
+        this.$store.dispatch('SHOW_ACTIVECLASS', "classActive")
     },
     filters: {
-        classStatus
+        classStatus,
+        classFilter
     },
     methods: {
         //获取所有学校
@@ -226,12 +229,12 @@ export default {
             if (this.formInline.status === "") {
                 this.classStatus[this.formInline.status] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(this.formInline.name) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.formInline.bianma + "&teacherTwo=" + this.formInline.bianma).then(res => {
+            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.teacherCode + "&teacherTwo=" + this.pmCode).then(res => {
                 this.classList = res.data.classList
-            }).catch(err=>console.log(err))
+            }).catch(err => console.log(err))
         },
         //获取所有课程
-         getAllCourse() {
+        getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
                 console.log(res)
@@ -257,8 +260,34 @@ export default {
             this.classId = classId;
             this.getAllCourse()
         },
-        handleClick() {
+        handleClick(classId,classState,teacherOne) {
+             if(classState==="N"){
+                classState="S"
+            }else{
+                classState="N"
+            }
+        //      this.$alert('这是一段内容', '标题名称', {
+        //   confirmButtonText: '确定',
+        //   callback: teacherOne => {
+        //     this.$message({
+        //       type: 'info',
+        //       message: `action: ${ teacherOne }`
+        //     });
+        //   }
+        // });
+            this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+                userid: this.username,
+                accesstoken: this.password,
+                classId: classId,
+                classState: classState,
 
+            })).then(res => {
+                if (res.data.updateClassFlag === "success") {
+                    this.dialogVisible = false;
+                    this.onSubmit()
+                }
+
+            })
         },
         changeClass() {
             // if (this.formInline.ClassStatus === "") {
@@ -267,24 +296,24 @@ export default {
             // if (this.formInline.courseName === "" && this.formInline.courseStatus === "" && this.formInline.courseContent === "") {
             //     this.dialogVisible = false;
             // } else {
-                this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
-                    userid: this.username,
-                    accesstoken: this.password,
-                    classId: this.classId,
-                    teacherOne: this.teacherCode,
-                    teacherTwo: this.pmCode,
-                    classState: this.classStatus[this.modify.status],
-                    className: this.modify.name,
-                    courseIdListStr: JSON.stringify(this.checkedCourse)
+            this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+                userid: this.username,
+                accesstoken: this.password,
+                classId: this.classId,
+                teacherOne: this.teacherCode,
+                teacherTwo: this.pmCode,
+                classState: this.classStatus[this.modify.status],
+                className: this.modify.name,
+                courseIdListStr: JSON.stringify(this.checkedCourse)
 
-                })).then(res => {
-                    
-                    if (res.data.updateClassFlag === "success") {
-                        this.dialogVisible = false;
-                        this.onSubmit()
-                    }
+            })).then(res => {
 
-                })
+                if (res.data.updateClassFlag === "success") {
+                    this.dialogVisible = false;
+                    this.onSubmit()
+                }
+
+            })
             // }
         },
         handleCheckAllChange(event) {
@@ -338,6 +367,7 @@ export default {
         margin-top: 20px;
     }
 }
+
 .baseNews {
     font-family: '微软雅黑';
     font-weight: 400;

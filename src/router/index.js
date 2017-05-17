@@ -49,7 +49,7 @@ export default new Router({
         {path:'classs',component:Classs},
         {path:'newclass',name:'newClass',component:NewClass},
         {path:'xueji',component:XueJi},
-        {path:'newXueJi',name:'newXuJi',component:NewXueJi}
+        {path:'newXueJi/:stuId',name:'newXuJi',component:NewXueJi}
       ]
     },
     {path:'/cultivate',component:Cultivate,

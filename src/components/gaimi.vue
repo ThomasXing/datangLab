@@ -71,7 +71,6 @@ export default {
     methods: {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
-                console.log(valid)
                 if (valid) {
                     this.$http.post("/api/yzh/research/inter/updateStuPassword", qs.stringify({
                         userid: sessionStorage.getItem("keyId"),
