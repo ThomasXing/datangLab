@@ -3,7 +3,7 @@
         <div class='base-news'>
             <table class='baseNews'>
                 <thead class="base-head">基本信息</thead>
-                <el-form :model="stuManagementQB" class="demo-form-inline">
+                <el-form :model="stuManagementQB" :rules="rules1" class="demo-form-inline">
                     <tr>
                         <td class='tr'>
                             所属学校：
@@ -42,7 +42,7 @@
                     <tr>
                         <td class='tr'>身份证：</td>
                         <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuIdCard"></el-input>
+                            <el-input placeholder="" v-model="stuManagementQB.stuIdCard"  auto-complete="off"></el-input>
                         </td>
                     </tr>
                     <tr>
@@ -196,7 +196,7 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                                                                </el-date-picker>-->
+                                                                                            </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
@@ -302,13 +302,12 @@
             <el-button class="btn-q" type="primary" size="large" @click='updateXueJi' v-show="isXiugai">确定</el-button>
             <el-button class='btn-w' type="primary" size="large" @click="back">取消</el-button>
         </div>
-        <div>{{stuManagementQB}}</div>
     </div>
 </template>
 <script>
 import qs from "qs"
-import { normalTime, managementState, courseStatus,sex } from "../filters"
-import { mapGetters,mapState } from "vuex"
+import { normalTime, managementState, courseStatus, sex } from "../filters"
+import { mapGetters } from "vuex"
 const get_stuQualification = {
     A: '硕士及以上',
     B: '本科',
@@ -317,22 +316,38 @@ const get_stuQualification = {
 
 export default {
     data() {
+        let validateIdCard = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('身份证号码不能为空'));
+            } else {
+                if (/^d{15}|d{}18$/.test(this.stuManagementQB.stuIdCard)) {
+                    this.$refs.stuManagementQB.validateField('stuIdCard');
+                    console.log(1)
+                }
+                callback();
+            }
+        }
         return {
-            
-            // stuManagementQB: {
-            //     school: '',
-            //     professional: '',
-            //     stuName: '',
-            //     stuIDCard: '',
-            //     stuSex: '',
-            //     stuQualification: '',
-            //     stuSelfSchoolName: '',
-            //     stuPhone: '',
-            //     product: '',
-            //     className: '',
-            //     stuEventName: ''
 
-            // },
+            stuManagementQB: {
+                schoolName: '',
+                professionName: '',
+                stuTrueName: '',
+                stuIdCard: '',
+                stuSex: '',
+                stuQualification: '',
+                stuSelfSchoolName: '',
+                stuPhone: '',
+                product: '',
+                className: '',
+                stuEventName: ''
+
+            },
+            rules1: {
+                stuIdCard: [
+                    { validator: validateIdCard, trigger: 'blur' }
+                ],
+            },
             stuEvent: {
                 ruxue: false,
                 jilv: false,
@@ -364,7 +379,7 @@ export default {
             classEvent: {
 
             },
-            classState: {
+            classthis: {
                 "等待开课": "W",
                 "开课": "S",
                 "结课": "E",
@@ -393,8 +408,8 @@ export default {
                 "毕业资格无效": 11
             },
             stuXueJiNews: [{
-                "graduationState": "Y",
-                "managementState": "A",
+                "graduationthis": "Y",
+                "managementthis": "A",
                 "score": 100
             }],
             stuEventIntro: {
@@ -458,7 +473,7 @@ export default {
             stuEventInfo: null,
             newStuEvent: []
         }
-        
+
     },
     created() {
         this.getSchoolList()
@@ -468,14 +483,17 @@ export default {
         this.getpmList()
         this.getAllCourse()
         this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
-        this.$store.dispatch("Modify_XuJi", this.$route.params.stuId)
+        // this.$store.dispatch("Modify_XuJi", this.$route.params.stuId)
+        if (this.$route.params.stuId === "new") {
+            this.$store.dispatch("addXuJi")
+        } else {
+            this.$store.dispatch("xiugaiXuJi")
+            this.get_newXueJI()
 
-    },
-    mounted() {
-        this.get_newXueJI()
+        }
     },
     computed: {
-        ...mapGetters(['stuManagementQB', 'isXiugai'])
+        ...mapGetters(['isXiugai'])
     },
     filters: {
         normalTime,
@@ -619,47 +637,84 @@ export default {
 
         },
         get_newXueJI() {
-           for(let list of  this.$store.state.stuManagementQB.classRefList){
-               console.log(list)
-                  this.$set(this.classEvent,this.$store.state.stuManagementQB.classRefList.classId,this.$store.state.stuManagementQB.classRefList)
-           }
-         
-            console.log("this.stuManagementQB", this.$store.state.stuManagementQB.classRefList)
-            console.log('this.$store.state.isXiugai',this.$store.state.isXiugai);
-
-            if (this.$store.state.isXiugai === true) {
-                // this.stuManagementQB.school = this.stuManagementQB.schoolName;
-                // this.stuManagementQB.professional = this.stuManagementQB.professionName;
-                // // this.stuManagementQB.stuName = this.stuManagementQB.stuTrueName;
-                // this.stuManagementQB.stuIDCard = this.stuManagementQB.stuIdCard;
-                this.stuManagementQB.stuSex === "F" ? this.stuManagementQB.stuSex = "女" : this.stuManagementQB.stuSex = "男";
-                // this.stuManagementQB.stuSex = this.stuManagementQB.stuSex;
-                // this.stuManagementQB.stuQualification = get_stuQualification[this.stuManagementQB.stuQualification];
-                // this.stuManagementQB.stuSelfSchoolName = this.stuManagementQB.stuSelfSchoolName;
-                // this.stuManagementQB.stuSelfProfessionName = this.stuManagementQB.stuSelfProfessionName;
-                // this.stuManagementQB.stuPhone = this.stuManagementQB.stuPhone;
-                // this.stuManagementQB.stuMail = this.stuManagementQB.stuMail;
-                // this.stuXueJiNews = this.stuManagementQB.classRefList;
-                this.classList = this.stuManagementQB.classRefList;
-
-                for (let item of this.classList) {
-                    item.stuEventList.forEach(function (ele) {
-                        for (let list of Object.keys(ele))
-                            if (!ele[list]) {
-                                delete ele[list]
+            this.$http.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + this.$route.params.stuId).then(res => {
+                let data = res.data.stuManagementQB
+                data.stuSex === "F" ? data.stuSex = "女" : data.stuSex = "男";
+                let stuQualification = data.stuQualification;
+                data.stuQualification = get_stuQualification[stuQualification]
+                this.stuManagementQB = data;
+                console.log(data)
+                for (let list of this.stuManagementQB.classRefList) {
+                    this.$set(this.classEvent, list.classId, list)
+                    for (let item of list.stuEventList) {
+                        for (let key of Object.keys(item)) {
+                            if (!item[key]) {
+                                delete item[key]
                             }
-                        let time = ele.eventDate;
-                        let newStuEvent={};
-                        this.$set(newStuEvent, time, ele)
-                        // delete newStuEvent[time].eventDate;
-                        newStuEvent[time].eventName=
+                        }
+                        let newStuEvent = {};
+                        let time = item.eventDate
+                        this.$set(newStuEvent, time, item)
+                        if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
+                            this.newStuEvent = [];
+                        }
                         this.newStuEvent.push(newStuEvent)
-                        this.classId=item.classId;
-                        this.$set(this.classEvent, this.classId, this.newStuEvent)
-                        console.log("this.classEvent",this.classEvent,item.classId,newStuEvent)
-                    }, this)
+                        this.stuManagementQB.className = list.className;
+                        console.log(this.stuManagementQB.className)
+                        this.$set(this.classEvent, list.classId, this.newStuEvent)
+                    }
                 }
-            }
+                for (let key of Object.keys(this.classEvent)) {
+                    this.classId = key
+                }
+                for (let list of this.stuManagementQB.classRefList) {
+                    this.$set(this.myClassList, list.classCreDate, list.className)
+                    this.classId = list.classId;
+                    this.stuXueJiNews = this.stuManagementQB.classRefList;
+                }
+
+            }, err => console.log(err))
+            //    for(let list of  this.$store.this.stuManagementQB.classRefList){
+            //        console.log(list)
+            //           this.$set(this.classEvent,this.$store.this.stuManagementQB.classRefList.classId,this.$store.this.stuManagementQB.classRefList)
+            //    }
+
+            //     console.log("this.stuManagementQB", this.$store.this.stuManagementQB.classRefList)
+            //     console.log('this.$store.this.isXiugai',this.$store.this.isXiugai);
+
+            // if (this.$store.this.isXiugai === true) {
+            // this.stuManagementQB.school = this.stuManagementQB.schoolName;
+            // this.stuManagementQB.professional = this.stuManagementQB.professionName;
+            // // this.stuManagementQB.stuName = this.stuManagementQB.stuTrueName;
+            // this.stuManagementQB.stuIDCard = this.stuManagementQB.stuIdCard;
+            // this.stuManagementQB.stuSex === "F" ? this.stuManagementQB.stuSex = "女" : this.stuManagementQB.stuSex = "男";
+            // this.stuManagementQB.stuSex = this.stuManagementQB.stuSex;
+            // this.stuManagementQB.stuQualification = get_stuQualification[this.stuManagementQB.stuQualification];
+            // this.stuManagementQB.stuSelfSchoolName = this.stuManagementQB.stuSelfSchoolName;
+            // this.stuManagementQB.stuSelfProfessionName = this.stuManagementQB.stuSelfProfessionName;
+            // this.stuManagementQB.stuPhone = this.stuManagementQB.stuPhone;
+            // this.stuManagementQB.stuMail = this.stuManagementQB.stuMail;
+            // this.stuXueJiNews = this.stuManagementQB.classRefList;
+            // this.classList = this.stuManagementQB.classRefList;
+
+            // for (let item of this.classList) {
+            //     item.stuEventList.forEach(function (ele) {
+            //         for (let list of Object.keys(ele))
+            //             if (!ele[list]) {
+            //                 delete ele[list]
+            //             }
+            //         let time = ele.eventDate;
+            //         let newStuEvent = {};
+            //         this.$set(newStuEvent, time, ele)
+            //         // delete newStuEvent[time].eventDate;
+            //         newStuEvent[time].eventName =
+            //             this.newStuEvent.push(newStuEvent)
+            //         this.classId = item.classId;
+            //         this.$set(this.classEvent, this.classId, this.newStuEvent)
+            //         console.log("this.classEvent", this.classEvent, item.classId, newStuEvent)
+            //     }, this)
+            // }
+            // }
         },
         get_schoolCode(a) {
             this.schoolCode = a;
@@ -690,7 +745,7 @@ export default {
                     break
                 case 2:
                     this.stuEventIntro.stuEvent2.stuEvent2Intro = this.stuEventList.instructions;
-                    this.stuEventIntro.stuEvent2.stuEvent2Score = this.stuEventList.jilv;
+                    this.stuEventIntro.stuEvent2.stuEvent2Score = parseInt(this.stuEventList.jilv);
                     this.stuEventInfo = this.stuEventIntro.stuEvent2;
                     break
                 case 3:
@@ -776,8 +831,8 @@ export default {
             let params = {
                 userid: sessionStorage.getItem("keyId"),
                 accesstoken: sessionStorage.getItem("keyToken"),
-                stuName: this.stuManagementQB.stuName,
-                stuIDCard: this.stuManagementQB.stuIDCard,
+                stuName: this.stuManagementQB.stuTrueName,
+                stuIDCard: this.stuManagementQB.stuIdCard,
                 stuSex: this.stuSex[this.stuManagementQB.stuSex],
                 stuQualification: this.stuQualification[this.stuManagementQB.stuQualification],
                 stuSelfSchoolName: this.stuManagementQB.stuSelfSchoolName,
@@ -786,7 +841,7 @@ export default {
                 stuMail: this.stuManagementQB.stuMail,
                 eventListStr: JSON.stringify(this.eventListStr),
                 schoolCode: this.schoolCode,
-                professionCode: this.professionCode,
+                professionCode: this.professionCode
             }
             this.$http.post("/api/yzh/research/inter/addStuManagement", qs.stringify(params)).then(res => {
                 if (res.data.addStuManagementFlag === "success") {
@@ -811,8 +866,8 @@ export default {
             let params = {
                 userid: sessionStorage.getItem("keyId"),
                 accesstoken: sessionStorage.getItem("keyToken"),
-                stuName: this.stuManagementQB.stuName,
-                stuIDCard: this.stuManagementQB.stuIDCard,
+                stuName: this.stuManagementQB.stuTrueName,
+                stuIDCard: this.stuManagementQB.stuIdCard,
                 stuSex: this.stuSex[this.stuManagementQB.stuSex],
                 stuQualification: this.stuQualification[this.stuManagementQB.stuQualification],
                 stuSelfSchoolName: this.stuManagementQB.stuSelfSchoolName,
@@ -822,11 +877,12 @@ export default {
                 eventListStr: JSON.stringify(this.eventListStr),
                 schoolCode: this.schoolCode,
                 professionCode: this.professionCode,
-                classId: ""
+                classId: this.classId,
+                stuId: this.$route.params.stuId
             }
             this.$http.post("/api/yzh/research/inter/updateStuManagement", qs.stringify(params)).then(res => {
-                if (res.data.addStuManagementFlag === "success") {
-                    this.$alert('学籍添加成功', '提示信息', {
+                if (res.data.updateStuManagementFlag === "success") {
+                    this.$alert('学籍修改成功', '提示信息', {
                         confirmButtonText: '确定',
                     });
                 }

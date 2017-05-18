@@ -216,8 +216,7 @@ export default {
             }, err => console.log(err))
         },
         addXuJi() {
-            this.$store.dispatch("addXuJi")
-            this.$router.push({ path: 'newXueJi' })
+            this.$router.push({ path: 'newXueJi/new' })
         },
         modiXuJi(stuId) {
             this.$router.push({ path: 'newXueJi/'+stuId,params:{stuId:stuId} })

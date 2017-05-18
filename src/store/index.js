@@ -10,8 +10,9 @@ const state = {
     xuejiActive: null,
     courseActive: null,
     classActive: null,
-    xueji:null,
-    isXiugai:false
+    xueji: null,
+    isXiugai: null,
+    wh: ""
 }
 
 const actions = {
@@ -24,30 +25,19 @@ const actions = {
     // showLoading:({commit})=>{
     // 	commit(types.SHOW_LOADING)
     // },
-    Modify_XuJi(context,stuId) {
-          axios.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + stuId).then(res => {
-                context.commit("modify_xuJi",res.data.stuManagementQB)
-        }, err => console.log(err))
-    },
-    addXuJi:({commit}) => commit("add_xueji"),
+
+    addXuJi: ({ commit }) => commit("add_xueji"),
+    WH: ({ commit }) => commit("wh"),
+    xiugaiXuJi: ({ commit }) => commit("xiugaixueji"),
     SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val)
 }
-const get_stuQualification = {
-	A:'硕士及以上',
-	B:'本科',
-	C:'专科'
-}
+
 const mutations = {
     set_title(state, val) {
         state.title = val
     },
-    modify_xuJi(state, data) {
-            data.stuSex==="F"? data.stuSex="女" : data.stuSex="男";
-            let stuQualification =  data.stuQualification;
-            data.stuQualification=get_stuQualification[stuQualification] 
-            state.stuManagementQB = data;
-            console.log("state.stuManagementQB",state.stuManagementQB)
-            state.isXiugai=true;
+    xiugaixueji(state) {
+        state.isXiugai = true;
     },
     show_activeClass: (state, val) => {
         state.xuejiActive = false;
@@ -65,8 +55,17 @@ const mutations = {
                 break;
         }
     },
-    add_xueji:(state)=>{
-        state.isXiugai=false;
+    add_xueji: (state) => {
+        state.isXiugai = false;
+    },
+    wh: (state) => {
+       
+            let wh = document.body.scrollHeight
+            state.wh = wh;
+            let labMenu = document.getElementById("lab-menu");
+            labMenu.style.height = wh;
+            console.log(state.wh)
+
     }
 }
 const getters = {
@@ -76,7 +75,8 @@ const getters = {
     xuejiActive: state => state.xuejiActive,
     courseActive: state => state.courseActive,
     classActive: state => state.classActive,
-    isXiugai:state => state.isXiugai
+    isXiugai: state => state.isXiugai,
+    wh: state => state.wh
 }
 export default new Vuex.Store({
     state,

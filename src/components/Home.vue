@@ -118,6 +118,7 @@ export default {
         width: 100%;
         height: 640px;
         background: url(../assets/images/homebg.png) no-repeat 100%;
+        background-size: cover;
         &-con {
             width: 380px;
             float: right;

@@ -54,8 +54,8 @@ export const classFilter = function(type){
 	return classState1[type]
 }
 export const normalTime=(time)=>{
-	if(time){
-		// console.log(parseInt(time))
+	if(time&&parseInt(time).toString().length>4){
+		
 		var oDate=new Date();
 		oDate.setTime(time);
 
@@ -68,5 +68,7 @@ export const normalTime=(time)=>{
 		var s=oDate.getSeconds();
 
 		return y+'-'+m+'-'+d+' '+h+':'+m+':'+s;
+	}else{
+		return time
 	}
 }
