@@ -37,12 +37,12 @@ export default {
 
         }
     },
-    mounted() {
-        this.$store.dispatch("WH")
-
-    },
+    
     created() {
         this.$store.dispatch('SET_TITLE', '实验室管理平台')
+    },
+    mounted(){
+          this.$store.dispatch("WH")
     },
     computed: {
         ...mapGetters(['xuejiActive', 'courseActive', 'classActive','wh'])
@@ -62,6 +62,7 @@ export default {
         font-family: "微软雅黑";
         padding-top: 36px;
         float: left;
+        min-height: 800px;
         &-item {
             display: block;
             height: 50px;

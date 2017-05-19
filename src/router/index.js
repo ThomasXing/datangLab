@@ -14,9 +14,7 @@ import Gaimi from '@/components/gaimi'
 import NewCourse from '@/components/newCourse'
 import NewClass from '@/components/newClass'
 import NewXueJi from '@/components/newXueJi'
-
 Vue.use(Router)
-
 export default new Router({
   routes: [
     {

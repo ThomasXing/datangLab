@@ -1,95 +1,64 @@
 <template>
     <div class="newCourse">
         <div class='base-news'>
-            <table class='baseNews'>
-                <thead class="base-head">基本信息</thead>
-                <el-form :model="stuManagementQB" :rules="rules1" class="demo-form-inline">
-                    <tr>
-                        <td class='tr'>
-                            所属学校：
-                        </td>
-                        <td>
-                            <el-select v-model="stuManagementQB.schoolName" placeholder="全部学校" v-for='item in schoolList' :key='item.schoolCode' @change="get_schoolCode(item.schoolCode)">
-                                <el-option :label="item.schoolName" value="青岛实训基地"></el-option>
+            <div class='baseNews'>
+                <h3 class="base-head">基本信息</h3>
+                <el-form :model="stuManagementQB" :rules="rules" ref="stuManagementQB" :label-position="labelPosition" label-width="175px" class="demo-form-inline">
+                    <el-form-item label="所属学校：">
+                        <el-select v-model="stuManagementQB.schoolName" placeholder="全部学校" v-for='item in schoolList' :key='item.schoolCode' @change="get_schoolCode(item.schoolCode)">
+                            <el-option :label="item.schoolName" value="青岛实训基地"></el-option>
     
-                            </el-select>
-                        </td>
+                        </el-select>
+                    </el-form-item>
     
-                    </tr>
-                    <tr>
-                        <td class='tr'>
-                            所属专业：
-                        </td>
-                        <td>
-                            <el-select v-model="stuManagementQB.professionName" placeholder="全部专业" v-for='profession in professionList' :key='profession.professionName' @change="get_professionCode(profession.professionCode)">
-                                <el-option :label="profession.professionName" value="移动互联产品研发"></el-option>
-                            </el-select>
+                    <el-form-item label="所属专业：">
+                        <el-select v-model="stuManagementQB.professionName" placeholder="全部专业" v-for='profession in professionList' :key='profession.professionName' @change="get_professionCode(profession.professionCode)">
+                            <el-option :label="profession.professionName" value="移动互联产品研发"></el-option>
+                        </el-select>
     
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>学员学号：</td>
-                        <td>
-                            <el-input :disabled="true" placeholder="系统生成学员学号，用户不可修改"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>姓名：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuTrueName"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>身份证：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuIdCard"  auto-complete="off"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>性别：</td>
-                        <td>
-                            <el-select v-model="stuManagementQB.stuSex" placeholder="请选择">
-                                <el-option :label="key" :value="key" v-for="(val,key) in stuSex" :key="val">
-                                </el-option>
+                    </el-form-item>
     
-                            </el-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>学历：</td>
-                        <td>
-                            <el-select v-model="stuManagementQB.stuQualification" placeholder="请选择">
-                                <el-option :label="key" :value="key" v-for="(val,key) in stuQualification" :key="val"></el-option>
+                    <el-form-item label="学员学号：">
+                        <el-input :disabled="true" placeholder="系统生成学员学号，用户不可修改"></el-input>
+                    </el-form-item>
     
-                            </el-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>毕业学校：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuSelfSchoolName"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>专业：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuSelfProfessionName"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>手机：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuPhone"></el-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class='tr'>邮箱：</td>
-                        <td>
-                            <el-input placeholder="" v-model="stuManagementQB.stuMail"></el-input>
-                        </td>
-                    </tr>
+                    <el-form-item label="姓名：" prop="stuTrueName">
+                        <el-input placeholder="" v-model="stuManagementQB.stuTrueName"></el-input>
+                    </el-form-item>
+    
+                    <el-form-item label="身份证：" prop="stuIdCard">
+                        <el-input placeholder="" v-model="stuManagementQB.stuIdCard" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="性别：">
+                        <el-select v-model="stuManagementQB.stuSex" placeholder="请选择">
+                            <el-option :label="key" :value="key" v-for="(val,key) in stuSex" :key="val">
+                            </el-option>
+    
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="学历：">
+                        <el-select v-model="stuManagementQB.stuQualification" placeholder="请选择">
+                            <el-option :label="key" :value="key" v-for="(val,key) in stuQualification" :key="val"></el-option>
+    
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="毕业学校：">
+                        <el-input placeholder="" v-model="stuManagementQB.stuSelfSchoolName"></el-input>
+                    </el-form-item>
+    
+                    <el-form-item label="专业：">
+                        <el-input placeholder="" v-model="stuManagementQB.stuSelfProfessionName"></el-input>
+                    </el-form-item>
+    
+                    <el-form-item label="手机：" prop="stuPhone">
+                        <el-input placeholder="" v-model="stuManagementQB.stuPhone"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱：" prop="stuMail">
+                        <el-input placeholder="" v-model="stuManagementQB.stuMail"></el-input>
+                    </el-form-item>
+    
                 </el-form>
-            </table>
+            </div>
         </div>
         <div class='base-news'>
             <table class='baseNews'>
@@ -127,14 +96,13 @@
                     <td v-for="(list,key,index) in myClassList" class="tr">
                         <el-button type="primary" @click="get_activeClass(list)">{{list}}</el-button>
                     </td>
-    
                 </tr>
             </table>
         </div>
         <div class='base-news'>
             <table class='baseNews'>
                 <thead class="base-head">学籍信息</thead>
-                <tr v-for="item in stuXueJiNews">
+                <tr v-for="item in this.stuXueJiNews[this.classId]">
                     <td class='tr'>学籍状态：</td>
                     <td>
                         {{item.graduationState | courseStatus}}
@@ -196,7 +164,7 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                                                                            </el-date-picker>-->
+                                                                                                                                            </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
@@ -298,8 +266,8 @@
             </table>
         </div>
         <div class="sub">
-            <el-button class="btn-q" type="primary" size="large" @click='addXueJi' v-show="!isXiugai">确定</el-button>
-            <el-button class="btn-q" type="primary" size="large" @click='updateXueJi' v-show="isXiugai">确定</el-button>
+            <el-button class="btn-q" type="primary" size="large" @click='addXueJi("stuManagementQB")' v-show="!isXiugai">确定</el-button>
+            <el-button class="btn-q" type="primary" size="large" @click='updateXueJi("stuManagementQB")' v-show="isXiugai">确定</el-button>
             <el-button class='btn-w' type="primary" size="large" @click="back">取消</el-button>
         </div>
     </div>
@@ -320,15 +288,34 @@ export default {
             if (value === '') {
                 callback(new Error('身份证号码不能为空'));
             } else {
-                if (/^d{15}|d{}18$/.test(this.stuManagementQB.stuIdCard)) {
-                    this.$refs.stuManagementQB.validateField('stuIdCard');
-                    console.log(1)
+                if (!/^([0-9]){7,18}(x|X)?$/.test(value)) {
+                    callback(new Error('身份证号码格式错误'));
+                }
+                callback();
+            }
+        };
+        let validatePhone = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('手机号码不能空'));
+            } else {
+                if (!/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|7[0135678]|18[0-9])\d{8}$/.test(value)) {
+                    callback(new Error('手机号码格式错误'));
+                }
+                callback();
+            }
+        };
+        let validateMail = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('邮箱不能为空'));
+            } else {
+                if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)) {
+                    callback(new Error('邮箱格式格式错误'));
                 }
                 callback();
             }
         }
         return {
-
+            labelPosition: "right",
             stuManagementQB: {
                 schoolName: '',
                 professionName: '',
@@ -340,13 +327,24 @@ export default {
                 stuPhone: '',
                 product: '',
                 className: '',
-                stuEventName: ''
+                stuEventName: '',
+                stuMail: ''
 
             },
-            rules1: {
+            rules: {
                 stuIdCard: [
                     { validator: validateIdCard, trigger: 'blur' }
                 ],
+                stuTrueName: [
+                    { min: 2, max: 16, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+                ],
+                stuPhone: [
+                    { validator: validatePhone, trigger: 'blur' }
+
+                ],
+                stuMail: [
+                    { validator: validateMail, trigger: 'blur' }
+                ]
             },
             stuEvent: {
                 ruxue: false,
@@ -407,11 +405,13 @@ export default {
                 "退学": 10,
                 "毕业资格无效": 11
             },
-            stuXueJiNews: [{
-                "graduationthis": "Y",
-                "managementthis": "A",
-                "score": 100
-            }],
+            stuXueJiNews: {
+                // classId: {
+                //     "graduationthis": "Y",
+                //     "managementthis": "A",
+                //     "score": 100
+                // }
+            },
             stuEventIntro: {
                 stuEvent1: {
                     stuEvent1Intro: "",
@@ -471,7 +471,8 @@ export default {
             classId: "",
             eventListStr: [],
             stuEventInfo: null,
-            newStuEvent: []
+            newStuEvent: [],
+            XueJiNews: []
         }
 
     },
@@ -479,13 +480,16 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getTeacherList()
-        this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
         this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
-        // this.$store.dispatch("Modify_XuJi", this.$route.params.stuId)
         if (this.$route.params.stuId === "new") {
             this.$store.dispatch("addXuJi")
+            this.stuXueJiNews[this.classId] = [{
+                "graduationthis": "Y",
+                "managementthis": "A",
+                "score": 100
+            }]
         } else {
             this.$store.dispatch("xiugaiXuJi")
             this.get_newXueJI()
@@ -526,14 +530,6 @@ export default {
                 this.pmList = res.data.teacherList;
             })
         },
-        getAllProduct() {
-            this.$http.get("/api/yzh/research/inter/getAllProduct?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.productList = res.data.productList;
-                this.productCode = res.data.productList[0].productCode
-            }).catch(err => console.log(err))
-
-        },
-        //获取所有班级
         getAllClass() {
             this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.classList = res.data.classList;
@@ -573,11 +569,11 @@ export default {
         get_classId(list) {
             this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + encodeURIComponent(encodeURIComponent(list))).then(res => {
                 this.classId = res.data.classList[0].classId;
-                console.log(this.classId)
             })
         },
         get_activeClass(list) {
-            this.get_classId(list)
+            this.get_classId(list);
+
         },
         get_stuEvent() {
             let stuEv = this.stuEventName[this.stuEventList.stuEventName];
@@ -643,7 +639,6 @@ export default {
                 let stuQualification = data.stuQualification;
                 data.stuQualification = get_stuQualification[stuQualification]
                 this.stuManagementQB = data;
-                console.log(data)
                 for (let list of this.stuManagementQB.classRefList) {
                     this.$set(this.classEvent, list.classId, list)
                     for (let item of list.stuEventList) {
@@ -652,69 +647,34 @@ export default {
                                 delete item[key]
                             }
                         }
+                       
                         let newStuEvent = {};
                         let time = item.eventDate
                         this.$set(newStuEvent, time, item)
                         if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
                             this.newStuEvent = [];
                         }
+                        // console.log(newStuEvent)
                         this.newStuEvent.push(newStuEvent)
                         this.stuManagementQB.className = list.className;
-                        console.log(this.stuManagementQB.className)
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
                     }
+                    
                 }
-                for (let key of Object.keys(this.classEvent)) {
-                    this.classId = key
-                }
-                for (let list of this.stuManagementQB.classRefList) {
+                //  console.log( this.stuManagementQB.classRefList[0].stuEventList)
+                console.log(data,this.classEvent)
+                this.stuManagementQB.classRefList.forEach(function (list, key) {
+
                     this.$set(this.myClassList, list.classCreDate, list.className)
-                    this.classId = list.classId;
-                    this.stuXueJiNews = this.stuManagementQB.classRefList;
-                }
-
+                    let obj = {};
+                    let XueJiNews = [];
+                    obj['graduationState'] = this.stuManagementQB.classRefList[key]['graduationState']
+                    obj['managementState'] = this.stuManagementQB.classRefList[key]['managementState']
+                    obj['score'] = this.stuManagementQB.classRefList[key]['score']
+                    XueJiNews.push(obj)
+                    this.$set(this.stuXueJiNews, list.classId, XueJiNews)
+                }, this)
             }, err => console.log(err))
-            //    for(let list of  this.$store.this.stuManagementQB.classRefList){
-            //        console.log(list)
-            //           this.$set(this.classEvent,this.$store.this.stuManagementQB.classRefList.classId,this.$store.this.stuManagementQB.classRefList)
-            //    }
-
-            //     console.log("this.stuManagementQB", this.$store.this.stuManagementQB.classRefList)
-            //     console.log('this.$store.this.isXiugai',this.$store.this.isXiugai);
-
-            // if (this.$store.this.isXiugai === true) {
-            // this.stuManagementQB.school = this.stuManagementQB.schoolName;
-            // this.stuManagementQB.professional = this.stuManagementQB.professionName;
-            // // this.stuManagementQB.stuName = this.stuManagementQB.stuTrueName;
-            // this.stuManagementQB.stuIDCard = this.stuManagementQB.stuIdCard;
-            // this.stuManagementQB.stuSex === "F" ? this.stuManagementQB.stuSex = "女" : this.stuManagementQB.stuSex = "男";
-            // this.stuManagementQB.stuSex = this.stuManagementQB.stuSex;
-            // this.stuManagementQB.stuQualification = get_stuQualification[this.stuManagementQB.stuQualification];
-            // this.stuManagementQB.stuSelfSchoolName = this.stuManagementQB.stuSelfSchoolName;
-            // this.stuManagementQB.stuSelfProfessionName = this.stuManagementQB.stuSelfProfessionName;
-            // this.stuManagementQB.stuPhone = this.stuManagementQB.stuPhone;
-            // this.stuManagementQB.stuMail = this.stuManagementQB.stuMail;
-            // this.stuXueJiNews = this.stuManagementQB.classRefList;
-            // this.classList = this.stuManagementQB.classRefList;
-
-            // for (let item of this.classList) {
-            //     item.stuEventList.forEach(function (ele) {
-            //         for (let list of Object.keys(ele))
-            //             if (!ele[list]) {
-            //                 delete ele[list]
-            //             }
-            //         let time = ele.eventDate;
-            //         let newStuEvent = {};
-            //         this.$set(newStuEvent, time, ele)
-            //         // delete newStuEvent[time].eventDate;
-            //         newStuEvent[time].eventName =
-            //             this.newStuEvent.push(newStuEvent)
-            //         this.classId = item.classId;
-            //         this.$set(this.classEvent, this.classId, this.newStuEvent)
-            //         console.log("this.classEvent", this.classEvent, item.classId, newStuEvent)
-            //     }, this)
-            // }
-            // }
         },
         get_schoolCode(a) {
             this.schoolCode = a;
@@ -745,7 +705,8 @@ export default {
                     break
                 case 2:
                     this.stuEventIntro.stuEvent2.stuEvent2Intro = this.stuEventList.instructions;
-                    this.stuEventIntro.stuEvent2.stuEvent2Score = parseInt(this.stuEventList.jilv);
+                    this.stuEventIntro.stuEvent2.stuEvent2Score = Math.abs(this.stuEventList.jilv);
+                    console.log(this.stuEventIntro.stuEvent2.stuEvent2Score)
                     this.stuEventInfo = this.stuEventIntro.stuEvent2;
                     break
                 case 3:
@@ -762,7 +723,7 @@ export default {
 
                     this.stuEventIntro.stuEvent5.stuEvent5Intro = this.stuEventList.instructions;
                     this.stuEventIntro.stuEvent5.stuEvent5Date = this.stuEventList.fuxueTime;
-                    this.stuEventIntro.stuEvent5.stuEvent5ClassId = this.stuEventList.fuxueClass;
+                    this.stuEventIntro.stuEvent5.stuEvent5ClassId = this.classId;
                     this.stuEventInfo = this.stuEventIntro.stuEvent5;
                     break
                 case 6:
@@ -822,36 +783,41 @@ export default {
             }
             this.$set(newStuEvent, time, stuEventList)
             this.newStuEvent.push(newStuEvent)
-
             this.$set(this.classEvent, this.classId, this.newStuEvent)
             this.visible3 = false;
-            console.log(this.classEvent)
         },
-        addXueJi() {
-            let params = {
-                userid: sessionStorage.getItem("keyId"),
-                accesstoken: sessionStorage.getItem("keyToken"),
-                stuName: this.stuManagementQB.stuTrueName,
-                stuIDCard: this.stuManagementQB.stuIdCard,
-                stuSex: this.stuSex[this.stuManagementQB.stuSex],
-                stuQualification: this.stuQualification[this.stuManagementQB.stuQualification],
-                stuSelfSchoolName: this.stuManagementQB.stuSelfSchoolName,
-                stuSelfProfessionName: this.stuManagementQB.stuSelfProfessionName,
-                stuPhone: this.stuManagementQB.stuPhone,
-                stuMail: this.stuManagementQB.stuMail,
-                eventListStr: JSON.stringify(this.eventListStr),
-                schoolCode: this.schoolCode,
-                professionCode: this.professionCode
-            }
-            this.$http.post("/api/yzh/research/inter/addStuManagement", qs.stringify(params)).then(res => {
-                if (res.data.addStuManagementFlag === "success") {
-                    this.$alert('学籍添加成功', '提示信息', {
-                        confirmButtonText: '确定',
-                    });
+        addXueJi(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    let params = {
+                        userid: sessionStorage.getItem("keyId"),
+                        accesstoken: sessionStorage.getItem("keyToken"),
+                        stuName: this.stuManagementQB.stuTrueName,
+                        stuIDCard: this.stuManagementQB.stuIdCard,
+                        stuSex: this.stuSex[this.stuManagementQB.stuSex],
+                        stuQualification: this.stuQualification[this.stuManagementQB.stuQualification],
+                        stuSelfSchoolName: this.stuManagementQB.stuSelfSchoolName,
+                        stuSelfProfessionName: this.stuManagementQB.stuSelfProfessionName,
+                        stuPhone: this.stuManagementQB.stuPhone,
+                        stuMail: this.stuManagementQB.stuMail,
+                        eventListStr: JSON.stringify(this.eventListStr),
+                        schoolCode: this.schoolCode,
+                        professionCode: this.professionCode
+                    }
+                    this.$http.post("/api/yzh/research/inter/addStuManagement", qs.stringify(params)).then(res => {
+                        if (res.data.addStuManagementFlag === "success") {
+                            this.$alert('学籍添加成功', '提示信息', {
+                                confirmButtonText: '确定',
+                            });
+                        }
+                    })
+                } else {
+                    return false;
                 }
-            })
+            });
+
         },
-        updateXueJi() {
+        updateXueJi(formName) {
             for (let key of this.schoolList) {
                 console.log(key.schoolName, this.stuManagementQB)
                 if (key.schoolName === this.stuManagementQB.school) {
@@ -877,16 +843,23 @@ export default {
                 eventListStr: JSON.stringify(this.eventListStr),
                 schoolCode: this.schoolCode,
                 professionCode: this.professionCode,
-                classId: this.classId,
                 stuId: this.$route.params.stuId
             }
-            this.$http.post("/api/yzh/research/inter/updateStuManagement", qs.stringify(params)).then(res => {
-                if (res.data.updateStuManagementFlag === "success") {
-                    this.$alert('学籍修改成功', '提示信息', {
-                        confirmButtonText: '确定',
-                    });
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.$http.post("/api/yzh/research/inter/updateStuManagement", qs.stringify(params)).then(res => {
+                        if (res.data.updateStuManagementFlag === "success") {
+                            this.$alert('学籍修改成功', '提示信息', {
+                                confirmButtonText: '确定',
+                            });
+                        }
+                    })
+                } else {
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
         },
         back() {
             this.$router.go(-1)
@@ -907,8 +880,8 @@ export default {
     .base-head {
         font-size: 18px;
         color: #44aee0;
+        font-weight: normal;
     }
-
     tr {
         height: 61px;
         td {
@@ -923,7 +896,14 @@ export default {
             height: 32px;
         }
     }
-
+    .el-select {
+        width: 247px;
+        height: 32px;
+    }
+    .el-input {
+        width: 247px;
+        height: 32px;
+    }
     .tr {
         text-align: right;
         width: 160px;

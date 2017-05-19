@@ -34,7 +34,7 @@
         <div class="course-list">
             <el-button class="btn" type="primary" @click="newCourse">新建课程</el-button>
             <el-table :data="courseList" border style="width: 100%" class='course-list' v-show='courseList.length!==0' row-key='courseList.courseId' current-row-key>
-                <el-table-column fixed prop="index" label="序号" width="52"c class="course-index">
+                <el-table-column fixed prop="index" label="序号" width="52" c class="course-index">
                 </el-table-column>
                 <el-table-column prop="courseCode" label="课程编码" width="218">
                 </el-table-column>
@@ -88,16 +88,15 @@
     
             </table>
             <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="changeCoourse">确 定</el-button>
-            </span>
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="changeCoourse">确 定</el-button>
+                </span>
         </el-dialog>
     </div>
 </template>
 <script>
 import qs from 'qs'
-import { mapActions } from 'vuex'
-import { courseStatus,courseFilter } from "../filters"
+import { courseStatus, courseFilter } from "../filters"
 export default {
     name: 'course',
     data() {
@@ -133,7 +132,12 @@ export default {
         this.getSchoolList()
         this.getAllProfession()
         this.getAllCourse()
-         this.$store.dispatch('SHOW_ACTIVECLASS',"courseActive") 
+        this.$store.dispatch('SHOW_ACTIVECLASS', "courseActive")
+    },
+    mounted() {
+        let wh = document.body.scrollHeight;
+        console.log(wh)
+        this.$store.dispatch("WH", wh)
     },
     filters: {
         courseStatus,
@@ -151,11 +155,11 @@ export default {
                 this.courseList = res.data.courseList
             })
         },
-        handleClick(courseId,courseState) {
-            if(courseState==="N"){
-                courseState="Y"
-            }else{
-                courseState="N"
+        handleClick(courseId, courseState) {
+            if (courseState === "N") {
+                courseState = "Y"
+            } else {
+                courseState = "N"
             }
             this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
                 userid: this.username,
@@ -166,7 +170,7 @@ export default {
             })).then(res => {
                 if (res.data.updateCourseFlag === "success") {
                     this.dialogVisible = false;
-                    this. onSubmit()
+                    this.onSubmit()
                 }
 
             })
@@ -181,25 +185,25 @@ export default {
             if (this.formInline.courseStatus === "") {
                 this.courseState[this.formInline.courseStatus] = "";
             }
-           if(this.formInline.courseName===""&&this.formInline.courseStatus===""&&this.formInline.courseContent===""){
-               this.dialogVisible = false;
-           }else{
-                 this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
-                userid: this.username,
-                accesstoken: this.password,
-                courseId: this.courseId,
-                courseName: this.formInline.courseName,
-                courseState: this.courseState[this.formInline.courseStatus],
-                courseContent: this.formInline.courseContent
+            if (this.formInline.courseName === "" && this.formInline.courseStatus === "" && this.formInline.courseContent === "") {
+                this.dialogVisible = false;
+            } else {
+                this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
+                    userid: this.username,
+                    accesstoken: this.password,
+                    courseId: this.courseId,
+                    courseName: this.formInline.courseName,
+                    courseState: this.courseState[this.formInline.courseStatus],
+                    courseContent: this.formInline.courseContent
 
-            })).then(res => {
-                if (res.data.updateCourseFlag === "success") {
-                    this.dialogVisible = false;
-                    this.getAllCourse()
-                }
+                })).then(res => {
+                    if (res.data.updateCourseFlag === "success") {
+                        this.dialogVisible = false;
+                        this.getAllCourse()
+                    }
 
-            })
-           }
+                })
+            }
 
 
         },
@@ -230,9 +234,9 @@ export default {
         newCourse() {
             this.$router.push({ path: 'newCourse' })
         }
-    
 
-}
+
+    }
 }
 </script>
 <style lang="less" scoped>
@@ -257,12 +261,12 @@ export default {
     }
     .course-list {
         margin-top: 20px;
-      
     }
-    .el-table th>div{
-            padding: 0;
-        }
+    .el-table th>div {
+        padding: 0;
+    }
 }
+
 .baseNews {
     font-family: '微软雅黑';
     font-weight: 400;

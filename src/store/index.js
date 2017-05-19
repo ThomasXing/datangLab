@@ -20,14 +20,14 @@ const actions = {
     // SET_USERID:({commit},val)=>commit("set_userid",val),
     /*loading*/
     // hideLoading:({commit})=>{
-    // 	commit(types.HIDE_LOADING)
+    // 	commit(HIDE_LOADING)
     // },
     // showLoading:({commit})=>{
-    // 	commit(types.SHOW_LOADING)
+    // 	commit(SHOW_LOADING)
     // },
 
     addXuJi: ({ commit }) => commit("add_xueji"),
-    WH: ({ commit }) => commit("wh"),
+    WH: ({ commit }) => commit('wh'),
     xiugaiXuJi: ({ commit }) => commit("xiugaixueji"),
     SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val)
 }
@@ -59,12 +59,13 @@ const mutations = {
         state.isXiugai = false;
     },
     wh: (state) => {
-       
-            let wh = document.body.scrollHeight
-            state.wh = wh;
-            let labMenu = document.getElementById("lab-menu");
-            labMenu.style.height = wh;
-            console.log(state.wh)
+        let labMenu = document.getElementById("lab-menu");
+        // setInterval(() => {
+        //     let wh = document.body.scrollHeight;
+        //     state.wh = wh;
+        //     labMenu.style.height = state.wh;
+        // }, 1000)
+        // console.log(state.wh)
 
     }
 }
