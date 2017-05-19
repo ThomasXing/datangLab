@@ -538,6 +538,11 @@ export default {
         addClassList() {
             if (this.stuManagementQB.className) {
                 this.$set(this.myClassList, new Date().getTime(), this.stuManagementQB.className)
+                 this.stuXueJiNews[this.classId] = [{
+                "graduationthis": "Y",
+                "managementthis": "A",
+                "score": 100
+            }]
                 this.visible2 = false;
             }
         },
@@ -639,32 +644,26 @@ export default {
                 let stuQualification = data.stuQualification;
                 data.stuQualification = get_stuQualification[stuQualification]
                 this.stuManagementQB = data;
-                for (let list of this.stuManagementQB.classRefList) {
-                    this.$set(this.classEvent, list.classId, list)
+                this.stuManagementQB.classRefList.forEach(function (list, key) {
                     for (let item of list.stuEventList) {
                         for (let key of Object.keys(item)) {
                             if (!item[key]) {
                                 delete item[key]
                             }
                         }
-                       
+                      
                         let newStuEvent = {};
-                        let time = item.eventDate
-                        this.$set(newStuEvent, time, item)
+                       list.stuEventList.forEach(function(val,index){
+                           console.log(list.stuEventList[index].eventDate)              
+                            this.$set(newStuEvent, list.stuEventList[index].eventDate, list.stuEventList[index])
+                       },this)
                         if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
                             this.newStuEvent = [];
                         }
-                        // console.log(newStuEvent)
                         this.newStuEvent.push(newStuEvent)
                         this.stuManagementQB.className = list.className;
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
                     }
-                    
-                }
-                //  console.log( this.stuManagementQB.classRefList[0].stuEventList)
-                console.log(data,this.classEvent)
-                this.stuManagementQB.classRefList.forEach(function (list, key) {
-
                     this.$set(this.myClassList, list.classCreDate, list.className)
                     let obj = {};
                     let XueJiNews = [];
@@ -706,7 +705,6 @@ export default {
                 case 2:
                     this.stuEventIntro.stuEvent2.stuEvent2Intro = this.stuEventList.instructions;
                     this.stuEventIntro.stuEvent2.stuEvent2Score = Math.abs(this.stuEventList.jilv);
-                    console.log(this.stuEventIntro.stuEvent2.stuEvent2Score)
                     this.stuEventInfo = this.stuEventIntro.stuEvent2;
                     break
                 case 3:
@@ -819,7 +817,6 @@ export default {
         },
         updateXueJi(formName) {
             for (let key of this.schoolList) {
-                console.log(key.schoolName, this.stuManagementQB)
                 if (key.schoolName === this.stuManagementQB.school) {
                     this.schoolCode = key.schoolCode;
                 }
@@ -855,7 +852,6 @@ export default {
                         }
                     })
                 } else {
-                    console.log('error submit!!');
                     return false;
                 }
             });
