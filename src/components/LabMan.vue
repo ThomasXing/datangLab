@@ -22,7 +22,9 @@
             </ul>
     
             <div class="labman-box">
+                 <transition name="slide-down">
                 <router-view></router-view>
+                </transition>
             </div>
         </div>
     </div>

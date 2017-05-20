@@ -164,7 +164,7 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                                                                                                                            </el-date-picker>-->
+                                                                                                                                                </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
@@ -260,7 +260,7 @@
                     <div v-for="(evitem,keyTime) in newEvent" style="display:inline-block">
     
                         <td class="tr">{{keyTime|normalTime}}</td>
-                        <td v-for="item in evitem">{{item}}</td>
+                        <td v-for="(item,ikey) in evitem" >{{ikey==='eventDate'?'':item}}</td>
                     </div>
                 </tr>
             </table>
@@ -281,7 +281,6 @@ const get_stuQualification = {
     B: '本科',
     C: '专科'
 }
-
 export default {
     data() {
         let validateIdCard = (rule, value, callback) => {
@@ -538,11 +537,11 @@ export default {
         addClassList() {
             if (this.stuManagementQB.className) {
                 this.$set(this.myClassList, new Date().getTime(), this.stuManagementQB.className)
-                 this.stuXueJiNews[this.classId] = [{
-                "graduationState": "Y",
-                "managementState": "A",
-                "score": 100
-            }]
+                this.stuXueJiNews[this.classId] = [{
+                    "graduationState": "Y",
+                    "managementState": "A",
+                    "score": 100
+                }]
                 this.visible2 = false;
             }
         },
@@ -651,16 +650,25 @@ export default {
                                 delete item[key]
                             }
                         }
-                      
+
                         let newStuEvent = {};
-                       list.stuEventList.forEach(function(val,index){
-                           console.log(list.stuEventList[index].eventDate)              
+                        list.stuEventList.forEach((val, index) => {
+
                             this.$set(newStuEvent, list.stuEventList[index].eventDate, list.stuEventList[index])
-                       },this)
+                        })
                         if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
                             this.newStuEvent = [];
                         }
+
                         this.newStuEvent.push(newStuEvent)
+                        for (let key in this.newStuEvent[0]) {
+                            for (let stuEventIndex of Object.keys(this.stuEventName)) {
+                                if ( this.stuEventName[stuEventIndex]=== this.newStuEvent[0][key].eventName) {
+                                    this.newStuEvent[0][key].eventName = stuEventIndex
+                                }
+                            }
+
+                        }
                         this.stuManagementQB.className = list.className;
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
                     }
