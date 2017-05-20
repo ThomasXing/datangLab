@@ -486,8 +486,8 @@ export default {
         if (this.$route.params.stuId === "new") {
             this.$store.dispatch("addXuJi")
             this.stuXueJiNews[this.classId] = [{
-                "graduationthis": "Y",
-                "managementthis": "A",
+                "graduationState": "Y",
+                "managementState": "A",
                 "score": 100
             }]
         } else {
@@ -539,8 +539,8 @@ export default {
             if (this.stuManagementQB.className) {
                 this.$set(this.myClassList, new Date().getTime(), this.stuManagementQB.className)
                  this.stuXueJiNews[this.classId] = [{
-                "graduationthis": "Y",
-                "managementthis": "A",
+                "graduationState": "Y",
+                "managementState": "A",
                 "score": 100
             }]
                 this.visible2 = false;

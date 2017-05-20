@@ -96,6 +96,7 @@
 </template>
 <script>
 import qs from 'qs'
+
 import { courseStatus, courseFilter } from "../filters"
 export default {
     name: 'course',
@@ -133,11 +134,6 @@ export default {
         this.getAllProfession()
         this.getAllCourse()
         this.$store.dispatch('SHOW_ACTIVECLASS', "courseActive")
-    },
-    mounted() {
-        let wh = document.body.scrollHeight;
-        console.log(wh)
-        this.$store.dispatch("WH", wh)
     },
     filters: {
         courseStatus,
