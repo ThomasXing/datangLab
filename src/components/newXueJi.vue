@@ -251,7 +251,7 @@
                                 <el-button class='btn-w' type="text" size="small" @click="visible3 = false">取消</el-button>
                             </div>
                         </el-popover>
-                        <el-button class="btn" type="primary" v-popover:addxueji @click="">添加事件</el-button>
+                        <el-button class="btn" type="primary" v-popover:addxueji style="display:block;margin-left:71px;">添加事件</el-button>
                     </td>
     
                 </tr>
