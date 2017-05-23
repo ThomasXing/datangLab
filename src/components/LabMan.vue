@@ -1,29 +1,27 @@
 <template>
-    <div class="labman">
+    <div class="labman" id='jw'>
         <HeadView></HeadView>
         <div>
     
             <ul class='labman-menu' id="lab-menu">
-                <li :class="{active:courseActive}">
-                    <router-link to='/labman/course' class='labman-menu-item'>
-                        课程管理
+               
+                    <router-link to='/labman/course' tag='li' :class="{active:courseActive}" class='labman-menu-item'>
+                        <a href="javascript:;">课程管理</a>  
                     </router-link>
-                </li>
-                <li :class="{active:classActive}">
-                    <router-link to='/labman/classs' class='labman-menu-item'>
-                        班级管理
+              
+                    <router-link to='/labman/classs' tag='li' :class="{active:classActive}" class='labman-menu-item'>
+                        <a href="javascript:;">班级管理</a>  
                     </router-link>
-                </li>
-                <li :class="{active:xuejiActive}">
-                    <router-link to='/labman/xueji' class='labman-menu-item'>
-                        学籍管理
+               
+                    <router-link to='/labman/xueji' tag='li'  :class="{active:xuejiActive}" class='labman-menu-item'>
+                        <a href="javascript:;">学籍管理</a>  
                     </router-link>
-                </li>
+               
             </ul>
     
             <div class="labman-box">
-                 <transition name="slide-down">
-                <router-view></router-view>
+                <transition name="slide-down">
+                    <router-view></router-view>
                 </transition>
             </div>
         </div>
@@ -33,21 +31,33 @@
 import HeadView from '../components/Head'
 import { mapGetters } from "vuex"
 export default {
-    name: 'labman',
+    name: 'jw',
     data() {
         return {
 
         }
     },
-    
+    watch:{
+        $route:"fetchHeight"
+    },
     created() {
         this.$store.dispatch('SET_TITLE', '实验室管理平台')
     },
-    mounted(){
-          this.$store.dispatch("WH")
-    },
+    // mounted() {
+    //     this.$store.dispatch("WH")
+    // },
     computed: {
-        ...mapGetters(['xuejiActive', 'courseActive', 'classActive','wh'])
+        ...mapGetters(['xuejiActive', 'courseActive', 'classActive', 'menuHeight'])
+    },
+    methods: {
+        fetchHeight() {
+            let labMenu = document.getElementById("lab-menu");
+            let wh = document.body.scrollHeight;
+            this.$store.dispatch("WH",wh)
+            
+            // labMenu.style.height = wh;
+            console.log(wh)
+        },
     },
     components: {
         HeadView
@@ -71,6 +81,9 @@ export default {
             text-align: center;
             line-height: 50px;
             color: #ffffff;
+        }
+        a{
+            color:#ffffff;
         }
         .active {
             background: #1e222d;

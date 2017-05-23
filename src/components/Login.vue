@@ -58,8 +58,7 @@ export default {
                     sessionStorage.setItem('keyId', res.data.userid)
                     sessionStorage.setItem('keyToken', res.data.accesstoken)
                 }, error => {
-                    // console.log(err)
-                    if (error.message === "Network Error") {
+                    if (error.message === "Network Error"|| new XMLHttpRequest().status==0) {
                         this.$alert('网络错误', '提示信息', {
                             confirmButtonText: '确定',
                         });

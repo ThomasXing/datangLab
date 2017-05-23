@@ -76,8 +76,9 @@
 </template>
 <script>
 import qs from "qs"
+import { mapGetters } from 'vuex'
 export default {
-    name:'newCourse',
+    name: 'newCourse',
     data() {
         return {
             formInline: {
@@ -87,9 +88,7 @@ export default {
                 courseContent: '',
                 product: ''
             },
-            schoolList: '',
             productList: '',
-            professionList: '',
             schoolCode: '',
             professionCode: '',
             productCode: ''
@@ -97,27 +96,15 @@ export default {
         }
     },
     created() {
-        this.getSchoolList()
-        this.getAllProfession()
         this.getAllProduct()
-        this.$store.dispatch('SHOW_ACTIVECLASS',"courseActive") 
-        // if(this.$route.name){
-        //      this.$store.dispatch('SET_LINK_ACTIVE', '竞争力培养')
-        // }
+        this.$store.dispatch('SHOW_ACTIVECLASS', "courseActive")
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
+    },
+    computed: {
+        ...mapGetters(['schoolList', 'professionList'])
     },
     methods: {
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.schoolList = res.data.schoolList;
-            }).catch(err => console.log(err))
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.professionList = res.data.professionList
-            })
-        },
         get_schoolCode(a) {
             this.schoolCode = a;
         },

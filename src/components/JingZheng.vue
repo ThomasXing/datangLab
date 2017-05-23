@@ -28,8 +28,8 @@
             </ul>
             <ul class='company-list'>
     
-                <li v-for='val in item1' class="company-item">
-                    <router-link to="/labman/course">{{val}}</router-link>
+                <li v-for='(val,key) in item1'  class="company-item">                  
+                    <router-link :to='key'>{{val}}</router-link>
                 </li>
     
             </ul>
@@ -52,7 +52,7 @@ export default {
     name: 'jingzheng',
     data() {
         return {
-            item1: ['实验室管理平台', '实验设计平台', '理论检测平台', '基础实验平台'],
+            item1: {'/labman/course':'实验室管理平台', '/sourceLab/source':'实验设计平台', '/theory/check':'理论检测平台','/basis/make': '基础实验平台'},
             item2: ['技能实验平台'],
             item3: ['虚拟工作站'],
             item4: ['能力评估平台']

@@ -1,6 +1,6 @@
 # datangedu-lab
 
-> A Vue.js project
+> 大唐369云智汇教务教研教学管理系统
 
 ## Build Setup
 

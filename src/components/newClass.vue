@@ -83,7 +83,7 @@
                     <td class='tr'>班级状态：</td>
                     <td colspan="2">
                         <el-select v-model="formInline.status" placeholder="请选择">
-                            <el-option :label="key" :value="key" v-for="(val,key) in classState" :key="val" ></el-option>
+                            <el-option :label="key" :value="key" v-for="(val,key) in classState" :key="val"></el-option>
                         </el-select>
                     </td>
                 </tr>
@@ -110,6 +110,7 @@
 </template>
 <script>
 import qs from "qs"
+import {mapGetters} from 'vuex'
 export default {
     data() {
         return {
@@ -129,8 +130,6 @@ export default {
                 "结课": "E",
                 "失效": "N"
             },
-            schoolList: '',
-            professionList: '',
             schoolCode: '',
             professionCode: '',
             productList: '',
@@ -147,28 +146,19 @@ export default {
         }
     },
     created() {
-        this.getSchoolList()
-        this.getAllProfession()
+
         this.getTeacherList()
         this.getAllProduct()
         this.getpmList()
         this.getAllCourse()
-        this.$store.dispatch('SHOW_ACTIVECLASS',"classActive") 
-
+        this.$store.dispatch('SHOW_ACTIVECLASS', "classActive")
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
+    },
+    computed: {
+        ...mapGetters(['schoolList', 'professionList'])
     },
     methods: {
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.schoolList = res.data.schoolList;
-            }).catch(err => console.log(err))
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.professionList = res.data.professionList
-            })
-        },
         //查询教师
         getTeacherList() {
             this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {

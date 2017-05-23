@@ -88,7 +88,7 @@
 </template>
 <script>
 import { sex, managementState } from "../filters"
-import { mapActions } from "vuex"
+import { mapActions,mapGetters } from "vuex"
 import qs from "qs"
 export default {
     data() {
@@ -118,39 +118,24 @@ export default {
                 "曾留级": 6,
                 "曾重读": 9
             },
-            username: '',
-            password: '',
-            schoolList: '',
             schoolCode: '',
-            professionList: '',
             professionCode: '',
             stuManagementList: []
         }
     },
     created() {
-        this.username = sessionStorage.getItem("keyId");
-        this.password = sessionStorage.getItem("keyToken")
-        this.getSchoolList()
-        this.getAllProfession()
         this.getAllStuManagement()
         this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
+    },
+    computed: {
+        ...mapGetters(['schoolList', 'professionList'])
     },
     methods: {
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.schoolList = res.data.schoolList;
-            })
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.professionList = res.data.professionList;
-            })
-        },
         //获取所有学籍
         getAllStuManagement() {
-            this.$http.get("/api/yzh/research/inter/getAllStuManagement?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+            this.$http.get("/api/yzh/research/inter/getAllStuManagement?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" +sessionStorage.getItem("keyToken")).then(res => {
                 this.stuManagementList = res.data.stuManagementList
             })
         },
@@ -219,7 +204,7 @@ export default {
             this.$router.push({ path: 'newXueJi/new' })
         },
         modiXuJi(stuId) {
-            this.$router.push({ path: 'newXueJi/'+stuId,params:{stuId:stuId} })
+            this.$router.push({ path: 'newXueJi/' + stuId, params: { stuId: stuId } })
         }
     },
     filters: {

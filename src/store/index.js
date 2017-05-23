@@ -12,22 +12,30 @@ const state = {
     classActive: null,
     xueji: null,
     isXiugai: null,
-    wh: ""
+    schoolList: "",
+    professionList:"",
+    menuHeight: ""
 }
 
 const actions = {
     SET_TITLE: ({ commit }, val) => commit("set_title", val),
-    // SET_USERID:({commit},val)=>commit("set_userid",val),
-    /*loading*/
-    // hideLoading:({commit})=>{
-    // 	commit(HIDE_LOADING)
-    // },
-    // showLoading:({commit})=>{
-    // 	commit(SHOW_LOADING)
-    // },
+    GET_SCHOOLLIST: ({ commit }) => {
+        axios.get("/api/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+             let data = res.data.schoolList;
+            commit("get_schoolList", data) 
 
+        },err=> console.log(err))
+       
+    },
+    GET_PROFESSIONLIST:({commit})=>{
+         axios.get("/api/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            let data = res.data.professionList;
+            commit("get_professionList", data)
+
+        },err=> console.log(err))
+    },
     addXuJi: ({ commit }) => commit("add_xueji"),
-    WH: ({ commit }) => commit('wh'),
+    WH: ({ commit }, menuHeight) => commit('wh', menuHeight),
     xiugaiXuJi: ({ commit }) => commit("xiugaixueji"),
     SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val)
 }
@@ -58,13 +66,19 @@ const mutations = {
     add_xueji: (state) => {
         state.isXiugai = false;
     },
-    wh: (state) => {
+    get_schoolList: (state,data) => {
+        state.schoolList = data;
+    },
+    get_professionList:(state,data)=>{
+        state.professionList = data;
+    },
+    wh: (state, menuHeight) => {
         let labMenu = document.getElementById("lab-menu");
-        // setInterval(() => {
-        //     let wh = document.body.scrollHeight;
-        //     state.wh = wh;
-        //     labMenu.style.height = state.wh;
-        // }, 1000)
+
+        //    
+        // state.menuHeight = menuHeight;
+        // labMenu.style.height = state.menuHeight;
+        // console.log(labMenu.style.height)
         // console.log(state.wh)
 
     }
@@ -77,7 +91,9 @@ const getters = {
     courseActive: state => state.courseActive,
     classActive: state => state.classActive,
     isXiugai: state => state.isXiugai,
-    wh: state => state.wh
+    schoolList: state => state.schoolList,
+    professionList: state => state.professionList,
+    menuHeight: state => state.menuHeight
 }
 export default new Vuex.Store({
     state,

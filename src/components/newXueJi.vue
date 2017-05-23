@@ -164,7 +164,7 @@
                                         </el-date-picker>
                                     </el-form>
                                     <!--<el-date-picker v-model="stuEventList.startTime" type="daterange" placeholder="选择日期范围">
-                                                                                                                                                </el-date-picker>-->
+                                                                                                                                                            </el-date-picker>-->
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写休学原因" v-model="stuEventList.instructions"></el-input>
                                 </td>
                             </tr>
@@ -251,18 +251,19 @@
                                 <el-button class='btn-w' type="text" size="small" @click="visible3 = false">取消</el-button>
                             </div>
                         </el-popover>
-                        <el-button class="btn" type="primary" v-popover:addxueji style="display:block;margin-left:71px;">添加事件</el-button>
+                        <el-button class="btn" type="primary" v-popover:addxueji style="display:block;margin-left:51px;">添加事件</el-button>
                     </td>
     
                 </tr>
-                <tr v-for="(newEvent,key) in classEvent[this.classId]">
+                <table v-for="(newEvent,key) in classEvent[this.classId]">
     
-                    <div v-for="(evitem,keyTime) in newEvent" style="display:inline-block">
+                    <tr v-for="(evitem,keyTime) in newEvent">
     
-                        <td class="tr">{{keyTime|normalTime}}</td>
-                        <td v-for="(item,ikey) in evitem" >{{ikey==='eventDate'?'':item}}</td>
-                    </div>
-                </tr>
+                        <td class="tr">{{keyTime|normalTime}}</td>  
+                        <td v-for="(item,ikey) in evitem" :key="ikey" style="min-width:100px;">{{ikey==='eventDate'?'':item}}</td>
+                    </tr>
+    
+                </table>
             </table>
         </div>
         <div class="sub">
@@ -456,8 +457,6 @@ export default {
                     stuEvent11Intro: ""
                 }
             },
-            schoolList: null,
-            professionList: '',
             schoolCode: '',
             professionCode: '',
             productList: '',
@@ -471,13 +470,13 @@ export default {
             eventListStr: [],
             stuEventInfo: null,
             newStuEvent: [],
-            XueJiNews: []
+            XueJiNews: [],
+            isActive: false
         }
 
     },
     created() {
-        this.getSchoolList()
-        this.getAllProfession()
+
         this.getTeacherList()
         this.getpmList()
         this.getAllCourse()
@@ -494,9 +493,11 @@ export default {
             this.get_newXueJI()
 
         }
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
     },
     computed: {
-        ...mapGetters(['isXiugai'])
+        ...mapGetters(['isXiugai', 'schoolList', 'professionList'])
     },
     filters: {
         normalTime,
@@ -573,11 +574,13 @@ export default {
         get_classId(list) {
             this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + encodeURIComponent(encodeURIComponent(list))).then(res => {
                 this.classId = res.data.classList[0].classId;
+                if (this.$store.state.isXiugai === true) {
+                    this.newStuEvent=this.classEvent[this.classId]     
+                }
             })
         },
         get_activeClass(list) {
             this.get_classId(list);
-
         },
         get_stuEvent() {
             let stuEv = this.stuEventName[this.stuEventList.stuEventName];
@@ -643,6 +646,7 @@ export default {
                 let stuQualification = data.stuQualification;
                 data.stuQualification = get_stuQualification[stuQualification]
                 this.stuManagementQB = data;
+                let id = [];
                 this.stuManagementQB.classRefList.forEach(function (list, key) {
                     for (let item of list.stuEventList) {
                         for (let key of Object.keys(item)) {
@@ -650,9 +654,10 @@ export default {
                                 delete item[key]
                             }
                         }
-
                         let newStuEvent = {};
+
                         list.stuEventList.forEach((val, index) => {
+
 
                             this.$set(newStuEvent, list.stuEventList[index].eventDate, list.stuEventList[index])
                         })
@@ -661,9 +666,10 @@ export default {
                         }
 
                         this.newStuEvent.push(newStuEvent)
+
                         for (let key in this.newStuEvent[0]) {
                             for (let stuEventIndex of Object.keys(this.stuEventName)) {
-                                if ( this.stuEventName[stuEventIndex]=== this.newStuEvent[0][key].eventName) {
+                                if (this.stuEventName[stuEventIndex] === this.newStuEvent[0][key].eventName) {
                                     this.newStuEvent[0][key].eventName = stuEventIndex
                                 }
                             }
@@ -671,7 +677,9 @@ export default {
                         }
                         this.stuManagementQB.className = list.className;
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
+
                     }
+                    ;
                     this.$set(this.myClassList, list.classCreDate, list.className)
                     let obj = {};
                     let XueJiNews = [];
@@ -679,7 +687,8 @@ export default {
                     obj['managementState'] = this.stuManagementQB.classRefList[key]['managementState']
                     obj['score'] = this.stuManagementQB.classRefList[key]['score']
                     XueJiNews.push(obj)
-                    this.$set(this.stuXueJiNews, list.classId, XueJiNews)
+                    this.$set(this.stuXueJiNews, list.classId, XueJiNews);
+                    id.push(list.classId)
                 }, this)
             }, err => console.log(err))
         },
@@ -726,7 +735,6 @@ export default {
                     this.stuEventInfo = this.stuEventIntro.stuEvent4;
                     break
                 case 5:
-
                     this.stuEventIntro.stuEvent5.stuEvent5Intro = this.stuEventList.instructions;
                     this.stuEventIntro.stuEvent5.stuEvent5Date = this.stuEventList.fuxueTime;
                     this.stuEventIntro.stuEvent5.stuEvent5ClassId = this.classId;
@@ -764,9 +772,6 @@ export default {
                     break
             }
 
-            if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
-                this.newStuEvent = [];
-            }
 
 
             let time = new Date().getTime();
@@ -778,7 +783,9 @@ export default {
             }
 
             this.eventListStr = [stuEventObj];
-            this.$set(this.classEvent, this.classId, newStuEvent)
+            if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
+                this.newStuEvent = [];
+            }
             this.$set(newStuEvent, time, this.stuEventList)
             for (let stuEvent of Object.keys(newStuEvent[time])) {
                 if (!newStuEvent[time][stuEvent]) {
@@ -888,6 +895,7 @@ export default {
     }
     tr {
         height: 61px;
+        vertical-align: middle;
         td {
             padding-right: 10px;
         }
@@ -921,7 +929,16 @@ export default {
     margin: 34px;
     width: 908px;
     border-bottom: 1px solid #ddd;
+
+    .baseNews {
+        .el-button:focus,
+        .el-button:hover {
+            color: #eee;
+            border-color: #20a0ff;
+        }
+    }
 }
+
 
 .sub {
     text-align: center;

@@ -14,8 +14,11 @@ import Gaimi from '@/components/gaimi'
 import NewCourse from '@/components/newCourse'
 import NewClass from '@/components/newClass'
 import NewXueJi from '@/components/newXueJi'
+import SourceLab from '@/components/jy/SourceLab.vue'
+import Source from '@/components/jy/Source.vue'
+import Ability from '@/components/jy/Ability.vue'
+import JobEval from '@/components/jy/JobEval.vue'
 Vue.use(Router)
-console.log(new Router())
 export default new Router({
   routes: [
     {
@@ -40,7 +43,7 @@ export default new Router({
     },
     {
       path: '/labman',
-      name: 'labman',
+      name: 'jw',
       component: LabMan,
       children:[
         {path:'course',component:Course},
@@ -49,6 +52,16 @@ export default new Router({
         {path:'newclass',name:'newClass',component:NewClass},
         {path:'xueji',component:XueJi},
         {path:'newXueJi/:stuId',name:'newXuJi',component:NewXueJi}
+      ]
+    },
+    {
+      path:'/sourceLab',
+      name:'jy',
+      component:SourceLab,
+      children:[
+        {path:'source',component:Source},
+        {path:'ability',component:Ability},
+        {path:'jobeval',component:JobEval},
       ]
     },
     {path:'/cultivate',component:Cultivate,

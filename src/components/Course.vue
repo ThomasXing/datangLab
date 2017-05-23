@@ -90,13 +90,13 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="changeCoourse">确 定</el-button>
-                </span>
+            </span>
         </el-dialog>
     </div>
 </template>
 <script>
 import qs from 'qs'
-
+import {mapGetters} from 'vuex'
 import { courseStatus, courseFilter } from "../filters"
 export default {
     name: 'course',
@@ -113,10 +113,8 @@ export default {
                 courseStatus: ''
             },
             username: '',
-            password: '',
-            schoolList: '',
+            password: '',           
             schoolCode: '',
-            professionList: '',
             professionCode: '',
             courseList: [],
             courseState: {
@@ -130,10 +128,13 @@ export default {
     created() {
         this.username = sessionStorage.getItem("keyId");
         this.password = sessionStorage.getItem("keyToken")
-        this.getSchoolList()
-        this.getAllProfession()
         this.getAllCourse()
         this.$store.dispatch('SHOW_ACTIVECLASS', "courseActive")
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
+    },
+    computed: {
+        ...mapGetters(['schoolList', 'professionList'])
     },
     filters: {
         courseStatus,
@@ -202,18 +203,6 @@ export default {
             }
 
 
-        },
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.schoolList = res.data.schoolList;
-            })
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.professionList = res.data.professionList;
-            })
         },
         //获取所有课程
         getAllCourse() {

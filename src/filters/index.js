@@ -60,14 +60,14 @@ export const normalTime=(time)=>{
 		oDate.setTime(time);
 
 		var y=oDate.getFullYear();
-		var m=oDate.getMonth()+1;
+		var mm=oDate.getMonth()+1;
 		var d=oDate.getDate();
 
 		var h=oDate.getHours();
 		var m=oDate.getMinutes();
 		var s=oDate.getSeconds();
 
-		return y+'-'+m+'-'+d+' '+h+':'+m+':'+s;
+		return y+'-'+mm+'-'+d+' '+h+':'+m+':'+s;
 	}else{
 		return time
 	}

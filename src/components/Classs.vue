@@ -132,6 +132,7 @@
 </template>
 <script>
 import { classStatus,classFilter } from '../filters'
+import {mapActions,mapGetters} from 'vuex'
 import qs from "qs"
 export default {
     name: 'course',
@@ -155,9 +156,7 @@ export default {
             },
             username: '',
             password: '',
-            schoolList: '',
             schoolCode: '',
-            professionList: '',
             professionCode: '',
             teacherList: '',
             teacherCode: '',
@@ -182,30 +181,22 @@ export default {
     created() {
         this.username = sessionStorage.getItem("keyId");
         this.password = sessionStorage.getItem("keyToken")
-        this.getSchoolList()
-        this.getAllProfession()
         this.getTeacherList()
         this.getpmList()
         this.onSubmit()
+        
         this.$store.dispatch('SHOW_ACTIVECLASS', "classActive")
+        this.$store.dispatch('GET_SCHOOLLIST')
+        this.$store.dispatch('GET_PROFESSIONLIST')
+    },
+    computed:{
+        ...mapGetters(['schoolList','professionList'])
     },
     filters: {
         classStatus,
         classFilter
     },
     methods: {
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.schoolList = res.data.schoolList;
-            })
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
-                this.professionList = res.data.professionList;
-            })
-        },
         //获取所有班级
         getAllClass() {
             this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
@@ -237,7 +228,6 @@ export default {
         getAllCourse() {
             this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
-                console.log(res)
             })
         },
         get_schoolCode(a) {
@@ -266,15 +256,6 @@ export default {
             }else{
                 classState="N"
             }
-        //      this.$alert('这是一段内容', '标题名称', {
-        //   confirmButtonText: '确定',
-        //   callback: teacherOne => {
-        //     this.$message({
-        //       type: 'info',
-        //       message: `action: ${ teacherOne }`
-        //     });
-        //   }
-        // });
             this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
                 userid: this.username,
                 accesstoken: this.password,
