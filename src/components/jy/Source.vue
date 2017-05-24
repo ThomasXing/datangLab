@@ -4,7 +4,7 @@
     <div id="source" class="clearfix">
         <div class="source-head clearfix">
             <div class="source-head-incre">
-                <el-button class="btn" type="primary" @click.native="incre">新增课程</el-button>
+                <el-button class="btn" type="primary" @click="RootVisible = true">新增课程</el-button>
             </div>
             <div class="source-head-title">
                 任务
@@ -14,12 +14,17 @@
             </div>
         </div>
         <div class="source-tree" id="tree">
-            <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" default-expand-all @node-click="handleNodeClick" @mouseDown.self="titleMousedown(app,$event)">
+            <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" default-expand-all @mouseup="handle(data,obj)" @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
             </el-tree>
-            <div id="contextmenu" v-show="sourceMenu">
-    
-            </div>
+           
         </div>
+         <div id="treemenu" v-show="menuShow">
+                <ul class="treemenu">
+                    <li @click='newDirectory'>新建目录</li>
+                    <li @click='delDirectory'>删除课程</li>
+                    <li @click='rename'>重命名</li>
+                </ul>
+            </div>
         <el-dialog title="提示" :visible.sync="RootVisible" size="tiny">
             <el-input id="rootNode" placeholder="请输入内容" autofocus value=""></el-input>
             <span slot="footer" class="dialog-footer">
@@ -68,48 +73,19 @@
     </div>
 </template>
 <script>
+import qs from 'qs'
 let id = 1000;
-
+let vm = this;
+const jy_url = "http://www.369college.com/369education"
 export default {
     data() {
         return {
-            sourceMenu: false,
+            menuShow: false,
             RootVisible: false,
-            data: [{
-                label: '一级 1',
-                children: [{
-                    label: '二级 1-1',
-                    children: [{
-                        label: '三级 1-1-1'
-                    }]
-                }]
-            }, {
-                label: '一级 2',
-                children: [{
-                    label: '二级 2-1',
-                    children: [{
-                        label: '三级 2-1-1'
-                    }]
-                }, {
-                    label: '二级 2-2',
-                    children: [{
-                        label: '三级 2-2-1'
-                    }]
-                }]
-            }, {
-                label: '一级 3',
-                children: [{
-                    label: '二级 3-1',
-                    children: [{
-                        label: '三级 3-1-1'
-                    }]
-                }, {
-                    label: '二级 3-2',
-                    children: [{
-                        label: '三级 3-2-1'
-                    }]
-                }]
-            }],
+            EventTarget: '',
+            data: [
+
+            ],
             defaultProps: {
                 children: 'children',
                 label: 'label'
@@ -118,47 +94,13 @@ export default {
     },
 
     mounted() {
-      
         this.$nextTick(() => {
             let vm = this;
             let tree = document.getElementById("tree");
+            let treemenu = document.getElementById('treemenu')
             tree.oncontextmenu = function () {
                 return false;
             }
-
-            
-            var menu = document.getElementById("contextmenu");
-            let tree_node = document.querySelectorAll('.el-tree-node');
-            for (let item of tree_node) {
-                item.onmouseup = function () {
-                    let that = this;
-                    bindEvent(this, "contextmenu", closeContextMenu);
-                    bindEvent(this, "mouseup", openNewContextMenu);
-                    bindEvent(this, "mousedown", closeNewContextMenu);
-                    bindEvent(menu, "mouseup", openNewContextMenu);
-                }
-            }
-            //  bindEvent(document, "mousedown", closeNewContextMenu);
-            tree.appendChild(menu);
-
-            function closeContextMenu() {
-                return false;
-            }
-
-            function openNewContextMenu(ev) {
-                ev = ev || window.event;
-                var btn = ev.button;
-                if (btn == 2) {
-                    menu.style.left = ev.clientX + "px";
-                    menu.style.top = ev.clientY + "px";
-                    vm.sourceMenu = true;
-                }
-            }
-
-            function closeNewContextMenu(ev) {
-                vm.sourceMenu = false;
-            }
-
             function bindEvent(elem, eventType, callback) {
                 var ieType = ["on" + eventType];
                 if (ieType in elem) {
@@ -169,48 +111,121 @@ export default {
                     elem.addEventListener(eventType, callback, false);
                 }
             }
+            // function openNewContextMenu(ev) {
+            //     ev = ev || window.event;
+            //     var btn = ev.button;
+            //     if (btn == 2) {
+            //         treemenu.style.left = ev.clientX + "px";
+            //         treemenu.style.top = ev.clientY + "px";
+            //         vm.menuShow = true;
+            //     }
+            // }
+            function closeContextMenu() {
+                return false;
+            }
+            function closeNewContextMenu(ev) {
 
+                if (ev.target !== treemenu) {
+                    vm.menuShow = false;
+                }
+            }
+            bindEvent(tree, 'mouseup', function (ev) {
+                if (ev.target !== tree) {
+                    ev = ev || window.event;
+                    var btn = ev.button;
+                    if (btn == 2) {
+                        treemenu.style.left = ev.clientX + "px";
+                        treemenu.style.top = ev.clientY + "px";
+                        vm.menuShow = true;
+                    }
+                    this.EventTarget = ev.target;
+                }
+            })
+            bindEvent(document, 'click', closeNewContextMenu)
+            bindEvent(tree, 'click', closeNewContextMenu)
+            bindEvent(treemenu, 'contextmenu', closeContextMenu)
         })
-        
-        //   this.contextMenu()
+
     },
     methods: {
-        // contextMenu(){
-        //       for(let item of this.data){
-        //         bindEvent(item,'contextmenu',openNewContextMenu)
-        //       }
-        //        function bindEvent(elem, eventType, callback) {
-        //         var ieType = ["on" + eventType];
-        //         if (ieType in elem) {
-        //             elem[ieType] = callback;
-        //         } else if ("attachEvent" in elem) {
-        //             elem.attachEvent(ieType, callback);
-        //         } else {
-        //             elem.addEventListener(eventType, callback, false);
-        //         }
-        //     }
-        //      function openNewContextMenu(ev) {
-        //         ev = ev || window.event;
-        //         var btn = ev.button;
-        //         if (btn == 2) {
-        //             menu.style.left = ev.clientX + "px";
-        //             menu.style.top = ev.clientY + "px";
-        //             vm.sourceMenu = true;
-        //         }
-        //     }
+        sureIcre() {
+            // this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
+            //     userid: sessionStorage.getItem("keyId"),
+            //     accesstoken: sessionStorage.getItem("keyToken"),
+            //     catalogName: "javascript",
+            // })).then(res => {
+            //     if (res.data.addCatalogFlag === "success") {
+            //         console.log()
 
-        
-        // },
-        handleNodeClick(data, node, obj) {
-            console.log(data, node, obj, this.$refs.tree);
+            //     }
+
+            // })
+            let rootNode = document.getElementById("rootNode").getElementsByTagName('input')[0].value;
+            let tree_node = document.querySelectorAll('.el-tree-node');
+            let obj = {
+                id: id++,
+                label: rootNode,
+                children: []
+            }
+            if (rootNode !== "") {
+                this.data.push(obj)
+            }
+            this.RootVisible = false;
         },
-        titleMousedown(app, event) {
-            // console.log(event)
+        newDirectory() {
+            console.log(1)
+            this.$emit("node-click")
+        },
+        delDirectory() {
+
+        },
+        rename() {
+
+        },
+        handle(data,obj){
+            console.log(data)
+        },
+        handleNodeClick(data, node, obj) {
+            console.log(data, node, obj);
         },
         append(store, data) {
             store.append({ id: id++, label: 'testtest', children: [] }, data);
         },
+        renderContent: function (createElement, { node, data, store }) {
+            var self = this;
+            return createElement('span', [
+                createElement('span', node.label),
+                createElement('span', {
+                    attrs: {
+                        style: "float: right; margin-right: 20px"
+                    }
+                }, [
+                        createElement('el-button', {
+                            attrs: {
+                                size: "mini"
+                            }, on: {
+                                click: function () {
+                                    console.info("点击了节点" + data.id + "的添加按钮");
+
+                                    store.append({ id:id++, label: 'testtest', children: [] }, data);
+                                }
+                            }
+                        }, "添加"),
+                        createElement('el-button', {
+                            attrs: {
+                                size: "mini"
+                            }, on: {
+                                click: function () {
+                                    console.info("点击了节点" + data.id + "的删除按钮");
+                                    store.remove(data);
+                                }
+                            }
+                        }, "删除"),
+                    ]),
+            ]);
+        }
     }
+
 
 };
 </script>

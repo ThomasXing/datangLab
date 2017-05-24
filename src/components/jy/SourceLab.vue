@@ -13,6 +13,9 @@
                 <router-link tag='li' to='/sourceLab/jobeval' active-class="active" class='labman-menu-item'>
                     <a href="javascript:;">岗位评估</a>
                 </router-link>
+                  <router-link tag='li' to='/sourceLab/tree' active-class="active" class='labman-menu-item'>
+                    <a href="javascript:;">tree</a>
+                </router-link>
             </ul>
     
             <div class="labman-box">
