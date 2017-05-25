@@ -12,7 +12,6 @@ import 'element-ui/lib/theme-default/index.css'
 require('./assets/css/base.less')
 Vue.config.productionTip = false
 Vue.use(ElementUI)
-const jy_url  = "http://www.369college.com/369education"
 Vue.prototype.$http = axios;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
 // axios.interceptors.request.use(function (config) {  //配置发送请求的信息

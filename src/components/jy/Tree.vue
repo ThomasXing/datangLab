@@ -1,6 +1,14 @@
 <template>
     <div id="tree">
-        <el-tree :data="data2" :props="defaultProps" node-key="id" default-expand-all @node-click="nodeClick">
+        <el-button class="btn" type="primary" @click="RootVisible = true">新增课程</el-button>
+        <el-dialog title="提示" :visible.sync="RootVisible" size="tiny">
+            <el-input id="rootNode" placeholder="请输入内容" autofocus value="" v-model="nodeVal"></el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="RootVisible = false">取 消</el-button>
+                <el-button type="primary" @click="sureIcre">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-tree :data="data2" :props="defaultProps" node-key="id" default-expand-all @node-click="nodeClick" :render-content="renderContent">
         </el-tree>
         <div id="treemenu" v-show="menuShow">
             <ul class="treemenu">
@@ -21,7 +29,9 @@ export default {
 
         return {
             menuShow: false,
+            RootVisible:false,
             EventTarget: '',
+            nodeVal:"",
             data2: [{
                 id: 1,
                 label: 'Level one 1',
@@ -60,6 +70,11 @@ export default {
             defaultProps: {
                 children: 'children',
                 label: 'label'
+            },
+            obj:{
+                id:'',
+                  children: [],
+                label: ''
             }
         }
     },
@@ -115,12 +130,15 @@ export default {
         // append(data) {
         //     this.$parent.append({ id: id++, label: 'testtest', children: [] }, data);
         // },
-
+        sureIcre(){
+            this.obj.label=this.nodeVal;
+            this.data2.push(this.obj)
+        },
         remove(store, data) {
             store.remove(data);
         },
         nodeClick(node) {
-            console.log(node.$treeNodeId,this.$parent)
+            console.log(this.data2)
             // let obj = {
             //     id: id++,
             //     label: rootNode,
@@ -132,18 +150,40 @@ export default {
         newDirectory() {
 
         },
-        renderContent(h, { node, data, store }) {
-            console.log(h, { node, data, store })
-            //     return (
-            //         `<span>
-            //             <span>
-            //                 <span>${node.label}</span>
-            //             </span>
-            //             <span style="float: right; margin-right: 20px">
-            //                 <el-button size="mini" @click={() => this.append(store, data)}>Append</el-button>
-            //                 <el-button size="mini" @click={() => this.remove(store, data)}>Delete</el-button>
-            //             </span>
-            //         </span>`);
+        append(store, data) {
+            store.append({ id: id++, label: "nodeVal", children: [] }, data);
+        },
+        renderContent: function (createElement, { node, data, store }) {
+            var self = this;
+            return createElement('span', [
+                createElement('span', node.label),
+                createElement('span', {
+                    attrs: {
+                        style: "float: right; margin-right: 20px"
+                    }
+                }, [
+                        createElement('el-button', {
+                            attrs: {
+                                size: "mini"
+                            }, on: {
+                                click: function () {
+                                    console.info("点击了节点" + data.id + "的添加按钮");
+                                    self.append(store, data)
+                                }
+                            }
+                        }, "添加"),
+                        createElement('el-button', {
+                            attrs: {
+                                size: "mini"
+                            }, on: {
+                                click: function () {
+                                    console.info("点击了节点" + data.id + "的删除按钮");
+                                    store.remove(data);
+                                }
+                            }
+                        }, "删除"),
+                    ]),
+            ]);
         }
     }
 };

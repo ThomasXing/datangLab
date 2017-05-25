@@ -10,21 +10,22 @@
                 任务
             </div>
             <div class="source-head-editor">
-                <el-button class="btn" type="primary" @click="">编辑</el-button>
+                <el-button class="btn" type="primary" @click="IcredialogFormVisible=true">编辑</el-button>
             </div>
         </div>
         <div class="source-tree" id="tree">
-            <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" default-expand-all @mouseup="handle(data,obj)" @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
+            <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
             </el-tree>
-           
+    
         </div>
-         <div id="treemenu" v-show="menuShow">
-                <ul class="treemenu">
-                    <li @click='newDirectory'>新建目录</li>
-                    <li @click='delDirectory'>删除课程</li>
-                    <li @click='rename'>重命名</li>
-                </ul>
-            </div>
+        <div id="treemenu" v-show="menuShow">
+            <ul class="treemenu">
+                <li @click='createSource' v-show="creShow">创建资源</li>
+                <li @click='newDirectory' v-show="newDire">新建目录</li>
+                <li @click='delDirectory'>删除课程</li>
+                <li @click='rename'>重命名</li>
+            </ul>
+        </div>
         <el-dialog title="提示" :visible.sync="RootVisible" size="tiny">
             <el-input id="rootNode" placeholder="请输入内容" autofocus value=""></el-input>
             <span slot="footer" class="dialog-footer">
@@ -70,10 +71,40 @@
                 </div>
             </div>
         </div>
+        <el-dialog title="任务" :visible.sync="IcredialogFormVisible">
+            <el-form :model="icreTask" label-width="80px">
+                <el-form-item label="任务名称">
+                    <el-input v-model="icreTask.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="任务说明">
+                    <el-input type="textarea" :rows="5" placeholder="最多输入1000个汉字" v-model="icreTask.instructions"></el-input>
+                </el-form-item>
+                <el-form-item label="测评内容">
+                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.content"></el-input>
+                </el-form-item>
+                <el-form-item label="测评标准">
+                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.standard"></el-input>
+                </el-form-item>
+                <el-form-item label="上传文件">
+                    <el-upload class="upload-demo" drag action="http://www.369college.com/369education/yzh/education/inter/uploadFile" multiple name="" :data="upload" accept="">
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">将文件拖到此处，或
+                            <em>点击上传</em>
+                        </div>
+                        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="IcredialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="IcredialogVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
 import qs from 'qs'
+import { mapActions } from 'vuex'
 let id = 1000;
 let vm = this;
 const jy_url = "http://www.369college.com/369education"
@@ -82,14 +113,42 @@ export default {
         return {
             menuShow: false,
             RootVisible: false,
-            EventTarget: '',
+            IcredialogFormVisible: false,
+            creShow: false,
+            newDire: true,
+            targetNode: '',
             data: [
 
             ],
             defaultProps: {
                 children: 'children',
                 label: 'label'
+            },
+            icreTask: {
+                name: '',
+                instructions: '',
+                content: '',
+                standard: ''
+            },
+            upload: {
+                title: '',
+
+            },
+            treeObj: {
+                data: {
+                    id:'',
+                    children:[],
+                    label:''
+                },
+                node: '',
+                obj: ''
+            },
+            rootData: {
+                children: '',
+                label: ''
             }
+
+
         }
     },
 
@@ -111,15 +170,6 @@ export default {
                     elem.addEventListener(eventType, callback, false);
                 }
             }
-            // function openNewContextMenu(ev) {
-            //     ev = ev || window.event;
-            //     var btn = ev.button;
-            //     if (btn == 2) {
-            //         treemenu.style.left = ev.clientX + "px";
-            //         treemenu.style.top = ev.clientY + "px";
-            //         vm.menuShow = true;
-            //     }
-            // }
             function closeContextMenu() {
                 return false;
             }
@@ -137,8 +187,9 @@ export default {
                         treemenu.style.left = ev.clientX + "px";
                         treemenu.style.top = ev.clientY + "px";
                         vm.menuShow = true;
+                        ev.target.click()
+                        this.targetNode = ev.target;
                     }
-                    this.EventTarget = ev.target;
                 }
             })
             bindEvent(document, 'click', closeNewContextMenu)
@@ -148,6 +199,7 @@ export default {
 
     },
     methods: {
+        // ...mapActions(['SureIcre']),
         sureIcre() {
             // this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
             //     userid: sessionStorage.getItem("keyId"),
@@ -160,68 +212,52 @@ export default {
             //     }
 
             // })
+
             let rootNode = document.getElementById("rootNode").getElementsByTagName('input')[0].value;
-            let tree_node = document.querySelectorAll('.el-tree-node');
-            let obj = {
-                id: id++,
-                label: rootNode,
-                children: []
-            }
             if (rootNode !== "") {
-                this.data.push(obj)
+                this.treeObj.data.label = rootNode;
+                this.data.push(this.treeObj.data)
             }
             this.RootVisible = false;
         },
         newDirectory() {
-            console.log(1)
-            this.$emit("node-click")
+            console.log(this.data)
+            this.append(this.$refs.tree.store, this.treeObj.data)
         },
         delDirectory() {
-
+            this.$refs.tree.store.remove(this.treeObj.data)
         },
         rename() {
-
+            // renderContent(createElement){
+            //     return createElement(
+            //         'input',this.treeobj.node.label
+            //     )
+            // }
+            console.log(this.$refs.tree.store, this.treeObj.node.label)
         },
-        handle(data,obj){
-            console.log(data)
+        createSource() {
+            this.IcredialogFormVisible = true;
         },
         handleNodeClick(data, node, obj) {
-            console.log(data, node, obj);
+            this.treeObj.data = data;
+            this.treeObj.node = node;
+            this.treeObj.obj = obj;
+            if (this.treeObj.node.level > 3) {
+                this.creShow = true;
+                this.newDire = false;
+            } else {
+                this.creShow = false;
+                this.newDire = true;
+            }
+            console.log(this.treeObj.data)
         },
         append(store, data) {
-            store.append({ id: id++, label: 'testtest', children: [] }, data);
+            store.append({ id: id++, label: "nodeVal", children: [] }, data);
         },
         renderContent: function (createElement, { node, data, store }) {
             var self = this;
             return createElement('span', [
-                createElement('span', node.label),
-                createElement('span', {
-                    attrs: {
-                        style: "float: right; margin-right: 20px"
-                    }
-                }, [
-                        createElement('el-button', {
-                            attrs: {
-                                size: "mini"
-                            }, on: {
-                                click: function () {
-                                    console.info("点击了节点" + data.id + "的添加按钮");
-
-                                    store.append({ id:id++, label: 'testtest', children: [] }, data);
-                                }
-                            }
-                        }, "添加"),
-                        createElement('el-button', {
-                            attrs: {
-                                size: "mini"
-                            }, on: {
-                                click: function () {
-                                    console.info("点击了节点" + data.id + "的删除按钮");
-                                    store.remove(data);
-                                }
-                            }
-                        }, "删除"),
-                    ]),
+                createElement('span', node.label)
             ]);
         }
     }
