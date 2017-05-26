@@ -13,8 +13,11 @@
                 <el-button class="btn" type="primary" @click="IcredialogFormVisible=true">编辑</el-button>
             </div>
         </div>
-        <div class="source-tree" id="tree">
-            <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
+        <div class="source-tree" id="tree" @keydown.enter="newName">
+            <div id="filter" v-show="showDire">
+                <el-input placeholder="请输入内容" v-show="showDire" autofocus id="direNewName" @bulr="this.showDire=false"></el-input>
+            </div>
+            <el-tree :data="data" :props="defaultProps" node-key="catalogId" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
             </el-tree>
     
         </div>
@@ -100,12 +103,12 @@
                 <el-button type="primary" @click="IcredialogVisible = false">确 定</el-button>
             </div>
         </el-dialog>
+    
     </div>
 </template>
 <script>
 import qs from 'qs'
-import { mapActions } from 'vuex'
-let id = 1000;
+// import { mapActions } from 'vuex'
 let vm = this;
 const jy_url = "http://www.369college.com/369education"
 export default {
@@ -116,13 +119,13 @@ export default {
             IcredialogFormVisible: false,
             creShow: false,
             newDire: true,
-            targetNode: '',
+            showDire: false,
             data: [
 
             ],
             defaultProps: {
-                children: 'children',
-                label: 'label'
+                children: 'catalogList',
+                label: 'catalogName'
             },
             icreTask: {
                 name: '',
@@ -135,24 +138,18 @@ export default {
 
             },
             treeObj: {
-                data: {
-                    id:'',
-                    children:[],
-                    label:''
-                },
+                data: {},
                 node: '',
                 obj: ''
             },
-            rootData: {
-                children: '',
-                label: ''
-            }
-
 
         }
     },
-
+    created() {
+        this.getAllCatalog()
+    },
     mounted() {
+
         this.$nextTick(() => {
             let vm = this;
             let tree = document.getElementById("tree");
@@ -174,7 +171,6 @@ export default {
                 return false;
             }
             function closeNewContextMenu(ev) {
-
                 if (ev.target !== treemenu) {
                     vm.menuShow = false;
                 }
@@ -187,45 +183,84 @@ export default {
                         treemenu.style.left = ev.clientX + "px";
                         treemenu.style.top = ev.clientY + "px";
                         vm.menuShow = true;
+                        vm.nodeTarget = ev.target;
                         ev.target.click()
-                        this.targetNode = ev.target;
+
                     }
                 }
             })
             bindEvent(document, 'click', closeNewContextMenu)
-            bindEvent(tree, 'click', closeNewContextMenu)
+            bindEvent(treemenu, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'contextmenu', closeContextMenu)
         })
 
     },
     methods: {
         // ...mapActions(['SureIcre']),
+        getAllCatalog() {
+            this.$http.get(jy_url + "/yzh/education/inter/getAllCatalog?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
+                this.data = res.data.catalogList;
+            })
+        },
         sureIcre() {
-            // this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
-            //     userid: sessionStorage.getItem("keyId"),
-            //     accesstoken: sessionStorage.getItem("keyToken"),
-            //     catalogName: "javascript",
-            // })).then(res => {
-            //     if (res.data.addCatalogFlag === "success") {
-            //         console.log()
-
-            //     }
-
-            // })
-
             let rootNode = document.getElementById("rootNode").getElementsByTagName('input')[0].value;
             if (rootNode !== "") {
-                this.treeObj.data.label = rootNode;
-                this.data.push(this.treeObj.data)
+                this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
+                    userid: sessionStorage.getItem("jykeyId"),
+                    accesstoken: sessionStorage.getItem("jykeyToken"),
+                    catalogName: rootNode,
+                })).then(res => {
+                    if (res.data.addCatalogFlag === "success") {
+                        let obj = {
+                            id: '',
+                            label: rootNode,
+                            children: []
+                        }
+                        this.data.push(obj)
+                        this.getAllCatalog()
+                    }
+                })
+
             }
             this.RootVisible = false;
         },
         newDirectory() {
-            console.log(this.data)
-            this.append(this.$refs.tree.store, this.treeObj.data)
+            let direNewName = document.getElementById('direNewName')
+            let currentNode = document.getElementsByClassName('is-current')[0];
+            currentNode.appendChild(direNewName)
+            this.showDire = true;
+        },
+        newName() {
+            let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0].value;
+            console.log(this.treeObj.data.catalogid)
+            if (direInput !== "") {
+                let nodeData = { catalogId: '', catalogName: direInput, catalogList: [] };
+                    this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
+                        userid: sessionStorage.getItem("jykeyId"),
+                        accesstoken: sessionStorage.getItem("jykeyToken"),
+                        catalogName: direInput,
+                        catalogPid: this.treeObj.data.catalogid
+                    })).then(res => {
+                         if (res.data.addCatalogFlag === "success") {
+                this.$refs.tree.store.append(nodeData, this.treeObj.data);
+                this.showDire = false;
+                this.getAllCatalog()
+                     }
+                })
+
+            }
         },
         delDirectory() {
-            this.$refs.tree.store.remove(this.treeObj.data)
+            this.$http.post(jy_url + "/yzh/education/inter/deletePXCatalog", qs.stringify({
+                userid: sessionStorage.getItem("jykeyId"),
+                accesstoken: sessionStorage.getItem("jykeyToken"),
+                catalogId: this.treeObj.data.catalogId,
+            })).then(res => {
+                if (res.data.deleteCatalogFlag === "success") {
+                    this.$refs.tree.store.remove(this.treeObj.data)
+                    this.getAllCatalog()
+                }
+            })
         },
         rename() {
             // renderContent(createElement){
@@ -242,7 +277,7 @@ export default {
             this.treeObj.data = data;
             this.treeObj.node = node;
             this.treeObj.obj = obj;
-            if (this.treeObj.node.level > 3) {
+            if (this.treeObj.node.level > 4) {
                 this.creShow = true;
                 this.newDire = false;
             } else {
@@ -251,17 +286,44 @@ export default {
             }
             console.log(this.treeObj.data)
         },
-        append(store, data) {
-            store.append({ id: id++, label: "nodeVal", children: [] }, data);
-        },
         renderContent: function (createElement, { node, data, store }) {
             var self = this;
-            return createElement('span', [
-                createElement('span', node.label)
-            ]);
+            return createElement('el-tooltip', {
+                attrs: {
+                    effect: "dark",
+                    content: node.label,
+                    placement: "bottom-end"
+                }
+            }, [
+                    createElement('span', node.label),
+                    //  [
+                    //         createElement('el-input', {
+                    //             attrs: {
+                    //                 size: "mini",
+                    //                 v-model:node.label,
+                    //                 v-show:"showDire"
+                    //             }, on: {
+                    //                 click: function () {
+                    //                     console.info("点击了节点" + data.id + "的添加按钮");
+                    //                     self.append(store, data)
+                    //                 }
+                    //             }
+                    //         }, "添加"),
+                    //         createElement('el-button', {
+                    //             attrs: {
+                    //                 size: "mini"
+                    //             }, on: {
+                    //                 click: function () {
+                    //                     console.info("点击了节点" + data.id + "的删除按钮");
+                    //                     store.remove(data);
+                    //                 }
+                    //             }
+                    //         }, "删除"),
+                    //     ]
+                ])
         }
-    }
 
+    }
 
 };
 </script>
@@ -295,6 +357,8 @@ export default {
     .source-tree {
         float: left;
         min-height: 761px;
+        height: inherit;
+        position: relative;
         .el-tree {
             border: none;
             background-color: #f6f6f6
@@ -302,14 +366,37 @@ export default {
         width: 20%;
         padding-left: 14px;
         background-color: #f6f6f6;
-        #contextmenu {
-            width: 180px;
-            height: 240px;
-            background-color: #f2f2f2;
+
+        #filter {
+            width: 100%;
+            height: 100%;
             position: absolute;
-            border: 1px solid #BFBFBF;
-            box-shadow: 2px 2px 3px #aaaaaa;
+            top: 0;
+            left: 0;
+            background-color: rgba(209, 219, 229, .5);
+            #direNewName {
+                position: relative;
+                z-index: 9999;
+            }
         }
+    }
+    #treemenu {
+        width: 144px;
+        line-height: 34px;
+        background-color: #ffffff;
+        position: absolute;
+        border: 1px solid #8ecde7;
+        box-shadow: 2px 2px 3px #aaaaaa;
+        z-index: 1000;
+    }
+
+    #treemenu li {
+        height: 34px;
+        padding-left: 15px;
+        cursor: pointer;
+    }
+    #treemenu li:hover {
+        background-color: #edf7ff;
     }
     .source-con {
         width: 70%;

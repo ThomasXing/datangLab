@@ -188,7 +188,7 @@ export default {
     }
 };
 </script>
-<style>
+<style scoped>
 #treemenu {
     width: 180px;
     height: 240px;

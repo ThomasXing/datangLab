@@ -60,6 +60,7 @@ export default {
                     if (res.data.loginFlag === true) {
                         sessionStorage.setItem('userid', this.userid)
                         this.$router.push({ name: 'lab', params: { userId: this.userid } })
+                         sessionStorage.setItem('rolelist', res.data.rolelist)
                     }
                 }, error => {
                     // console.log(err)

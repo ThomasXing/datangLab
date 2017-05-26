@@ -49,25 +49,51 @@ export default {
                     confirmButtonText: '确定',
                 })
             } else if (this.$route.params.id == "竞争力培养") {
-                this.$http.post('/api/yzh/inter/login', qs.stringify({
-                    userName: this.userid,
-                    passWord: this.accesstoken
-                })).then(res => {
-                    sessionStorage.setItem('userid', this.userid)
-                    this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
-                    sessionStorage.setItem('keyId', res.data.userid)
-                    sessionStorage.setItem('keyToken', res.data.accesstoken)
-                }, error => {
-                    if (error.message === "Network Error"|| new XMLHttpRequest().status==0) {
-                        this.$alert('网络错误', '提示信息', {
-                            confirmButtonText: '确定',
-                        });
-                    } else {
-                        this.$alert('用户名或密码输入错误', '提示信息', {
-                            confirmButtonText: '确定',
-                        })
-                    }
-                })
+                if (sessionStorage.getItem("rolelist") === "1") {
+                    this.$http.post('/api/yzh/inter/login', qs.stringify({
+                        userName: this.userid,
+                        passWord: this.accesstoken
+                    })).then(res => {
+                        sessionStorage.setItem('userid', this.userid)
+                        this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
+                        sessionStorage.setItem('keyId', res.data.userid)
+                        sessionStorage.setItem('keyToken', res.data.accesstoken)
+
+                    }, error => {
+                        if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
+                            this.$alert('网络错误', '提示信息', {
+                                confirmButtonText: '确定',
+                            });
+                        } else {
+                            this.$alert('用户名或密码输入错误', '提示信息', {
+                                confirmButtonText: '确定',
+                            })
+                        }
+                    })
+                } else if (sessionStorage.getItem("rolelist") === "2") {
+                    this.$http.post('http://www.369college.com/369education/yzh/inter/login', qs.stringify({
+                        userName: this.userid,
+                        passWord: this.accesstoken
+                    })).then(res => {
+                        console.log(res)
+                        sessionStorage.setItem('jyuserid', this.userid)
+                        this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
+                        sessionStorage.setItem('jykeyId', res.data.userid)
+                        sessionStorage.setItem('jykeyToken', res.data.accesstoken)
+
+                    }, error => {
+                        if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
+                            this.$alert('网络错误', '提示信息', {
+                                confirmButtonText: '确定',
+                            });
+                        } else {
+                            this.$alert('用户名或密码输入错误', '提示信息', {
+                                confirmButtonText: '确定',
+                            })
+                        }
+                    })
+                }
+
             }
         },
         rempw() {
