@@ -249,14 +249,14 @@ export default {
             
         },
         newName(ev) {
-            let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0].value;
-            if (ev.keyCode === 13||ev.type==="blur") {
-                if (direInput !== "") {
-                    let nodeData = { catalogId: '', catalogName: direInput, catalogList: [] };
+            let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0];
+            if (ev.keyCode === 13||(ev.type==="blur" &&ev.keyCode !== 13)) {
+                if (direInput.value !== "") {
+                    let nodeData = { catalogId: '', catalogName: direInput.value, catalogList: [] };
                     this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
                         userid: sessionStorage.getItem("jykeyId"),
                         accesstoken: sessionStorage.getItem("jykeyToken"),
-                        catalogName: direInput,
+                        catalogName: direInput.value,
                         catalogPid: this.treeObj.data.catalogId
                     })).then(res => {
                         if (res.data.addCatalogFlag === "success") {
@@ -265,6 +265,7 @@ export default {
                         }
                     })
                 }
+                direInput.value="";
                 this.showDire = false;
               
             }
@@ -360,12 +361,10 @@ export default {
                     placement: "bottom-end"
                 }
             }, [
-                    createElement('span', node.label)
+                    createElement('span', node.label)                
                 ])
         }
-
     }
-
 };
 </script>
 <style lang='less' scoped>
@@ -438,6 +437,7 @@ export default {
         border: 1px solid #8ecde7;
         box-shadow: 2px 2px 3px #aaaaaa;
         z-index: 1000;
+        padding: 10px 0;
     }
 
     #treemenu li {
