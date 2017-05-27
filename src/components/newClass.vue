@@ -161,18 +161,18 @@ export default {
     methods: {
         //查询教师
         getTeacherList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {
                 this.teacherList = res.data.teacherList;
             })
         },
         //查询项目经理
         getpmList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherXMRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherXMRole").then(res => {
                 this.pmList = res.data.teacherList;
             })
         },
         getAllProduct() {
-            this.$http.get("/api/yzh/research/inter/getAllProduct?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllProduct?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.productList = res.data.productList;
                 this.productCode = res.data.productList[0].productCode
             }).catch(err => console.log(err))
@@ -194,12 +194,12 @@ export default {
             this.pmCode = e;
         },
         getAllCourse() {
-            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
             })
         },
         addClass() {
-            this.$http.post("/api/yzh/research/inter/addClass", qs.stringify({
+            this.$http.post("/api/369research/yzh/research/inter/addClass", qs.stringify({
                 userid: sessionStorage.getItem("keyId"),
                 accesstoken: sessionStorage.getItem("keyToken"),
                 teacherOne: this.formInline.jiagoushi,

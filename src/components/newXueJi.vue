@@ -508,30 +508,30 @@ export default {
     methods: {
         //获取所有学校
         getSchoolList() {
-            this.$http.get("/api/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.schoolList = res.data.schoolList;
             }).catch(err => console.log(err))
         },
         //获取所有专业
         getAllProfession() {
-            this.$http.get("/api/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.professionList = res.data.professionList
             })
         },
         //查询教师
         getTeacherList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {
                 this.teacherList = res.data.teacherList;
             })
         },
         //查询项目经理
         getpmList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherXMRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherXMRole").then(res => {
                 this.pmList = res.data.teacherList;
             })
         },
         getAllClass() {
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.classList = res.data.classList;
             })
         },
@@ -572,7 +572,7 @@ export default {
 
         },
         get_classId(list) {
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + encodeURIComponent(encodeURIComponent(list))).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&className=" + encodeURIComponent(encodeURIComponent(list))).then(res => {
                 this.classId = res.data.classList[0].classId;
                 if (this.$store.state.isXiugai === true) {
                     this.newStuEvent=this.classEvent[this.classId]     
@@ -640,7 +640,7 @@ export default {
 
         },
         get_newXueJI() {
-            this.$http.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + this.$route.params.stuId).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + this.$route.params.stuId).then(res => {
                 let data = res.data.stuManagementQB
                 data.stuSex === "F" ? data.stuSex = "女" : data.stuSex = "男";
                 let stuQualification = data.stuQualification;
@@ -708,7 +708,7 @@ export default {
             this.pmCode = e;
         },
         getAllCourse() {
-            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
             })
         },
@@ -817,7 +817,7 @@ export default {
                         schoolCode: this.schoolCode,
                         professionCode: this.professionCode
                     }
-                    this.$http.post("/api/yzh/research/inter/addStuManagement", qs.stringify(params)).then(res => {
+                    this.$http.post("/api/369research/yzh/research/inter/addStuManagement", qs.stringify(params)).then(res => {
                         if (res.data.addStuManagementFlag === "success") {
                             this.$alert('学籍添加成功', '提示信息', {
                                 confirmButtonText: '确定',
@@ -859,7 +859,7 @@ export default {
             }
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.$http.post("/api/yzh/research/inter/updateStuManagement", qs.stringify(params)).then(res => {
+                    this.$http.post("/api/369research/yzh/research/inter/updateStuManagement", qs.stringify(params)).then(res => {
                         if (res.data.updateStuManagementFlag === "success") {
                             this.$alert('学籍修改成功', '提示信息', {
                                 confirmButtonText: '确定',

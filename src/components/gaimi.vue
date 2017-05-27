@@ -72,7 +72,7 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.$http.post("/api/yzh/research/inter/updateStuPassword", qs.stringify({
+                    this.$http.post("/api/369research/yzh/research/inter/updateStuPassword", qs.stringify({
                         userid: sessionStorage.getItem("keyId"),
                         accesstoken: sessionStorage.getItem("keyToken"),
                         stuId: "1c6c8ec083314978a5c9dc7db68456d7"

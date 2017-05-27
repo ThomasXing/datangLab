@@ -13,9 +13,12 @@
                 <el-button class="btn" type="primary" @click="IcredialogFormVisible=true">编辑</el-button>
             </div>
         </div>
-        <div class="source-tree" id="tree" @keydown.enter="newName">
-            <div id="filter" v-show="showDire">
-                <el-input placeholder="请输入内容" v-show="showDire" autofocus id="direNewName" @bulr="this.showDire=false"></el-input>
+        <div class="source-tree" id="tree">
+            <div class="filter" v-show="showDire">
+                <el-input type="text" placeholder="请输入内容" @keyup.native="newName($event)" v-show="showDire" @blur="newName($event)" id="direNewName"></el-input>
+            </div>
+            <div class="filter" v-show="renameShow">
+                <el-input placeholder="请输入内容" @keyup.native="renameV($event)" @blur="renameV($event)" v-show="renameShow" id="rename"></el-input>
             </div>
             <el-tree :data="data" :props="defaultProps" node-key="catalogId" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false" :render-content="renderContent">
             </el-tree>
@@ -23,8 +26,8 @@
         </div>
         <div id="treemenu" v-show="menuShow">
             <ul class="treemenu">
-                <li @click='createSource' v-show="creShow">创建资源</li>
                 <li @click='newDirectory' v-show="newDire">新建目录</li>
+                <li @click='createSource' v-show="creShow">创建资源</li>
                 <li @click='delDirectory'>删除课程</li>
                 <li @click='rename'>重命名</li>
             </ul>
@@ -77,19 +80,19 @@
         <el-dialog title="任务" :visible.sync="IcredialogFormVisible">
             <el-form :model="icreTask" label-width="80px">
                 <el-form-item label="任务名称">
-                    <el-input v-model="icreTask.name" auto-complete="off"></el-input>
+                    <el-input v-model="icreTask.taskName" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="任务说明">
-                    <el-input type="textarea" :rows="5" placeholder="最多输入1000个汉字" v-model="icreTask.instructions"></el-input>
+                    <el-input type="textarea" :rows="5" placeholder="最多输入1000个汉字" v-model="icreTask.taskIntro"></el-input>
                 </el-form-item>
                 <el-form-item label="测评内容">
-                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.content"></el-input>
+                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.testContent"></el-input>
                 </el-form-item>
                 <el-form-item label="测评标准">
-                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.standard"></el-input>
+                    <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.testStandard"></el-input>
                 </el-form-item>
                 <el-form-item label="上传文件">
-                    <el-upload class="upload-demo" drag action="http://www.369college.com/369education/yzh/education/inter/uploadFile" multiple name="" :data="upload" accept="">
+                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple name="" :data="upload" accept="" :on-preview="handlePreview" :on-remove="handleRemove">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或
                             <em>点击上传</em>
@@ -100,7 +103,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="IcredialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="IcredialogVisible = false">确 定</el-button>
+                <el-button type="primary" @click="icreTaskSource">确 定</el-button>
             </div>
         </el-dialog>
     
@@ -117,9 +120,10 @@ export default {
             menuShow: false,
             RootVisible: false,
             IcredialogFormVisible: false,
-            creShow: false,
+            creShow: true,
             newDire: true,
             showDire: false,
+            renameShow: false,
             data: [
 
             ],
@@ -128,10 +132,10 @@ export default {
                 label: 'catalogName'
             },
             icreTask: {
-                name: '',
-                instructions: '',
-                content: '',
-                standard: ''
+                taskName: '',
+                taskIntro: '',
+                testContent: '',
+                testStandard: ''
             },
             upload: {
                 title: '',
@@ -142,6 +146,7 @@ export default {
                 node: '',
                 obj: ''
             },
+
 
         }
     },
@@ -191,11 +196,18 @@ export default {
             })
             bindEvent(document, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'click', closeNewContextMenu)
-            bindEvent(treemenu, 'contextmenu', closeContextMenu)
+            bindEvent(treemenu, 'contextmenu', closeContextMenu);
+            
         })
 
     },
     methods: {
+        handleRemove(file, fileList) {
+            console.log(file, fileList);
+        },
+        handlePreview(file) {
+            console.log(file.response);
+        },
         // ...mapActions(['SureIcre']),
         getAllCatalog() {
             this.$http.get(jy_url + "/yzh/education/inter/getAllCatalog?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
@@ -225,29 +237,36 @@ export default {
             this.RootVisible = false;
         },
         newDirectory() {
+
             let direNewName = document.getElementById('direNewName')
             let currentNode = document.getElementsByClassName('is-current')[0];
+            let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0];
+            setTimeout(function(){
+                direInput.focus();
+            }, 10);
             currentNode.appendChild(direNewName)
             this.showDire = true;
+            
         },
-        newName() {
+        newName(ev) {
             let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0].value;
-            console.log(this.treeObj.data.catalogid)
-            if (direInput !== "") {
-                let nodeData = { catalogId: '', catalogName: direInput, catalogList: [] };
+            if (ev.keyCode === 13||ev.type==="blur") {
+                if (direInput !== "") {
+                    let nodeData = { catalogId: '', catalogName: direInput, catalogList: [] };
                     this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
                         userid: sessionStorage.getItem("jykeyId"),
                         accesstoken: sessionStorage.getItem("jykeyToken"),
                         catalogName: direInput,
-                        catalogPid: this.treeObj.data.catalogid
+                        catalogPid: this.treeObj.data.catalogId
                     })).then(res => {
-                         if (res.data.addCatalogFlag === "success") {
-                this.$refs.tree.store.append(nodeData, this.treeObj.data);
+                        if (res.data.addCatalogFlag === "success") {
+                            this.$refs.tree.store.append(nodeData, this.treeObj.data);
+                            this.getAllCatalog();
+                        }
+                    })
+                }
                 this.showDire = false;
-                this.getAllCatalog()
-                     }
-                })
-
+              
             }
         },
         delDirectory() {
@@ -262,29 +281,75 @@ export default {
                 }
             })
         },
+      
         rename() {
-            // renderContent(createElement){
-            //     return createElement(
-            //         'input',this.treeobj.node.label
-            //     )
-            // }
-            console.log(this.$refs.tree.store, this.treeObj.node.label)
+            let rename = document.getElementById('rename')
+            let currentNode = document.getElementsByClassName('is-current')[0];
+            let renameVal = rename.getElementsByTagName('input')[0];
+            renameVal.value = this.treeObj.node.label;
+             setTimeout(function() {
+                renameVal.focus();
+                renameVal.select();
+            }, 10);
+            this.preappend(rename, currentNode);
+ 
+            this.renameShow = true;
+        },
+        preappend(node, scope) {
+            if (node.nodeType === 1 || node.nodeType === 9 || node.nodeType === 11) {
+                scope.insertBefore(node, scope.firstChild);
+            }
+
+        },
+        renameV(ev) {
+            let renameVal = document.getElementById('rename').getElementsByTagName('input')[0].value;
+            if (ev.keyCode === 13||ev.type==="blur") {
+                if (renameVal !== "") {
+                    this.$http.post(jy_url + "/yzh/education/inter/updatePXCatalogName", qs.stringify({
+                        userid: sessionStorage.getItem("jykeyId"),
+                        accesstoken: sessionStorage.getItem("jykeyToken"),
+                        catalogName: renameVal,
+                        catalogId: this.treeObj.data.catalogId
+                    })).then(res => {
+                        if (res.data.updateCatalogFlag === "success") {
+                            this.getAllCatalog();
+                        }
+                    })
+                }
+                this.renameShow = false;
+               
+            }
         },
         createSource() {
             this.IcredialogFormVisible = true;
+        },
+        icreTaskSource() {
+            this.$http.post("/api/369education/yzh/eudcation/inter/addTask", qs.stringify({
+                userid: sessionStorage.getItem("jykeyId"),
+                accesstoken: sessionStorage.getItem("jykeyToken"),
+                catalogId: this.treeObj.data.catalogId,
+                taskName: this.icreTask.taskName,
+                taskIntro: this.icreTask.taskIntro,
+                testContent: this.icreTask.testContent,
+                testStandard: this.icreTask.testStandard,
+                taskFileStr: '',
+            })).then(res => {
+                if (res.data.updateCatalogFlag === "success") {
+                    this.getAllCatalog();
+                }
+            })
         },
         handleNodeClick(data, node, obj) {
             this.treeObj.data = data;
             this.treeObj.node = node;
             this.treeObj.obj = obj;
-            if (this.treeObj.node.level > 4) {
-                this.creShow = true;
+            if (this.treeObj.node.level > 3) {
+                this.creShow = false;
                 this.newDire = false;
             } else {
-                this.creShow = false;
+                this.creShow = true;
                 this.newDire = true;
             }
-            console.log(this.treeObj.data)
         },
         renderContent: function (createElement, { node, data, store }) {
             var self = this;
@@ -295,31 +360,7 @@ export default {
                     placement: "bottom-end"
                 }
             }, [
-                    createElement('span', node.label),
-                    //  [
-                    //         createElement('el-input', {
-                    //             attrs: {
-                    //                 size: "mini",
-                    //                 v-model:node.label,
-                    //                 v-show:"showDire"
-                    //             }, on: {
-                    //                 click: function () {
-                    //                     console.info("点击了节点" + data.id + "的添加按钮");
-                    //                     self.append(store, data)
-                    //                 }
-                    //             }
-                    //         }, "添加"),
-                    //         createElement('el-button', {
-                    //             attrs: {
-                    //                 size: "mini"
-                    //             }, on: {
-                    //                 click: function () {
-                    //                     console.info("点击了节点" + data.id + "的删除按钮");
-                    //                     store.remove(data);
-                    //                 }
-                    //             }
-                    //         }, "删除"),
-                    //     ]
+                    createElement('span', node.label)
                 ])
         }
 
@@ -361,18 +402,27 @@ export default {
         position: relative;
         .el-tree {
             border: none;
-            background-color: #f6f6f6
+            background-color: #f6f6f6;
+        //    .el-tree-node.el-tree-node__content {
+        //         text-overflow: ellipsis;
+        //         overflow: hidden;
+        //         white-space: nowrap;
+        //     }
         }
+        
         width: 20%;
         padding-left: 14px;
         background-color: #f6f6f6;
-
-        #filter {
+        #rename {
+            position: absolute;
+            z-index: 9999;
+        }
+        .filter {
             width: 100%;
             height: 100%;
             position: absolute;
             top: 0;
-            left: 0;
+            left: 0; // z-index: 1000;
             background-color: rgba(209, 219, 229, .5);
             #direNewName {
                 position: relative;

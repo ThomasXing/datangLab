@@ -147,7 +147,7 @@ export default {
             if (this.formInline.status === "") {
                 this.courseState[this.formInline.status] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma
+            this.$http.get("/api/369research/yzh/research/inter/getCourseByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&courseName=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&courseState=" + this.courseState[this.formInline.status] + "&courseCode=" + this.formInline.bianma
             ).then(res => {
                 this.courseList = res.data.courseList
             })
@@ -158,7 +158,7 @@ export default {
             } else {
                 courseState = "N"
             }
-            this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
+            this.$http.post("/api/369research/yzh/research/inter/updateCourse", qs.stringify({
                 userid: this.username,
                 accesstoken: this.password,
                 courseId: courseId,
@@ -185,7 +185,7 @@ export default {
             if (this.formInline.courseName === "" && this.formInline.courseStatus === "" && this.formInline.courseContent === "") {
                 this.dialogVisible = false;
             } else {
-                this.$http.post("/api/yzh/research/inter/updateCourse", qs.stringify({
+                this.$http.post("/api/369research/yzh/research/inter/updateCourse", qs.stringify({
                     userid: this.username,
                     accesstoken: this.password,
                     courseId: this.courseId,
@@ -206,7 +206,7 @@ export default {
         },
         //获取所有课程
         getAllCourse() {
-            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllCourse?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.courseList = res.data.courseList;
             })
         },

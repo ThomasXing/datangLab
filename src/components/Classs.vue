@@ -199,19 +199,19 @@ export default {
     methods: {
         //获取所有班级
         getAllClass() {
-            this.$http.get("/api/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllClass?userid=" + this.username + "&accesstoken=" + this.password).then(res => {
                 this.classList = res.data.classList
             })
         },
         //查询教师
         getTeacherList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + this.username + "&accesstoken=" + this.password + "&roleName=teacherJGRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + this.username + "&accesstoken=" + this.password + "&roleName=teacherJGRole").then(res => {
                 this.teacherList = res.data.teacherList;
             })
         },
         //查询项目经理
         getpmList() {
-            this.$http.get("/api/yzh/research/inter/getTeacherList?userid=" + this.username + "&accesstoken=" + this.password + "&roleName=teacherXMRole").then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + this.username + "&accesstoken=" + this.password + "&roleName=teacherXMRole").then(res => {
                 this.pmList = res.data.teacherList;
             })
         },
@@ -220,13 +220,13 @@ export default {
             if (this.formInline.status === "") {
                 this.classStatus[this.formInline.status] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.teacherCode + "&teacherTwo=" + this.pmCode).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getClassByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classState=" + this.classStatus[this.formInline.status] + "&classCode=" + this.formInline.bianma + "&teacherOne=" + this.teacherCode + "&teacherTwo=" + this.pmCode).then(res => {
                 this.classList = res.data.classList
             }).catch(err => console.log(err))
         },
         //获取所有课程
         getAllCourse() {
-            this.$http.get("/api/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.courseList = res.data.courseList
             })
         },
@@ -256,7 +256,7 @@ export default {
             }else{
                 classState="N"
             }
-            this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+            this.$http.post("/api/369research/yzh/research/inter/updateClass", qs.stringify({
                 userid: this.username,
                 accesstoken: this.password,
                 classId: classId,
@@ -277,7 +277,7 @@ export default {
             // if (this.formInline.courseName === "" && this.formInline.courseStatus === "" && this.formInline.courseContent === "") {
             //     this.dialogVisible = false;
             // } else {
-            this.$http.post("/api/yzh/research/inter/updateClass", qs.stringify({
+            this.$http.post("/api/369research/yzh/research/inter/updateClass", qs.stringify({
                 userid: this.username,
                 accesstoken: this.password,
                 classId: this.classId,

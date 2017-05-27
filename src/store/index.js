@@ -20,7 +20,7 @@ const state = {
 const actions = {
     SET_TITLE: ({ commit }, val) => commit("set_title", val),
     GET_SCHOOLLIST: ({ commit }) => {
-        axios.get("/api/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+        axios.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
              let data = res.data.schoolList;
             commit("get_schoolList", data) 
 
@@ -28,7 +28,7 @@ const actions = {
        
     },
     GET_PROFESSIONLIST:({commit})=>{
-         axios.get("/api/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+         axios.get("/api/369research/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
             let data = res.data.professionList;
             commit("get_professionList", data)
 

@@ -135,7 +135,7 @@ export default {
     methods: {
         //获取所有学籍
         getAllStuManagement() {
-            this.$http.get("/api/yzh/research/inter/getAllStuManagement?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" +sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllStuManagement?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" +sessionStorage.getItem("keyToken")).then(res => {
                 this.stuManagementList = res.data.stuManagementList
             })
         },
@@ -158,14 +158,14 @@ export default {
             }
         },
         handleClick(list) {
-            this.$http.get("/api/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + list.stuId).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getStuManagementByStuId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&stuId=" + list.stuId).then(res => {
                 let pass = res.data.stuManagementQB.stuIdCard.slice(-6);
                 this.$confirm('确定要为选中的学生，重置密码吗？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'info'
                 }).then(() => {
-                    this.$http.post("/api/yzh/research/inter/updateStuPassword", qs.stringify({
+                    this.$http.post("/api/369research/yzh/research/inter/updateStuPassword", qs.stringify({
                         userid: sessionStorage.getItem("keyId"),
                         accesstoken: sessionStorage.getItem("keyToken"),
                         stuId: list.stuId
@@ -196,7 +196,7 @@ export default {
             if (this.formInline.xujiRecord === "") {
                 this.xujiRecord[this.formInline.xujiRecord] = "";
             }
-            this.$http.get("/api/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(encodeURIComponent(this.formInline.firstname)) + "&creDate=" + this.formInline.startTime + "&endDate=" + this.formInline.endTime + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getStuManagementByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&schoolCode=" + this.schoolCode + "&professionCode=" + this.professionCode + "&className=" + encodeURIComponent(encodeURIComponent(this.formInline.name)) + "&classCode=" + this.formInline.bianma + "&stuCode=" + this.formInline.id + "&stuName=" + encodeURIComponent(encodeURIComponent(this.formInline.firstname)) + "&creDate=" + this.formInline.startTime + "&endDate=" + this.formInline.endTime + "&stateListStr=" + this.xujiStatus[this.formInline.xujiStatus] + "&eventListStr=" + this.xujiRecord[this.formInline.xujiRecord]).then(res => {
                 this.stuManagementList = res.data.stuManagementList;
             }, err => console.log(err))
         },

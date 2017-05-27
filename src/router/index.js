@@ -18,7 +18,6 @@ import SourceLab from '@/components/jy/SourceLab.vue'
 import Source from '@/components/jy/Source.vue'
 import Ability from '@/components/jy/Ability.vue'
 import JobEval from '@/components/jy/JobEval.vue'
-import Tree from '@/components/jy/Tree.vue'
 Vue.use(Router)
 export default new Router({
   routes: [
@@ -62,8 +61,7 @@ export default new Router({
       children:[
         {path:'source',component:Source},
         {path:'ability',component:Ability},
-        {path:'jobeval',component:JobEval},
-        {path:'tree',component:Tree}
+        {path:'jobeval',component:JobEval}
       ]
     },
     {path:'/cultivate',component:Cultivate,

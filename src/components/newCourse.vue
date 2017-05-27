@@ -115,13 +115,13 @@ export default {
             this.productCode = c;
         },
         getAllProduct() {
-            this.$http.get("/api/yzh/research/inter/getAllProduct?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+            this.$http.get("/api/369research/yzh/research/inter/getAllProduct?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.productList = res.data.productList;
                 this.productCode = res.data.productList[0].productCode
             }).catch(err => console.log(err))
         },
         addCourse() {
-            this.$http.post("/api/yzh/research/inter/addCourse", qs.stringify({
+            this.$http.post("/api/369research/yzh/research/inter/addCourse", qs.stringify({
                 userid: sessionStorage.getItem("keyId"),
                 accesstoken: sessionStorage.getItem("keyToken"),
                 schoolCode: this.schoolCode,

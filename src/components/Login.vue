@@ -50,7 +50,7 @@ export default {
                 })
             } else if (this.$route.params.id == "竞争力培养") {
                 if (sessionStorage.getItem("rolelist") === "1") {
-                    this.$http.post('/api/yzh/inter/login', qs.stringify({
+                    this.$http.post('/api/369research/yzh/inter/login', qs.stringify({
                         userName: this.userid,
                         passWord: this.accesstoken
                     })).then(res => {
