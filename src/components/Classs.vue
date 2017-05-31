@@ -184,7 +184,6 @@ export default {
         this.getTeacherList()
         this.getpmList()
         this.onSubmit()
-        
         this.$store.dispatch('SHOW_ACTIVECLASS', "classActive")
         this.$store.dispatch('GET_SCHOOLLIST')
         this.$store.dispatch('GET_PROFESSIONLIST')

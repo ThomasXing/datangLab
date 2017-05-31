@@ -92,13 +92,25 @@
                     <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.testStandard"></el-input>
                 </el-form-item>
                 <el-form-item label="上传文件">
-                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple name="" :data="upload" accept="" :on-preview="handlePreview" :on-remove="handleRemove">
+                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple :on-preview="handlePreview" :on-remove="handleRemove" :on-success="TaskSuccess">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或
                             <em>点击上传</em>
                         </div>
-                        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+                        <!--<div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>-->
                     </el-upload>
+                </el-form-item>
+                <el-form-item id="">
+                    <el-form :inline="true" :model="taskFileStr" class="demo-form-inline">
+                        <el-form-item label="标题">
+                            <el-input v-model="taskFileStr.fileName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="缩略图">
+                            <el-upload class="upload-demo" action="/api/369education/yzh/education/inter/uploadFile" :show-file-list="false" :on-success="handleSuccess">
+                                <el-input v-model="taskFileStr.fileThumbnail" placeholder="点击上传"></el-input>
+                            </el-upload>
+                        </el-form-item>
+                    </el-form>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -124,9 +136,7 @@ export default {
             newDire: true,
             showDire: false,
             renameShow: false,
-            data: [
-
-            ],
+            data: [],
             defaultProps: {
                 children: 'catalogList',
                 label: 'catalogName'
@@ -136,16 +146,22 @@ export default {
                 taskIntro: '',
                 testContent: '',
                 testStandard: ''
-            },
-            upload: {
-                title: '',
 
             },
+            taskFileStr: {
+                fileName: '',
+                fileThumbnail: '',
+                fileUrl: '',
+                fileAttachName: ''
+            },
+            fileList: [],
             treeObj: {
                 data: {},
                 node: '',
                 obj: ''
             },
+            fileList2: [{ name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }, { name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }]
+
 
 
         }
@@ -154,7 +170,6 @@ export default {
         this.getAllCatalog()
     },
     mounted() {
-
         this.$nextTick(() => {
             let vm = this;
             let tree = document.getElementById("tree");
@@ -197,7 +212,7 @@ export default {
             bindEvent(document, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'contextmenu', closeContextMenu);
-            
+
         })
 
     },
@@ -206,7 +221,19 @@ export default {
             console.log(file, fileList);
         },
         handlePreview(file) {
-            console.log(file.response);
+            // console.log(file.response)
+        },
+        TaskSuccess(res, file, fileList) {
+            if (res.success === true) {
+                this.taskFileStr.fileAttachName = file.name;
+                this.taskFileStr.fileUrl = res.filePath;
+            }
+
+        },
+        handleSuccess(res, file) {
+            if (res.success === true) {
+                this.taskFileStr.fileThumbnail = res.filePath;
+            }
         },
         // ...mapActions(['SureIcre']),
         getAllCatalog() {
@@ -240,17 +267,17 @@ export default {
 
             let direNewName = document.getElementById('direNewName')
             let currentNode = document.getElementsByClassName('is-current')[0];
-            let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0];
-            setTimeout(function(){
+            let direInput = direNewName.getElementsByTagName('input')[0];
+            setTimeout(function () {
                 direInput.focus();
             }, 10);
             currentNode.appendChild(direNewName)
             this.showDire = true;
-            
+
         },
         newName(ev) {
             let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0];
-            if (ev.keyCode === 13||(ev.type==="blur" &&ev.keyCode !== 13)) {
+            if (ev.keyCode === 13 || (ev.type === "blur" && ev.keyCode !== 13)) {
                 if (direInput.value !== "") {
                     let nodeData = { catalogId: '', catalogName: direInput.value, catalogList: [] };
                     this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
@@ -265,9 +292,9 @@ export default {
                         }
                     })
                 }
-                direInput.value="";
+                direInput.value = "";
                 this.showDire = false;
-              
+
             }
         },
         delDirectory() {
@@ -282,18 +309,18 @@ export default {
                 }
             })
         },
-      
+
         rename() {
             let rename = document.getElementById('rename')
             let currentNode = document.getElementsByClassName('is-current')[0];
             let renameVal = rename.getElementsByTagName('input')[0];
             renameVal.value = this.treeObj.node.label;
-             setTimeout(function() {
+            setTimeout(function () {
                 renameVal.focus();
                 renameVal.select();
             }, 10);
             this.preappend(rename, currentNode);
- 
+
             this.renameShow = true;
         },
         preappend(node, scope) {
@@ -304,7 +331,7 @@ export default {
         },
         renameV(ev) {
             let renameVal = document.getElementById('rename').getElementsByTagName('input')[0].value;
-            if (ev.keyCode === 13||ev.type==="blur") {
+            if (ev.keyCode === 13 || ev.type === "blur") {
                 if (renameVal !== "") {
                     this.$http.post(jy_url + "/yzh/education/inter/updatePXCatalogName", qs.stringify({
                         userid: sessionStorage.getItem("jykeyId"),
@@ -318,13 +345,14 @@ export default {
                     })
                 }
                 this.renameShow = false;
-               
+
             }
         },
         createSource() {
             this.IcredialogFormVisible = true;
         },
         icreTaskSource() {
+            this.fileList.push(this.taskFileStr)
             this.$http.post("/api/369education/yzh/eudcation/inter/addTask", qs.stringify({
                 userid: sessionStorage.getItem("jykeyId"),
                 accesstoken: sessionStorage.getItem("jykeyToken"),
@@ -333,23 +361,28 @@ export default {
                 taskIntro: this.icreTask.taskIntro,
                 testContent: this.icreTask.testContent,
                 testStandard: this.icreTask.testStandard,
-                taskFileStr: '',
+                taskFileStr: JSON.stringify(this.fileList)
             })).then(res => {
-                if (res.data.updateCatalogFlag === "success") {
-                    this.getAllCatalog();
-                }
+                console.log(res)
+                // if (res.data.updateCatalogFlag === "success") {
+                //     this.getAllCatalog();
+                // }
             })
         },
         handleNodeClick(data, node, obj) {
             this.treeObj.data = data;
             this.treeObj.node = node;
             this.treeObj.obj = obj;
-            if (this.treeObj.node.level > 3) {
-                this.creShow = false;
-                this.newDire = false;
-            } else {
-                this.creShow = true;
+            if (this.treeObj.node.level < 4 && this.treeObj.data.taskFlag === "N") {
                 this.newDire = true;
+                this.creShow = true;
+            } else if (this.treeObj.node.level == 4) {
+                this.newDire = false;
+                this.creShow = true;
+            }
+            if (this.treeObj.data.taskFlag !== "N") {
+                this.newDire = false;
+                this.creShow = false;
             }
         },
         renderContent: function (createElement, { node, data, store }) {
@@ -361,7 +394,7 @@ export default {
                     placement: "bottom-end"
                 }
             }, [
-                    createElement('span', node.label)                
+                    createElement('span', node.label)
                 ])
         }
     }
@@ -401,14 +434,14 @@ export default {
         position: relative;
         .el-tree {
             border: none;
-            background-color: #f6f6f6;
-        //    .el-tree-node.el-tree-node__content {
-        //         text-overflow: ellipsis;
-        //         overflow: hidden;
-        //         white-space: nowrap;
-        //     }
+            background-color: #f6f6f6; 
+            //    .el-tree-node.el-tree-node__content {
+            //         text-overflow: ellipsis;
+            //         overflow: hidden;
+            //         white-space: nowrap;
+            //     }
         }
-        
+
         width: 20%;
         padding-left: 14px;
         background-color: #f6f6f6;
