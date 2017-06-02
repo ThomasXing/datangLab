@@ -13,31 +13,53 @@ const state = {
     xueji: null,
     isXiugai: null,
     schoolList: "",
-    professionList:"",
-    menuHeight: ""
+    professionList: "",
+    menuHeight: "",
+    sourceToggle: true,
+    taskList: []
 }
 
 const actions = {
     SET_TITLE: ({ commit }, val) => commit("set_title", val),
     GET_SCHOOLLIST: ({ commit }) => {
         axios.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-             let data = res.data.schoolList;
-            commit("get_schoolList", data) 
+            let data = res.data.schoolList;
+            commit("get_schoolList", data)
 
-        },err=> console.log(err))
-       
+        }, err => console.log(err))
+
     },
-    GET_PROFESSIONLIST:({commit})=>{
-         axios.get("/api/369research/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
+    GET_PROFESSIONLIST: ({ commit }) => {
+        axios.get("/api/369research/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
             let data = res.data.professionList;
             commit("get_professionList", data)
 
-        },err=> console.log(err))
+        }, err => console.log(err))
     },
     addXuJi: ({ commit }) => commit("add_xueji"),
     WH: ({ commit }, menuHeight) => commit('wh', menuHeight),
     xiugaiXuJi: ({ commit }) => commit("xiugaixueji"),
-    SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val)
+    SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val),
+    SOURCE_HIDE: ({ commit }) => commit("source_hide"),
+    SOURCE_ShOW: ({ commit }) => commit("source_show"),
+    GET_TASKLIST: ({ commit }, item) => {
+        axios.get("/api/369education/yzh/education/inter/getTaskByCondition?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&catalogId=" + item).then(res => {
+            let data = res.data.taskList;
+            for (let val of data) {
+                for (let list of val.taskFileList) {             
+                    if (list.fileurl.slice(-3) === "ogg" || list.fileurl.slice(-3) === "pdf") {
+                        Vue.set(list, 'playIcon', "../assets/images/play.png")
+                    } else {
+                        Vue.set(list, 'playIcon', "../assets/images/download.png")
+                    }
+                }
+            }
+            console.log(data)
+            commit("get_taskList", data)
+        })
+    },
+
+
 }
 
 const mutations = {
@@ -66,11 +88,20 @@ const mutations = {
     add_xueji: (state) => {
         state.isXiugai = false;
     },
-    get_schoolList: (state,data) => {
+    get_schoolList: (state, data) => {
         state.schoolList = data;
     },
-    get_professionList:(state,data)=>{
+    get_professionList: (state, data) => {
         state.professionList = data;
+    },
+    source_hide: (state) => {
+        state.sourceToggle = false;
+    },
+    source_show: (state) => {
+        state.sourceToggle = true;
+    },
+    get_taskList: (state, data) => {
+        state.taskList = data;
     },
     wh: (state, menuHeight) => {
         let labMenu = document.getElementById("lab-menu");
@@ -93,6 +124,8 @@ const getters = {
     isXiugai: state => state.isXiugai,
     schoolList: state => state.schoolList,
     professionList: state => state.professionList,
+    sourceToggle: state => state.sourceToggle,
+    taskList: state => state.taskList,
     menuHeight: state => state.menuHeight
 }
 export default new Vuex.Store({

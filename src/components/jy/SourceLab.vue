@@ -7,7 +7,7 @@
                 <router-link tag='li' to='/sourceLab/source' active-class="active" class='labman-menu-item'>
                     <a href="javascript:;">资源库</a>
                 </router-link>
-                 <router-link tag='li' to='/sourceLab/ability' active-class="active" class='labman-menu-item'>
+                <router-link tag='li' to='/sourceLab/ability' active-class="active" class='labman-menu-item' >
                     <a href="javascript:;">能力评估</a>
                 </router-link>
                 <router-link tag='li' to='/sourceLab/jobeval' active-class="active" class='labman-menu-item'>
@@ -26,6 +26,11 @@
 <script>
 import HeadView from '../Head'
 export default {
+    data(){
+        return{
+            
+        }
+    },
     created() {
         this.$store.dispatch('SET_TITLE', '教研平台')
     },
