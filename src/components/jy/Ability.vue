@@ -13,7 +13,7 @@
         <el-form-item label="测评状态">
           <el-input v-model="test.status"></el-input>
         </el-form-item>
-        <el-form-item label='入学日期' class="datePicker">
+        <el-form-item label='发布时间' class="datePicker">
           <el-date-picker v-model="test.startTime" type="date" placeholder="选择日期" @change="creDate(test.startTime)">
           </el-date-picker>
           <label class="el-form-item__label">至</label>
@@ -25,27 +25,35 @@
           <el-button class="btn" type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
       </el-form>
-       <div class="source-list">
-              <el-button class="btn" type="primary" @click="newTest">新建测评</el-button>
-              <!--<el-table :data="classList" border style="width: 100%" class='course-list'  row-key='classList.classId' current-row-key>
-                  <el-table-column fixed prop="index" label="序号" width="52"  class="course-index">
-                  </el-table-column>
-                 
-                  <el-table-column fixed="right" label="操作" width="200">
-                      <template scope="scope">
-                          <el-button  class="my-btn"> 发布</el-button>
-                          <el-button  class="my-btn">修改</el-button>
-                      </template>
-                  </el-table-column>
-              </el-table>-->
-          </div>
+      <div class="source-list">
+        <el-button class="btn" type="primary" @click="newTest">新建测评</el-button>
+        <el-table :data="testQBList" border style="width: 100%" class='course-list' row-key='testQBList.testid' current-row-key v-show="testQBList.length!==0">
+          <el-table-column fixed prop="index" label="序号" width="52" class="course-index">
+          </el-table-column>
+          <el-table-column prop="testname" label="测评名称" width="152" class="course-index">
+          </el-table-column>
+          <el-table-column  label="测评状态" width="152" class="course-index">
+            <template scope="scope">
+              {{scope.row.teststate|testState}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="publishdate" label="发布时间" width="152" class="course-index">
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" width="200">
+            <template scope="scope">
+              <el-button class="my-btn"> 发布</el-button>
+              <el-button class="my-btn">修改</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
-
-   
+  
   </div>
 </template>
 <script>
 const jy_url = "http://www.369college.com/369education";
+import {testState} from '../../filters'
 export default {
   data() {
     return {
@@ -60,18 +68,29 @@ export default {
         startTime: '',
         endTime: ''
       },
-      courseid:'',
-      classList:''
+      courseid: '',
+      classList:[],
+      testQBList: []
     }
   },
   created() {
- 
+
     this.getAllCourse()
   },
-  methods: { 
+  filters:{
+    testState
+  },
+  methods: {
     getAllCourse() {
       this.$http.get(jy_url + "/yzh/education/inter/getAllCourse?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
         this.data = res.data.courseList;
+      })
+    },
+    getAllTest() {
+      this.$http.get(jy_url + "/yzh/education/inter/getAllTest?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid).then(res => {
+        this.testQBList = res.data.testQBList;
+        console.log(res)
+
       })
     },
     onSubmit() {
@@ -90,18 +109,28 @@ export default {
       }
     },
     newTest() {
-         this.$router.push({path:'source',query:{source:'test'}})
+      if (this.courseid !== "") {
+        this.$router.push({ path: 'source', query: { source: 'test', classList: JSON.stringify(this.classList), courseid: this.courseid } })
+      } else {
+        this.$alert('请选择课程', '提示信息', {
+          confirmButtonText: '确定',
+        });
+      }
     },
+
     handleNodeClick(data, node, obj) {
-      this.courseid=data.courseid;
-      this.getAllClassByCourseId()  
-      console.log(data,node,obj)
-    },
-    getAllClassByCourseId(){
-       this.$http.get(jy_url + "/yzh/education/inter/getAllClassByCourseId?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")+ "&courseId=" +this.courseid).then(res => {
-        this.classList = res.data.classList;
-        console.log(this.classList)
-      })  
+      this.courseid = data.courseid;
+        this.$http.get(jy_url + "/yzh/education/inter/getAllClassByCourseId?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid).then(res => {
+          this.classList = res.data.classList;
+        })
+        if (this.testQBList !== []) {
+          this.getAllTest()
+        } else {
+          this.$alert('请添加测评', '提示信息', {
+            confirmButtonText: '确定',
+          });
+        }
+      console.log(data, node, obj)
     }
   }
 }
@@ -132,10 +161,10 @@ export default {
   width: 68%;
   margin-top: 22px;
   margin-left: 20px;
- .demo-form-inline{
-   border-bottom: 1px solid #e8e8e8;
-   margin-bottom: 17px;
- }
+  .demo-form-inline {
+    border-bottom: 1px solid #e8e8e8;
+    margin-bottom: 17px;
+  }
   input {
     width: 172px;
     height: 32px;

@@ -3,7 +3,7 @@
         <div class="source-head ">
             <div class="source-head-incre">
                 <el-button class="btn" type="primary" @click="">保存并发布</el-button>
-                <el-button class="btn" type="primary" @click="">保存</el-button>
+                <el-button class="btn" type="primary" @click="saveTest">保存</el-button>
                 <el-button class="btn" type="primary" @click="">取消</el-button>
             </div>
         </div>
@@ -34,7 +34,7 @@
                 </tr>
             </table>
             <div class="source-con-file" v-for="list in item.taskFileList">
-               
+    
                 <div class="item">
                     <a :href="list.fileurl">
                         <!--:download="list.fileattachname"-->
@@ -49,10 +49,10 @@
                 <tr class="source-con-row">
                     <td class="source-con-row-f">测评时间：</td>
                     <td>
-                        <el-date-picker v-model="test.startTime"  type="datetime" placeholder="选择日期" @change="creDate(test.startTime)">
+                        <el-date-picker v-model="test.startTime" type="datetime" placeholder="选择日期" @change="creDate(test.startTime)">
                         </el-date-picker>
                         <label class="el-form-item__label">至</label>
-                        <el-date-picker v-model="test.endTime"  type="datetime" placeholder="选择日期" @change="endDate(test.endTime)">
+                        <el-date-picker v-model="test.endTime" type="datetime" placeholder="选择日期" @change="endDate(test.endTime)">
                         </el-date-picker>
                     </td>
                 </tr>
@@ -62,8 +62,8 @@
                         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
                         <el-checkbox v-model="Recheck" @change="handleCheckNotChange">反选</el-checkbox>
                         <div style="margin: 15px 0;"></div>
-                        <el-checkbox-group @change="handleCheckedCitiesChange" fill="#0491cd" v-model="checkedCourse">
-                            <el-checkbox v-for="course in courseList" :label="course.courseId" :key="course">{{course.courseName}}</el-checkbox>
+                        <el-checkbox-group @change="handleCheckedCitiesChange" fill="#0491cd" v-model="checkedClass">
+                            <el-checkbox v-for="myclass in classList" :label="myclass.pxClassName" :key="myclass.pxClassId" @change="get_checkedClassId($event,myclass.pxClassId)">{{myclass.pxClassName}}</el-checkbox>
                         </el-checkbox-group>
                     </td>
                 </tr>
@@ -75,8 +75,10 @@
     </div>
 </template>
 <script>
+const jy_url = "http://www.369college.com/369education";
 import HeadView from '../Head'
 import { mapGetters } from 'vuex'
+import qs from "qs"
 export default {
     data() {
         return {
@@ -86,68 +88,109 @@ export default {
                 startTime: '',
                 endTime: ''
             },
+            classList: [],
             checkAll: true,
             Recheck: false,
-            checkedCourse: [],
+            checkedClass: [],
+            checkedClassId: [],
             isIndeterminate: true,
-            courseList: ''
         }
     },
     created() {
-        this.item =JSON.parse(this.$route.query.taskinfo);
-        this.getAllCourse();
+        this.item = JSON.parse(this.$route.query.taskinfo)
+        this.classList = JSON.parse(this.$route.query.classList)
+        console.log(this.item, this.classList)
     },
-    computed: {
-        //  ...mapGetters(['item']),
-        //  item:function(){
-        //     for(let key of item.taskFileList)
-        //    console.log(key)
-        // }
-    },
+    // computed: {
+    //      ...mapGetters(['classList']),
+
+    // },
     components: {
         HeadView
     },
     methods: {
-        getAllCourse() {
-            this.$http.get("/api/369research/yzh/research/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.courseList = res.data.courseList
-            })
-        },
         creDate(time) {
+
             if (time) {
                 let d = new Date(time);
-                this.test.startTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()+" "+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();
+                let m = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
+                let dd = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+                let h = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+                let mm = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+                let s = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
+                this.test.startTime = d.getFullYear() + '-' + m + '-' + dd + " " + h + ':' + mm + ':' + s;
             }
         },
         endDate(time) {
             if (time) {
                 let d = new Date(time);
-                this.test.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()+" "+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();
+                let m = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
+                let dd = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+                let h = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+                let mm = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+                let s = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
+                this.test.endTime = d.getFullYear() + '-' + m + '-' + dd + " " + h + ':' + mm + ':' + s;
             }
         },
-        handleCheckAllChange(event) {
-            let courseArr = []
-            this.courseList.forEach(function (val) {
-                courseArr.push(val.courseId)
-            })
-            this.checkedCourse = event.target.checked ? courseArr : [];
-            this.isIndeterminate = false;
-        },
-        handleCheckNotChange(event) {
-            let courseArr = [];
-            let that = this;
-            this.courseList.forEach(function (val) {
-                if (that.checkedCourse.indexOf(val.courseId) === -1) {
-                    courseArr.push(val.courseId)
+        saveTest() {
+            console.log(this.$route.query.courseid)
+            this.$http.post("api/369education/yzh/education/inter/addTest", qs.stringify({
+                userid: sessionStorage.getItem("jykeyId"),
+                accesstoken: sessionStorage.getItem("jykeyToken"),
+                courseId: this.$route.query.courseid,
+                taskId: this.item.taskid,
+                testName: this.item.taskname,
+                testContent: this.item.taskcontent,
+                testStartDate: this.test.startTime,
+                testEndDate: this.test.endTime,
+                classIdListStr: JSON.stringify(this.checkedClassId),
+                testState:"A"
+            })).then(res => {
+                if(res.data.addTestFlag==="success"){
+                    this.$router.push({path:'ability'})
+                }else{
+                     this.$alert("添加错误，请重新添加", '提示信息', {
+                            confirmButtonText: '确定',
+                        });
                 }
             })
-            this.checkedCourse = event.target.checked ? courseArr : [];
+        },
+        handleCheckAllChange(event) {
+            let classArr = [];
+            let classIdList = []
+            this.classList.forEach(val => {
+                classArr.push(val.pxClassName);
+                classIdList.push(val.pxClassId)
+            })
+            this.checkedClass = event.target.checked ? classArr : [];
+            this.checkedClassId = event.target.checked ? classIdList : [];
+            this.isIndeterminate = false;
+          
+        },
+        handleCheckNotChange(event) {
+            let classArr = [];
+            let classIdList = []
+            this.classList.forEach(function (val) {
+                if (this.checkedClass.indexOf(val.pxClassName) === -1) {
+                    classArr.push(val.pxClassName)
+                    classIdList.push(val.pxClassId)
+                }
+            }, this)
+            this.checkedClass = event.target.checked ? classArr : [];
+            this.checkedClassId = event.target.checked ? classIdList : [];
             this.isIndeterminate = false;
         },
         handleCheckedCitiesChange(value) {
             let checkedCount = value.length;
-            this.checkAll = checkedCount === this.courseList.length;
-            this.isIndeterminate = checkedCount > 0 && checkedCount < this.courseList.length;
+            this.checkAll = checkedCount === this.classList.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.classList.length;
+        },
+        get_checkedClassId(event, classid) {
+            if (event.target.checked) {
+                this.checkedClassId.push(classid)
+            } else {
+                this.checkedClassId.splice(classid, 1);
+            }
         }
 
     }
@@ -161,7 +204,7 @@ export default {
         width: 100%;
         border-bottom: 1px solid #e8e8e8;
         &-incre {
-            width: 30%;
+            width: 40%;
             padding: 17px 0 17px 14px;
             border-bottom: 1px solid #e8e8e8;
         }
@@ -172,7 +215,7 @@ export default {
         }
     }
     .source-con {
-        width: 70%;
+        width: 60%;
         float: left;
         padding: 15px;
         &-row {

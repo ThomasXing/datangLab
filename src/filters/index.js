@@ -35,6 +35,12 @@ const get_stuQualification = {
 	B:'本科',
 	C:'专科'
 }
+const get_testState = {
+	A:'未发布',
+	B:'预备',
+	C:'进行中',
+	D:'已结束'
+}
 export const courseStatus = function (type) {
 	return courseState[type]
 }
@@ -71,4 +77,7 @@ export const normalTime=(time)=>{
 	}else{
 		return time
 	}
+}
+export const testState = function(type){
+	return get_testState[type];
 }

@@ -16,7 +16,8 @@ const state = {
     professionList: "",
     menuHeight: "",
     sourceToggle: true,
-    taskList: []
+    taskList: [],
+   
 }
 
 const actions = {
@@ -54,7 +55,6 @@ const actions = {
                     }
                 }
             }
-            console.log(data)
             commit("get_taskList", data)
         })
     },

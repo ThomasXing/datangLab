@@ -423,7 +423,7 @@ export default {
             }
         },
         saveTest() {
-            this.$router.push({ path: "addtest", query: { taskinfo: JSON.stringify(this.item) } })
+            this.$router.push({ path: "addtest", query: { taskinfo: JSON.stringify(this.item),classList:this.$route.query.classList,courseid:this.$route.query.courseid}})
         },
         handleNodeClick(data, node, obj) {
             this.treeObj.data = data;
