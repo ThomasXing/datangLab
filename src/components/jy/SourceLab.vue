@@ -7,7 +7,7 @@
                 <router-link tag='li' to='/sourceLab/source' active-class="active" class='labman-menu-item'>
                     <a href="javascript:;">资源库</a>
                 </router-link>
-                <router-link tag='li' to='/sourceLab/ability' active-class="active" class='labman-menu-item' >
+                <router-link tag='li' to='/sourceLab/ability' active-class="active" class='labman-menu-item'>
                     <a href="javascript:;">能力评估</a>
                 </router-link>
                 <router-link tag='li' to='/sourceLab/jobeval' active-class="active" class='labman-menu-item'>
@@ -26,9 +26,9 @@
 <script>
 import HeadView from '../Head'
 export default {
-    data(){
-        return{
-            
+    data() {
+        return {
+
         }
     },
     created() {
@@ -42,14 +42,15 @@ export default {
 <style lang='less'>
 .labman {
     &-menu {
+        margin-top: 50px;
         background: #383e4c;
         width: 10%; // height: 800px;
         color: #fff;
         font-size: 14px;
         font-family: "微软雅黑";
         padding-top: 36px;
-        float: left;
-        min-height: 800px;
+        height: 100vh;
+        position: fixed;
         &-item {
             display: block;
             height: 50px;
@@ -74,7 +75,8 @@ export default {
         }
     }
     &-box {
-        float: left;
+        margin-top: 50px;
+        float: right;
         width: 90%;
     }
 }

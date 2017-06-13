@@ -1,24 +1,91 @@
 <template>
   <div id="app">
+  
+    <router-view></router-view>
+    <el-dialog title="提示" :visible.sync="reLogin" size="tiny" @keyup.enter="reLoginId">
+      <span class="re-tool">登录失效，请重新登录</span>
    
-      <router-view></router-view>
- 
+     
+        <el-input v-model="accesstoken" type="password" placeholder="请输入用户密码"></el-input>
+    
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="reLoginfalse">取 消</el-button>
+        <el-button type="primary" @click="reLoginId">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
+import qs from 'qs'
 export default {
   name: 'app',
   data() {
     return {
+      accesstoken: ''
+    }
+  },
+  computed: {
+    ...mapGetters(['reLogin'])
+  },
+  methods: {
+    reLoginId() {
+      if (sessionStorage.getItem("rolelist") === "1") {
+        this.$http.post('/api/369research/yzh/inter/login', qs.stringify({
+          userName: sessionStorage.getItem("userid"),
+          passWord: this.accesstoken
+        })).then(res => {
+          this.$router.go(0)
+          sessionStorage.setItem('keyId', res.data.userid)
+          sessionStorage.setItem('keyToken', res.data.accesstoken)
+        }, error => {
+          if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
+            this.$alert('网络错误', '提示信息', {
+              confirmButtonText: '确定',
+            });
+          } else {
+            this.$alert('用户名或密码输入错误', '提示信息', {
+              confirmButtonText: '确定',
+            })
+          }
+        })
+      } else if (sessionStorage.getItem("rolelist") === "2") {
+        this.$http.post('/api/369education/yzh/inter/login', qs.stringify({
+          userName: sessionStorage.getItem("userid"),
+          passWord: this.accesstoken
+        })).then(res => {
+          this.$router.go(0)
+          sessionStorage.setItem('jykeyId', res.data.userid)
+          sessionStorage.setItem('jykeyToken', res.data.accesstoken)
 
+        }, error => {
+          if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
+            this.$alert('网络错误', '提示信息', {
+              confirmButtonText: '确定',
+            });
+          } else {
+            this.$alert('用户名或密码输入错误', '提示信息', {
+              confirmButtonText: '确定',
+            })
+          }
+        })
+      }
+    },
+    reLoginfalse(){
+      this.$store.dispatch("LoginFalse")
     }
   }
-
 }
 </script>
 
 <style>
+.re-tool {
+  font-size: 16px;
+  display: block;
+  margin: 10px;
+}
+
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all .4s cubic-bezier(0, 1.2, 1, 0.5);

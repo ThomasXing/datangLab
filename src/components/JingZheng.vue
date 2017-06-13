@@ -68,6 +68,7 @@ export default {
 </script>
 <style lang ="less">
 #jingzheng {
+    padding-top: 50px;
     height: 700px;
     .company-title {
         height: 132px;

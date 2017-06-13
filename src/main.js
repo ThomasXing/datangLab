@@ -21,13 +21,21 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 //   return Promise.reject(error);
 // });
 
-// axios.interceptors.response.use(function (response) { //配置请求回来的信息
-//   stores.dispatch('hideLoading')
-//   return response;
-// }, function (error) {
+axios.interceptors.response.use(function (res) { //配置请求回来的信息
+ 
+  if (res.data.loginFlag === "fail") {
+    store.dispatch("RE_LOGIN")
+  }
 
-//   return Promise.reject(error);
-// });
+  return res;
+}, function (error) {
+  if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
+    this.$alert('网络错误', '提示信息', {
+      confirmButtonText: '确定',
+    });
+  }
+  return Promise.reject(error);
+});
 Vue.directive('focus', {
   // 当绑定元素插入到 DOM 中。
   inserted: function (el) {

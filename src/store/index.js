@@ -4,7 +4,6 @@ import axios from 'axios'
 import qs from 'qs'
 Vue.use(Vuex)
 const state = {
-    userid: null,
     title: null,
     stuManagementQB: {},
     xuejiActive: null,
@@ -14,14 +13,18 @@ const state = {
     isXiugai: null,
     schoolList: "",
     professionList: "",
-    menuHeight: "",
     sourceToggle: true,
     taskList: [],
+    courseId:"",
+    reLogin:false,
+    catalogId:''
    
 }
 
 const actions = {
     SET_TITLE: ({ commit }, val) => commit("set_title", val),
+    GET_CURRENT: ({ commit }, val) => commit("get_current", val),
+    LoginFalse: ({ commit }) => commit("login_false"),
     GET_SCHOOLLIST: ({ commit }) => {
         axios.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
             let data = res.data.schoolList;
@@ -38,7 +41,7 @@ const actions = {
         }, err => console.log(err))
     },
     addXuJi: ({ commit }) => commit("add_xueji"),
-    WH: ({ commit }, menuHeight) => commit('wh', menuHeight),
+    RE_LOGIN: ({ commit }) => commit("re_login"),
     xiugaiXuJi: ({ commit }) => commit("xiugaixueji"),
     SHOW_ACTIVECLASS: ({ commit }, val) => commit("show_activeClass", val),
     SOURCE_HIDE: ({ commit }) => commit("source_hide"),
@@ -47,15 +50,22 @@ const actions = {
         axios.get("/api/369education/yzh/education/inter/getTaskByCondition?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&catalogId=" + item).then(res => {
             let data = res.data.taskList;
             for (let val of data) {
-                for (let list of val.taskFileList) {             
+                for (let list of val.taskFileList) {
+                        Vue.set(list, 'fileActive', false)               
                     if (list.fileurl.slice(-3) === "ogg" || list.fileurl.slice(-3) === "pdf") {
-                        Vue.set(list, 'playIcon', "../assets/images/play.png")
+                        Vue.set(list, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/play.png")
+                         Vue.set(list, 'download', false)                        
+                                              
                     } else {
-                        Vue.set(list, 'playIcon', "../assets/images/download.png")
+                        Vue.set(list, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/download.png")
+                        Vue.set(list, 'download', list.filename)                       
                     }
+                    list.fileurl="http://115.182.107.198/"+list.fileurl.replace(/http:\/\/115.182.107.198\//g,"");
+                    list.filethumbnail="http://115.182.107.198/"+list.filethumbnail.replace(/http:\/\/115.182.107.198\//g,"");
                 }
             }
-            commit("get_taskList", data)
+            commit("get_taskList",data)
+            commit("get_catalogId",item)
         })
     },
 
@@ -65,6 +75,9 @@ const actions = {
 const mutations = {
     set_title(state, val) {
         state.title = val
+    },
+      get_current(state, val) {
+        state.courseId = val
     },
     xiugaixueji(state) {
         state.isXiugai = true;
@@ -88,6 +101,12 @@ const mutations = {
     add_xueji: (state) => {
         state.isXiugai = false;
     },
+    re_login:(state)=>{
+        state.reLogin = true;
+    },
+    login_false(state){
+        state.reLogin = false;
+    },
     get_schoolList: (state, data) => {
         state.schoolList = data;
     },
@@ -100,23 +119,24 @@ const mutations = {
     source_show: (state) => {
         state.sourceToggle = true;
     },
-    get_taskList: (state, data) => {
+    get_taskList: (state,data) => {
         state.taskList = data;
     },
-    wh: (state, menuHeight) => {
-        let labMenu = document.getElementById("lab-menu");
-
+    get_catalogId:(state,item)=>{
+        state.catalogId = item;
+    }
+ 
         //    
         // state.menuHeight = menuHeight;
         // labMenu.style.height = state.menuHeight;
         // console.log(labMenu.style.height)
         // console.log(state.wh)
 
-    }
+    
 }
 const getters = {
     title: state => state.title,
-    // userid:state=>state.userid
+    courseId:state=>state.courseId,
     stuManagementQB: state => state.stuManagementQB,
     xuejiActive: state => state.xuejiActive,
     courseActive: state => state.courseActive,
@@ -126,7 +146,8 @@ const getters = {
     professionList: state => state.professionList,
     sourceToggle: state => state.sourceToggle,
     taskList: state => state.taskList,
-    menuHeight: state => state.menuHeight
+    reLogin: state => state.reLogin,
+    catalogId: state => state.catalogId,
 }
 export default new Vuex.Store({
     state,

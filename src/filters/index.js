@@ -60,6 +60,7 @@ export const classFilter = function(type){
 	return classState1[type]
 }
 export const normalTime=(time)=>{
+	
 	if(time&&parseInt(time).toString().length>4){
 		
 		var oDate=new Date();

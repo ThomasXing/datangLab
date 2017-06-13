@@ -37,6 +37,11 @@ export default {
   line-height: 50px;
   color: #ffffff;
   overflow: hidden;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 999;
   & .lab-logo {
     margin: 7px 20px;
   }

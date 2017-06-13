@@ -63,6 +63,7 @@ export default {
 <style scoped lang='less'>
     & .lab-con{
       width:916px;
+      padding-top: 50px;
       margin:63px auto;    
      &-box{
         width:252px;

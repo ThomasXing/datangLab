@@ -2,15 +2,17 @@
     <div id="addTest">
         <div class="source-head ">
             <div class="source-head-incre">
-                <el-button class="btn" type="primary" @click="">保存并发布</el-button>
-                <el-button class="btn" type="primary" @click="saveTest">保存</el-button>
-                <el-button class="btn" type="primary" @click="">取消</el-button>
+                <el-button class="btn" type="primary" @click="saveTest('B')" v-show="!update">保存并发布</el-button>
+                <el-button class="btn" type="primary" @click="updateTest('B')" v-show="update">保存并发布</el-button>
+                <el-button class="btn" type="primary" @click="saveTest('A')" v-show="!update">保存</el-button>
+                <el-button class="btn" type="primary" @click="updateTest('A')" v-show="update">保存</el-button>
+                <el-button class="btn" type="primary" @click="$router.push({path:'ability'})">取消</el-button>
             </div>
         </div>
         <div class="source-head">
             <el-form :inline="true" class="source-choice demo-form-inline">
                 <el-form-item label="测评任务：">
-                    <el-button class="btn" type="primary" @click="">从资源库中选择</el-button>
+                    <el-button class="btn" type="primary" @click="choiceSourceTest">从资源库中选择</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -33,12 +35,13 @@
                     <td>{{item.taskstandard}}</td>
                 </tr>
             </table>
-            <div class="source-con-file" v-for="list in item.taskFileList">
-    
+            <div class="source-con-file clearfix" v-for="list in item.taskFileList">
                 <div class="item">
-                    <a :href="list.fileurl">
-                        <!--:download="list.fileattachname"-->
-                        <img :src="list.filethumbnail" :alt="list.fileattachname" width="220" height="140">
+                    <a :href="list.fileurl" class="source-item " :download="list.download">
+                        <div class="source-img">
+                            <img :src="list.filethumbnail" :alt="list.fileattachname" width="220" height="140">
+                        </div>
+                        <div class="mask" :style="`background:#000 url(${list.playIcon})no-repeat 50% 50%`"></div>
                         <h3>{{list.filename}}</h3>
                     </a>
                 </div>
@@ -51,7 +54,7 @@
                     <td>
                         <el-date-picker v-model="test.startTime" type="datetime" placeholder="选择日期" @change="creDate(test.startTime)">
                         </el-date-picker>
-                        <label class="el-form-item__label">至</label>
+                        <label class="el-form-item__label " style="float:none;">至</label>
                         <el-date-picker v-model="test.endTime" type="datetime" placeholder="选择日期" @change="endDate(test.endTime)">
                         </el-date-picker>
                     </td>
@@ -88,18 +91,52 @@ export default {
                 startTime: '',
                 endTime: ''
             },
-            classList: [],
             checkAll: true,
             Recheck: false,
             checkedClass: [],
             checkedClassId: [],
             isIndeterminate: true,
+            item: {},
+            classList: [],
+            update: false,
+            testid: ''
         }
     },
     created() {
-        this.item = JSON.parse(this.$route.query.taskinfo)
-        this.classList = JSON.parse(this.$route.query.classList)
-        console.log(this.item, this.classList)
+        if (this.$route.query.update === 'true') {
+            this.update = true;
+            let testQD = JSON.parse(this.$route.query.updateTest);
+            this.item['taskFileList'] = testQD['taskFileList'];
+            this.item['taskcontent'] = testQD['testcontent'];
+            this.item['taskintro'] = testQD['testintro'];
+            this.item['taskname'] = testQD['testname'];
+            this.item['taskid'] = testQD['taskid'];
+            this.item['taskstandard'] = testQD['teststandard'];
+            this.classList = testQD['classList'];
+            this.classList.forEach((elem) => {
+                elem['pxClassId'] = elem['classid']
+                elem['pxClassName'] = elem['classname'];
+                if (elem['checkflag'] === true) {
+                    this.checkedClass.push(elem['pxClassName'])
+                    this.checkedClassId.push(elem['pxClassId'])
+                }
+            })
+            this.test.startTime = testQD['startdate']
+            this.test.endTime = testQD['enddate']
+            this.testid = testQD['testid']
+        } else {
+            this.item = JSON.parse(this.$route.query.taskinfo)
+            this.classList = JSON.parse(this.$route.query.classList)
+        }
+        this.item.taskFileList.forEach(elem => {
+            if (elem.fileurl.slice(-3) === "ogg" || elem.fileurl.slice(-3) === "pdf") {
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/play.png")
+                this.$set(elem, 'download', false)
+            } else {
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/download.png")
+                this.$set(elem, 'download', elem.filename)
+            }
+        })
     },
     // computed: {
     //      ...mapGetters(['classList']),
@@ -110,7 +147,6 @@ export default {
     },
     methods: {
         creDate(time) {
-
             if (time) {
                 let d = new Date(time);
                 let m = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
@@ -132,8 +168,7 @@ export default {
                 this.test.endTime = d.getFullYear() + '-' + m + '-' + dd + " " + h + ':' + mm + ':' + s;
             }
         },
-        saveTest() {
-            console.log(this.$route.query.courseid)
+        saveTest(testState) {
             this.$http.post("api/369education/yzh/education/inter/addTest", qs.stringify({
                 userid: sessionStorage.getItem("jykeyId"),
                 accesstoken: sessionStorage.getItem("jykeyToken"),
@@ -144,16 +179,46 @@ export default {
                 testStartDate: this.test.startTime,
                 testEndDate: this.test.endTime,
                 classIdListStr: JSON.stringify(this.checkedClassId),
-                testState:"A"
+                testState: testState
             })).then(res => {
-                if(res.data.addTestFlag==="success"){
-                    this.$router.push({path:'ability'})
-                }else{
-                     this.$alert("添加错误，请重新添加", '提示信息', {
-                            confirmButtonText: '确定',
-                        });
+                if (res.data.addTestFlag === "success") {
+                    this.$router.push({ path: 'ability' })
+                } else {
+                    this.$alert("添加错误，请重新添加", '提示信息', {
+                        confirmButtonText: '确定',
+                    });
                 }
             })
+        },
+        updateTest(teststate) {
+            let params = {
+                userid: sessionStorage.getItem("jykeyId"),
+                accesstoken: sessionStorage.getItem("jykeyToken"),
+                testid: this.testid,
+                taskid: this.item.taskid,
+                testname: this.item.taskname,
+                testcontent: this.item.taskcontent,
+                startdate: this.test.startTime,
+                enddate: this.test.endTime,
+                classIdListStr: JSON.stringify(this.checkedClassId),
+                teststate: teststate
+            }
+            this.$http.post("api/369education/yzh/education/inter/updateTest", qs.stringify(params)).then(res => {
+                if (res.data.updateTestFlag === "success") {
+                    this.$router.push({ path: 'ability' })
+                } else {
+                    this.$alert("添加错误，请重新添加", '提示信息', {
+                        confirmButtonText: '确定',
+                    });
+                }
+            })
+        },
+        choiceSourceTest() {
+            if (this.$route.query.update === 'true') {
+                this.$router.push({ path: 'source', query: { source: 'test', update: 'true', updateTest: this.$route.query.updateTest } })
+            } else {
+                this.$router.push({ path: 'source', query: { source: 'test', newTest: 'true', classList: this.$route.query.classList, courseid: this.$route.query.courseid } })
+            }
         },
         handleCheckAllChange(event) {
             let classArr = [];
@@ -165,13 +230,13 @@ export default {
             this.checkedClass = event.target.checked ? classArr : [];
             this.checkedClassId = event.target.checked ? classIdList : [];
             this.isIndeterminate = false;
-          
+
         },
         handleCheckNotChange(event) {
             let classArr = [];
             let classIdList = []
             this.classList.forEach(function (val) {
-                if (this.checkedClass.indexOf(val.pxClassName) === -1) {
+                if (this.checkedClassId.indexOf(val.pxClassId) === -1) {
                     classArr.push(val.pxClassName)
                     classIdList.push(val.pxClassId)
                 }
@@ -191,6 +256,7 @@ export default {
             } else {
                 this.checkedClassId.splice(classid, 1);
             }
+
         }
 
     }
@@ -215,7 +281,7 @@ export default {
         }
     }
     .source-con {
-        width: 60%;
+        width: 80%;
         float: left;
         padding: 15px;
         &-row {
@@ -236,6 +302,7 @@ export default {
             }
         }
         &-file {
+            float: left;
             .item {
                 margin: 20px;
                 float: left;
@@ -244,6 +311,36 @@ export default {
                     line-height: 50px;
                     color: #4d4d4d;
                 }
+            }
+            .source-item {
+                display: block;
+                position: relative;
+            }
+            .source-item:hover .mask {
+                transition: opacity .2s;
+                opacity: .3;
+                filter: alpha(opacity=30);
+            }
+            .source-item .source-img {
+                overflow: hidden;
+                width: 220px;
+                height: 140px;
+            }
+            .source-item img {
+                transition: transform .4s;
+            }
+            .source-item:hover img {
+                transform: scale(1.2);
+            }
+
+            .mask {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 220px;
+                height: 140px;
+                opacity: 0;
+                filter: alpha(opacity=0);
             }
         }
     }

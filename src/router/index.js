@@ -19,6 +19,7 @@ import Source from '@/components/jy/Source.vue'
 import Ability from '@/components/jy/Ability.vue'
 import JobEval from '@/components/jy/JobEval.vue'
 import AddTest from '@/components/jy/AddTest.vue'
+import TestList from '@/components/jy/TestList.vue'
 Vue.use(Router)
 export default new Router({
   routes: [
@@ -63,7 +64,8 @@ export default new Router({
         {path:'source',component:Source},
         {path:'ability',component:Ability},
         {path:'jobeval',component:JobEval},
-        {path:'addtest',component:AddTest}
+        {path:'addtest',component:AddTest},
+        {path:'testList',component:TestList},
       ]
     },
     {path:'/cultivate',component:Cultivate,
@@ -73,4 +75,5 @@ export default new Router({
       ]
     }
   ]
+
 })

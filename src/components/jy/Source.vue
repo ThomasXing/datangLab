@@ -17,7 +17,7 @@
         <div class="source-head clearfix" v-show="!sourceToggle">
             <div class="source-head-incre">
                 <el-button class="btn" type="primary" @click="saveTest">保存</el-button>
-                <el-button class="btn" type="primary" @click="RootVisible = true">取消</el-button>
+                <el-button class="btn" type="primary" @click="$router.push({path:'ability'})">取消</el-button>
             </div>
         </div>
     
@@ -47,42 +47,7 @@
                 <el-button type="primary" @click.native="sureIcre">确 定</el-button>
             </span>
         </el-dialog>
-        <div class="source-con" v-for="item in taskList" @click="addTest(taskList,item)" :class="{chioceTest:item.isActive===true}">
-            <table cellspacing="10px">
-                <tr class="source-con-row">
-                    <td class="source-con-row-t">任务名称：</td>
-                    <td>{{item.taskname}}</td>
-                </tr>
-                <tr class="source-con-row">
-                    <td>任务说明：</td>
-                    <td>{{item.taskintro}}</td>
     
-                </tr>
-                <tr class="source-con-row">
-                    <td>测评内容：</td>
-                    <td>{{item.taskcontent}}</td>
-                </tr>
-                <tr class="source-con-row">
-                    <td>测评标准：</td>
-                    <td>{{item.taskstandard}}</td>
-                </tr>
-            </table>
-            <div class="source-con-file" v-for="list in item.taskFileList">
-                <div class="item">
-                    <a :href="list.fileurl" class="source-item">
-                        <!--:download="list.fileattachname"-->
-                        <img :src="list.playIcon" alt="">
-                        <div class="source-img">
-                            <img :src="list.filethumbnail" :alt="list.fileattachname" width="220" height="140">
-                        </div>
-                        <div class="mask"></div>
-                        <h3>{{list.filename}}</h3>
-                    </a>
-                </div>
-            </div>
-            <i class="source-con-modify" @click="modifyTask(item)"></i>
-            <i class="source-con-remove" @click="removeTask(item)"></i>
-        </div>
         <el-dialog title="任务" :visible.sync="IcredialogFormVisible">
             <el-form :model="icreTask" label-width="80px">
                 <el-form-item label="任务名称">
@@ -98,33 +63,85 @@
                     <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.taskstandard"></el-input>
                 </el-form-item>
                 <el-form-item label="上传文件">
-                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple :on-remove="handleRemove" :on-success="TaskSuccess">
+                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple  :on-success="TaskSuccess" :on-preview="clickfile">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或
                             <em>点击上传</em>
                         </div>
                         <!--<div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>-->
                     </el-upload>
+                    <ul class="el-upload-list el-upload-list--text">
+                        <li class="el-upload-list__item is-success" v-for="list in this.icreTask.taskFileList" @click="modifyfile(list)" :class="{modifyfile:list.fileActive===true}">
+                            <!---->
+                            <a class="el-upload-list__item-name">
+                                <i class="el-icon-document"></i>{{list.fileattachname}}
+                            </a>
+                            <label class="el-upload-list__item-status-label">
+                                <i class="el-icon-upload-success el-icon-circle-check"></i>
+                            </label>
+                            <i class="el-icon-close" @click="delTaskFile(list)"></i>
+                            <!---->
+                            <!---->
+                        </li>
+                    </ul>
+    
                 </el-form-item>
                 <el-form-item>
                     <el-form :inline="true" class="demo-form-inline">
                         <el-form-item label="标题">
-                            <el-input type="text" id="testTitle" @blur="getTitle"></el-input>
+                            <el-input type="text" id="testTitle" @blur="getTitle" name="filetitle"></el-input>
                         </el-form-item>
                         <el-form-item label="缩略图">
                             <el-upload class="upload-demo" action="/api/369education/yzh/education/inter/uploadFile" :show-file-list="false" :on-success="imgHandleSuccess">
-                                <el-input placeholder="点击上传" id="img-thumbnail"></el-input>
+                                <el-input placeholder="点击上传" id="img-thumbnail" name='filethumbnail'></el-input>
                             </el-upload>
+    
                         </el-form-item>
                     </el-form>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="IcredialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="icreTaskSource">确 定</el-button>
+                <el-button type="primary" @click="icreTaskSource" v-show="!modifyFile">确 定</el-button>
+                <el-button type="primary" @click="modifyTaskSource" v-show="modifyFile">确 定</el-button>
             </div>
         </el-dialog>
+        <div class="source-box">
+            <div class="source-con" v-for="item in taskList" @click="addTest(taskList,item)" :class="{chioceTest:item.isActive===true}">
+                <table cellspacing="10px">
+                    <tr class="source-con-row">
+                        <td class="source-con-row-t">任务名称：</td>
+                        <td>{{item.taskname}}</td>
+                    </tr>
+                    <tr class="source-con-row">
+                        <td>任务说明：</td>
+                        <td>{{item.taskintro}}</td>
     
+                    </tr>
+                    <tr class="source-con-row">
+                        <td>测评内容：</td>
+                        <td>{{item.taskcontent}}</td>
+                    </tr>
+                    <tr class="source-con-row">
+                        <td>测评标准：</td>
+                        <td>{{item.taskstandard}}</td>
+                    </tr>
+                </table>
+                <div class="source-con-file" v-for="list in item.taskFileList">
+                    <div class="item">
+                        <a :href="list.fileurl" class="source-item " :download="list.download">
+                            <div class="source-img">
+                                <img :src="list.filethumbnail" :alt="list.fileattachname" width="220" height="140">
+                            </div>
+                            <div class="mask" :style="`background:#000 url(${list.playIcon}) no-repeat 50% 50%`"></div>
+                            <h3>{{list.filename}}</h3>
+                        </a>
+                    </div>
+                </div>
+                <span class="source-con-modify" @click="modifyTask(item)"></span>
+                <span class="source-con-remove" @click="removeTask(item)"></span>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -142,6 +159,7 @@ export default {
             showDire: false,
             renameShow: false,
             isActive: false,
+            modifyFile:false,
             data: [],
             defaultProps: {
                 children: 'catalogList',
@@ -160,7 +178,8 @@ export default {
                 data: {},
                 node: '',
                 obj: ''
-            }
+            },
+            res: {}
         }
     },
     created() {
@@ -172,7 +191,7 @@ export default {
         this.getAllCatalog()
     },
     computed: {
-        ...mapGetters(['sourceToggle', 'taskList'])
+        ...mapGetters(['sourceToggle', 'taskList',"catalogId"])
     },
 
     mounted() {
@@ -218,7 +237,6 @@ export default {
             bindEvent(document, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'click', closeNewContextMenu)
             bindEvent(treemenu, 'contextmenu', closeContextMenu);
-
         })
 
     },
@@ -227,32 +245,73 @@ export default {
             let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
             this.taskFileStr.fileName = testTitle.value;
         },
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
+        clickfile(file) {
+            // console.log(file)
         },
-        TaskSuccess(res, file, fileList) {
+        TaskSuccess(res, file) {
+            console.log(res)
             let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
             let imgThumbnail = document.getElementById('img-thumbnail').getElementsByTagName("input")[0];
             if (res.success === true) {
+                this.res = res;
                 this.taskFileStr.fileAttachName = file.name;
                 this.taskFileStr.fileUrl = res.filePath;
                 testTitle.value = "";
                 imgThumbnail.value = "";
+                console.log( this.taskFileStr)
             }
 
         },
         imgHandleSuccess(res, file) {
             let taskFileStr = {};
+            let url = "http://115.182.107.198/"
+            let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
             let imgThumbnail = document.getElementById('img-thumbnail').getElementsByTagName("input")[0];
-            if (res.success === true) {
+            if (res.success === true && JSON.stringify(this.res) !== "{}") {
                 this.taskFileStr.fileThumbnail = res.filePath;
                 imgThumbnail.value = file.name;
                 taskFileStr["fileName"] = this.taskFileStr.fileName;
                 taskFileStr["fileAttachName"] = this.taskFileStr.fileAttachName;
                 taskFileStr["fileThumbnail"] = this.taskFileStr.fileThumbnail;
                 taskFileStr["fileUrl"] = this.taskFileStr.fileUrl;
+                if(this.modifyFile===true){
+                    taskFileStr['fileMethod']="C";
+                }
                 this.fileList.push(taskFileStr)
+                console.log(this.fileList,1)
+            } else {
+                this.taskFileStr.filethumbnail =url+res.filePath;
+                imgThumbnail.value = file.name;
+                this.taskFileStr.filename = testTitle.value;
+                let taskFile = {};
+                taskFile['fileId'] = this.taskFileStr['fileId'];
+                taskFile['fileName'] = this.taskFileStr['filename'];
+                taskFile['fileThumbnail'] = this.taskFileStr['filethumbnail'];
+                taskFile['fileUrl'] = this.taskFileStr['fileurl'];
+                taskFile['fileAttachName'] = this.taskFileStr['fileattachname'];
+                taskFile['fileMethod'] ="U"
+                this.fileList.push(taskFile);
             }
+        },
+        modifyTaskSource(){
+            this.$http.post("/api/369education/yzh/education/inter/updateTask",qs.stringify({
+                userid: sessionStorage.getItem("jykeyId"),
+                accesstoken: sessionStorage.getItem("jykeyToken"),
+                taskId: this.icreTask.taskid,
+                taskName: this.icreTask.taskname,
+                taskIntro: this.icreTask.taskintro,
+                testContent: this.icreTask.taskcontent,
+                testStandard: this.icreTask.taskstandard,
+                taskFileStr: JSON.stringify(this.fileList)           
+            })).then(res=>{
+                if(res.data.updateTaskFlag==="success"){
+                     this.$alert('修改成功', '提示信息', {
+                            confirmButtonText: '确定',
+                        });
+                        this.IcredialogFormVisible=false;
+                        this.$store.dispatch("GET_TASKLIST", this.catalogId);     
+                }
+            })
         },
         getAllCatalog() {
             this.$http.get(jy_url + "/yzh/education/inter/getAllCatalog?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
@@ -277,12 +336,10 @@ export default {
                         this.getAllCatalog()
                     }
                 })
-
             }
             this.RootVisible = false;
         },
         newDirectory() {
-
             let direNewName = document.getElementById('direNewName')
             let currentNode = document.getElementsByClassName('is-current')[0];
             let direInput = direNewName.getElementsByTagName('input')[0];
@@ -291,7 +348,6 @@ export default {
             }, 10);
             currentNode.appendChild(direNewName)
             this.showDire = true;
-
         },
         newName(ev) {
             let direInput = document.getElementById('direNewName').getElementsByTagName('input')[0];
@@ -338,7 +394,6 @@ export default {
                 renameVal.select();
             }, 10);
             this.preappend(rename, currentNode);
-
             this.renameShow = true;
         },
         preappend(node, scope) {
@@ -385,16 +440,34 @@ export default {
                     this.$alert('添加成功', '提示信息', {
                         confirmButtonText: '确定',
                     });
-                    this.$store.dispatch("GET_TASKLIST",  this.treeObj.data.catalogId)
+                    this.$store.dispatch("GET_TASKLIST", this.treeObj.data.catalogId)
                 }
             })
         },
 
         modifyTask(item) {
-            console.log(item, this.icreTask)
-            this.icreTask = item;
             this.IcredialogFormVisible = true;
-            this.TaskSuccess()
+            this.modifyFile = true;
+            this.icreTask = item;
+        },
+        modifyfile(file) {
+            this.icreTask.taskFileList.forEach(elem => {
+                elem.fileActive = false;
+            })
+            file.fileActive = true;
+            this.taskFileStr = file;
+            console.log(this.taskFileStr)
+        },
+        delTaskFile(file) {
+            let taskFile = {};
+            this.icreTask.taskFileList.forEach(elem => {
+                if (elem.fileId === file.fileId) {
+                    this.icreTask.taskFileList.splice(elem, 1)
+                }
+            })
+            taskFile["fileId"]=file.fileId;
+            taskFile['fileMethod']="D";
+            this.fileList.push(taskFile)   
         },
         removeTask(item) {
             this.$confirm('确认删除吗？').then(_ => {
@@ -408,7 +481,7 @@ export default {
                         this.$alert('删除成功', '提示信息', {
                             confirmButtonText: '确定',
                         });
-                        this.$store.dispatch("GET_TASKLIST",  this.treeObj.data.catalogId)
+                        this.$store.dispatch("GET_TASKLIST", this.treeObj.data.catalogId)
                     }
                 })
             }).catch(_ => { });
@@ -423,7 +496,18 @@ export default {
             }
         },
         saveTest() {
-            this.$router.push({ path: "addtest", query: { taskinfo: JSON.stringify(this.item),classList:this.$route.query.classList,courseid:this.$route.query.courseid}})
+            if (this.$route.query.update === "true") {
+                let testQD = JSON.parse(this.$route.query.updateTest);
+                testQD['taskFileList'] = this.item['taskFileList'];
+                testQD['testcontent'] = this.item['taskcontent'];
+                testQD['testintro'] = this.item['taskintro'];
+                testQD['testname'] = this.item['taskname'];
+                testQD['teststandard'] = this.item['taskstandard'];
+                testQD['taskid'] = this.item['taskid'];
+                this.$router.push({ path: "addtest", query: { update: 'true', updateTest: JSON.stringify(testQD) } })
+            } else {
+                this.$router.push({ path: "addtest", query: { taskinfo: JSON.stringify(this.item), classList: this.$route.query.classList, courseid: this.$route.query.courseid } })
+            }
         },
         handleNodeClick(data, node, obj) {
             this.treeObj.data = data;
@@ -441,7 +525,7 @@ export default {
                 this.creShow = false;
                 this.$store.dispatch("GET_TASKLIST", data.catalogId)
             }
-           
+            console.log(data)
         },
         renderContent: function (createElement, { node, data, store }) {
             var self = this;
@@ -462,9 +546,12 @@ export default {
 #source {
     .source-head {
         height: 74px;
-        float: left;
         width: 100%;
         border-bottom: 1px solid #e8e8e8;
+        position: fixed;
+        overflow: hidden;
+        background: #fff;
+        z-index: 999;
         &-incre {
             width: 20%;
             padding: 17px 0 17px 14px;
@@ -481,15 +568,15 @@ export default {
         }
         &-editor {
             float: right;
-            margin-right: 91px;
+            padding-right: 15%;
             margin-top: 17px;
         }
     }
     .source-tree {
-        float: left;
-        min-height: 761px;
-        height: inherit;
-        position: relative;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        padding-top: 125px;
         .el-tree {
             border: none;
             background-color: #f6f6f6; //    .el-tree-node.el-tree-node__content {
@@ -541,84 +628,93 @@ export default {
     .chioceTest {
         border: 1px solid orange;
     }
-    .source-con {
-        width: 70%;
-        float: left;
-        padding: 15px;
-        position: relative;
-        &-modify {
-            top: 20px;
-            right: 86px;
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background-size: cover;
-            background-image: url(../../assets/images/modify.png);
-            cursor: pointer;
-        }
-        &-remove {
-            top: 20px;
-            right: 44px;
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background-size: cover;
-            background-image: url(../../assets/images/remove.png);
-            cursor: pointer;
-        }
-        &-row {
-            font-size: 16px;
-            color: #111111;
-            min-height: 70px;
-            td:first-child {
-                min-width: 80px;
-                text-align: right;
+    .source-box {
+        padding-top: 75px;
+        margin-left: 23%;
+        .source-con {
+            width: 80%;
+            float: left;
+            padding: 15px;
+            position: relative;
+            &-modify {
+                top: 20px;
+                right: 86px;
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                background-size: cover;
+                background-image: url(../../assets/images/modify.png);
+                cursor: pointer;
             }
-            &-t {
-                padding-left: 6px;
-                border-left: 5px solid #0491cd;
+            &-remove {
+                top: 20px;
+                right: 44px;
+                position: absolute;
+                width: 26px;
+                height: 26px;
+                background-size: cover;
+                background-image: url(../../assets/images/remove.png);
+                cursor: pointer;
             }
-        }
-        &-file {
-            .item {
-                margin: 20px;
-                float: left;
-                text-align: center;
-                h3 {
-                    line-height: 50px;
-                    color: #4d4d4d;
+            &-row {
+                font-size: 16px;
+                color: #111111;
+                min-height: 70px;
+                td:first-child {
+                    min-width: 80px;
+                    text-align: right;
+                }
+                &-t {
+                    padding-left: 6px;
+                    border-left: 5px solid #0491cd;
                 }
             }
-            .source-item {
-                display: block;
-                position: relative;
-            }
-            .source-item:hover .mask {
-                transition: opacity .2s;
-                opacity: .3;
-                filter: alpha(opacity=30);
-            }
-            .source-item .source-img {
-                overflow: hidden;
-                width: 220px;
-                height: 140px;
-            }
-            .source-item:hover img {
-                transition: transform .4s;                
-                transform: scale(1.2);
-            }
+            &-file {
+                .item {
+                    margin: 20px;
+                    float: left;
+                    text-align: center;
+                    h3 {
+                        line-height: 50px;
+                        color: #4d4d4d;
+                    }
+                }
+                .source-item {
+                    display: block;
+                    position: relative;
+                }
+                .source-item:hover .mask {
+                    transition: opacity .2s;
+                    opacity: .3;
+                    filter: alpha(opacity=30);
+                }
+                .source-item .source-img {
+                    overflow: hidden;
+                    width: 220px;
+                    height: 140px;
+                }
+                .source-item img {
+                    transition: transform .4s;
+                }
+                .source-item:hover img {
+                    transform: scale(1.2);
+                }
 
-            .mask {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 220px;
-                height: 140px;
-                background-color: #000;
-                opacity: 0;
-                filter: alpha(opacity=0);
+                .mask {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 220px;
+                    height: 140px;
+                    opacity: 0;
+                    filter: alpha(opacity=0);
+                }
             }
         }
     }
+}
+
+.modifyfile {
+    background: #eef1f6;
 }
 </style>

@@ -406,11 +406,6 @@ export default {
                 "毕业资格无效": 11
             },
             stuXueJiNews: {
-                // classId: {
-                //     "graduationthis": "Y",
-                //     "managementthis": "A",
-                //     "score": 100
-                // }
             },
             stuEventIntro: {
                 stuEvent1: {
@@ -506,18 +501,6 @@ export default {
         sex
     },
     methods: {
-        //获取所有学校
-        getSchoolList() {
-            this.$http.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.schoolList = res.data.schoolList;
-            }).catch(err => console.log(err))
-        },
-        //获取所有专业
-        getAllProfession() {
-            this.$http.get("/api/369research/yzh/research/inter/getAllProfession?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
-                this.professionList = res.data.professionList
-            })
-        },
         //查询教师
         getTeacherList() {
             this.$http.get("/api/369research/yzh/research/inter/getTeacherList?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&roleName=teacherJGRole").then(res => {
@@ -555,6 +538,7 @@ export default {
             }
         },
         endDate(time) {
+
             if (time) {
                 let d = new Date(time);
                 this.stuEventList.endTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -655,31 +639,24 @@ export default {
                             }
                         }
                         let newStuEvent = {};
-
                         list.stuEventList.forEach((val, index) => {
-
-
-                            this.$set(newStuEvent, list.stuEventList[index].eventDate, list.stuEventList[index])
+                            this.$set(newStuEvent, list.stuEventList[index].eventDate, list.stuEventList[index]);
                         })
                         if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
                             this.newStuEvent = [];
                         }
-
                         this.newStuEvent.push(newStuEvent)
-
+                    
                         for (let key in this.newStuEvent[0]) {
                             for (let stuEventIndex of Object.keys(this.stuEventName)) {
                                 if (this.stuEventName[stuEventIndex] === this.newStuEvent[0][key].eventName) {
                                     this.newStuEvent[0][key].eventName = stuEventIndex
                                 }
                             }
-
                         }
                         this.stuManagementQB.className = list.className;
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
-
-                    }
-                    ;
+                    };
                     this.$set(this.myClassList, list.classCreDate, list.className)
                     let obj = {};
                     let XueJiNews = [];
@@ -777,7 +754,8 @@ export default {
             let time = new Date().getTime();
             let stuEventObj = { "classId": this.classId, "stuEventName": this.stuEventName[this.stuEventList.stuEventName] };
             let newStuEvent = {};
-            let stuEventList = [];
+            let stuEventList = {};
+            let stuEventLists = []
             for (let key of Object.keys(this.stuEventInfo)) {
                 this.$set(stuEventObj, key, this.stuEventInfo[key])
             }
@@ -786,17 +764,27 @@ export default {
             if (Object.keys(this.classEvent).indexOf(this.classId) === -1) {
                 this.newStuEvent = [];
             }
-            this.$set(newStuEvent, time, this.stuEventList)
+            this.$set(newStuEvent, time, this.stuEventList)                        
             for (let stuEvent of Object.keys(newStuEvent[time])) {
                 if (!newStuEvent[time][stuEvent]) {
                     delete newStuEvent[time][stuEvent]
                 } else {
-                    stuEventList.push(newStuEvent[time][stuEvent])
+                   if(this.newStuEvent[0]===undefined){
+                    stuEventLists.push(newStuEvent[time][stuEvent])
+                   }else{
+                    stuEventList[stuEvent]=newStuEvent[time][stuEvent];                    
+                   }
                 }
             }
-            this.$set(newStuEvent, time, stuEventList)
-            this.newStuEvent.push(newStuEvent)
+
+            if(this.newStuEvent[0]===undefined){
+                this.$set(newStuEvent,time,stuEventLists)
+                this.newStuEvent.push(newStuEvent)
+            }else{
+                this.$set(this.newStuEvent[0], time, stuEventList)                          
+            }
             this.$set(this.classEvent, this.classId, this.newStuEvent)
+            console.log(this.classEvent)
             this.visible3 = false;
         },
         addXueJi(formName) {

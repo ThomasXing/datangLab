@@ -4,19 +4,19 @@
         <div>
     
             <ul class='labman-menu' id="lab-menu">
-               
-                    <router-link to='/labman/course' tag='li' :class="{active:courseActive}" class='labman-menu-item'>
-                        <a href="javascript:;">课程管理</a>  
-                    </router-link>
-              
-                    <router-link to='/labman/classs' tag='li' :class="{active:classActive}" class='labman-menu-item'>
-                        <a href="javascript:;">班级管理</a>  
-                    </router-link>
-               
-                    <router-link to='/labman/xueji' tag='li'  :class="{active:xuejiActive}" class='labman-menu-item'>
-                        <a href="javascript:;">学籍管理</a>  
-                    </router-link>
-               
+    
+                <router-link to='/labman/course' tag='li' :class="{active:courseActive}" class='labman-menu-item'>
+                    <a href="javascript:;">课程管理</a>
+                </router-link>
+    
+                <router-link to='/labman/classs' tag='li' :class="{active:classActive}" class='labman-menu-item'>
+                    <a href="javascript:;">班级管理</a>
+                </router-link>
+    
+                <router-link to='/labman/xueji' tag='li' :class="{active:xuejiActive}" class='labman-menu-item'>
+                    <a href="javascript:;">学籍管理</a>
+                </router-link>
+    
             </ul>
     
             <div class="labman-box">
@@ -37,9 +37,7 @@ export default {
 
         }
     },
-    watch:{
-        $route:"fetchHeight"
-    },
+   
     created() {
         this.$store.dispatch('SET_TITLE', '实验室管理平台')
     },
@@ -47,17 +45,7 @@ export default {
     //     this.$store.dispatch("WH")
     // },
     computed: {
-        ...mapGetters(['xuejiActive', 'courseActive', 'classActive', 'menuHeight'])
-    },
-    methods: {
-        fetchHeight() {
-            let labMenu = document.getElementById("lab-menu");
-            let wh = document.body.scrollHeight;
-            this.$store.dispatch("WH",wh)
-            
-            // labMenu.style.height = wh;
-            console.log(wh)
-        },
+        ...mapGetters(['xuejiActive', 'courseActive', 'classActive'])
     },
     components: {
         HeadView
@@ -67,14 +55,16 @@ export default {
 <style lang='less'>
 .labman {
     &-menu {
+        margin-top: 50px;
+
         background: #383e4c;
         width: 10%; // height: 800px;
         color: #fff;
         font-size: 14px;
         font-family: "微软雅黑";
         padding-top: 36px;
-        float: left;
-        min-height: 800px;
+        height: 100vh;
+        position: fixed;
         &-item {
             display: block;
             height: 50px;
@@ -82,8 +72,8 @@ export default {
             line-height: 50px;
             color: #ffffff;
         }
-        a{
-            color:#ffffff;
+        a {
+            color: #ffffff;
         }
         .active {
             background: #1e222d;
