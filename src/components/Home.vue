@@ -1,18 +1,22 @@
 <template>
     <div id="home">
         <div class="home-header con">
-            <h1 class="home-header-title"><a href="" >
-                                                <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
-                                            </a></h1>
+            <h1 class="home-header-title">
+                <a href="javascript:;">
+                    <img src="../assets/images/logo.png" alt="大唐网络和云智汇" width='500'>
+                </a>
+            </h1>
         </div>
         <div class="home-login" @keyup.enter='login'>
             <div class="home-login-con">
                 <div class="home-login-con-title">用户登录</div>
                 <ul>
-                    <li class="home-login-con-user clearfix"><span class="login-icon user"></span>
+                    <li class="home-login-con-user clearfix">
+                        <span class="login-icon user"></span>
                         <input class="home-user-input" type="text" placeholder="请输入用户名" v-model='userid' v-focus>
                     </li>
-                    <li class="home-login-con-user mar clearfix"><span class="login-icon pw"></span>
+                    <li class="home-login-con-user mar clearfix">
+                        <span class="login-icon pw"></span>
                         <input class="home-user-input" type="password" placeholder="请输入密码" v-model='password'>
                     </li>
                     <li>
@@ -59,17 +63,16 @@ export default {
                 })).then(res => {
                     if (res.data.loginFlag === true) {
                         sessionStorage.setItem('userid', this.userid)
-                        this.$router.push({ name: 'lab', params: { userId: this.userid } })
-                         sessionStorage.setItem('rolelist', res.data.rolelist)
+                        this.$store.dispatch("GET_USERID",res.data.userid)
+                        this.$router.push({ name: 'lab', params: { userId:  this.userid } })
+                        sessionStorage.setItem('rolelist', res.data.rolelist)
                     }
                 }, error => {
-                    // console.log(err)
                     if (error.message === "Network Error") {
                         this.$alert('网络错误', '提示信息', {
                             confirmButtonText: '确定',
                         });
                     } else {
-
                         this.open()
                     }
 
@@ -141,8 +144,7 @@ export default {
                 height: 60px;
                 background-color: #0491cd;
                 font-size: 30px;
-                font-weight: 500;
-                text-shadow: 1px 2px 2px #171e27;
+                font-weight: 500; // text-shadow: 1px 2px 2px #171e27;
                 color: #f2f8ff;
                 line-height: 60px;
                 padding-left: 20px;

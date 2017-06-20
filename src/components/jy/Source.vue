@@ -10,7 +10,7 @@
                 任务
             </div>
             <div class="source-head-editor">
-                <el-button class="btn" type="primary" @click="IcredialogFormVisible=true">编辑</el-button>
+                <el-button class="btn" type="primary" @click="createSource">编辑</el-button>
             </div>
         </div>
     
@@ -63,7 +63,7 @@
                     <el-input type="textarea" :rows="6" placeholder="最多输入1000个汉字" v-model="icreTask.taskstandard"></el-input>
                 </el-form-item>
                 <el-form-item label="上传文件">
-                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple  :on-success="TaskSuccess" :on-preview="clickfile">
+                    <el-upload class="upload-demo" drag action="/api/369education/yzh/education/inter/uploadFile" multiple :on-success="TaskSuccess" :on-preview="clickfile">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或
                             <em>点击上传</em>
@@ -71,7 +71,7 @@
                         <!--<div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>-->
                     </el-upload>
                     <ul class="el-upload-list el-upload-list--text">
-                        <li class="el-upload-list__item is-success" v-for="list in this.icreTask.taskFileList" @click="modifyfile(list)" :class="{modifyfile:list.fileActive===true}">
+                        <li class="el-upload-list__item is-success" v-for="(list,index) in this.icreTask.taskFileList" @click="modifyfile(list)" :class="{modifyfile:list.fileActive===true}">
                             <!---->
                             <a class="el-upload-list__item-name">
                                 <i class="el-icon-document"></i>{{list.fileattachname}}
@@ -79,7 +79,7 @@
                             <label class="el-upload-list__item-status-label">
                                 <i class="el-icon-upload-success el-icon-circle-check"></i>
                             </label>
-                            <i class="el-icon-close" @click="delTaskFile(list)"></i>
+                            <i class="el-icon-close" @click="delTaskFile(list,index)"></i>
                             <!---->
                             <!---->
                         </li>
@@ -103,7 +103,7 @@
             <div slot="footer" class="dialog-footer">
                 <el-button @click="IcredialogFormVisible = false">取 消</el-button>
                 <el-button type="primary" @click="icreTaskSource" v-show="!modifyFile">确 定</el-button>
-                <el-button type="primary" @click="modifyTaskSource" v-show="modifyFile">确 定</el-button>
+                <el-button type="primary" @click="modifyFileSource" v-show="modifyFile">确 定</el-button>
             </div>
         </el-dialog>
         <div class="source-box">
@@ -159,7 +159,7 @@ export default {
             showDire: false,
             renameShow: false,
             isActive: false,
-            modifyFile:false,
+            modifyFile: false,
             data: [],
             defaultProps: {
                 children: 'catalogList',
@@ -191,10 +191,11 @@ export default {
         this.getAllCatalog()
     },
     computed: {
-        ...mapGetters(['sourceToggle', 'taskList',"catalogId"])
+        ...mapGetters(['sourceToggle', 'taskList', "catalogId"])
     },
 
     mounted() {
+
         this.$nextTick(() => {
             let vm = this;
             let tree = document.getElementById("tree");
@@ -242,14 +243,20 @@ export default {
     },
     methods: {
         getTitle() {
-            let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
-            this.taskFileStr.fileName = testTitle.value;
+            if (JSON.stringify(this.taskFileStr) !== "{}") {
+                let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
+                this.taskFileStr['fileName'] = testTitle.value;
+            } else {
+                 this.$alert('请选择要修改的文件', '提示信息', {
+                        confirmButtonText: '确定',
+                    });
+            }
+
         },
         clickfile(file) {
             // console.log(file)
         },
         TaskSuccess(res, file) {
-            console.log(res)
             let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
             let imgThumbnail = document.getElementById('img-thumbnail').getElementsByTagName("input")[0];
             if (res.success === true) {
@@ -258,14 +265,12 @@ export default {
                 this.taskFileStr.fileUrl = res.filePath;
                 testTitle.value = "";
                 imgThumbnail.value = "";
-                console.log( this.taskFileStr)
             }
 
         },
         imgHandleSuccess(res, file) {
             let taskFileStr = {};
-            let url = "http://115.182.107.198/"
-            let testTitle = document.getElementById('testTitle').getElementsByTagName("input")[0];
+            let url = "http://115.182.107.198/";
             let imgThumbnail = document.getElementById('img-thumbnail').getElementsByTagName("input")[0];
             if (res.success === true && JSON.stringify(this.res) !== "{}") {
                 this.taskFileStr.fileThumbnail = res.filePath;
@@ -274,47 +279,49 @@ export default {
                 taskFileStr["fileAttachName"] = this.taskFileStr.fileAttachName;
                 taskFileStr["fileThumbnail"] = this.taskFileStr.fileThumbnail;
                 taskFileStr["fileUrl"] = this.taskFileStr.fileUrl;
-                if(this.modifyFile===true){
-                    taskFileStr['fileMethod']="C";
+                if (this.modifyFile === true) {
+                    taskFileStr['fileMethod'] = "C";
                 }
                 this.fileList.push(taskFileStr)
-                console.log(this.fileList,1)
             } else {
-                this.taskFileStr.filethumbnail =url+res.filePath;
+                this.taskFileStr.filethumbnail = url + res.filePath;
                 imgThumbnail.value = file.name;
-                this.taskFileStr.filename = testTitle.value;
-                let taskFile = {};
-                taskFile['fileId'] = this.taskFileStr['fileId'];
-                taskFile['fileName'] = this.taskFileStr['filename'];
-                taskFile['fileThumbnail'] = this.taskFileStr['filethumbnail'];
-                taskFile['fileUrl'] = this.taskFileStr['fileurl'];
-                taskFile['fileAttachName'] = this.taskFileStr['fileattachname'];
-                taskFile['fileMethod'] ="U"
-                this.fileList.push(taskFile);
+
             }
         },
-        modifyTaskSource(){
-            this.$http.post("/api/369education/yzh/education/inter/updateTask",qs.stringify({
-                userid: sessionStorage.getItem("jykeyId"),
-                accesstoken: sessionStorage.getItem("jykeyToken"),
+        async modifyFileSource() {
+            let taskFile = {};
+            taskFile['fileId'] = this.taskFileStr['fileId'];
+            taskFile['fileName'] = this.taskFileStr['fileName'];
+            taskFile['fileThumbnail'] = this.taskFileStr['filethumbnail'];
+            taskFile['fileUrl'] = this.taskFileStr['fileurl'];
+            taskFile['fileAttachName'] = this.taskFileStr['fileattachname'];
+            taskFile['fileMethod'] = "U";
+            this.fileList.push(taskFile);
+            await this.modifyTaskSource();
+        },
+        modifyTaskSource() {
+            this.$http.post("/api/369education/yzh/education/inter/updateTask", qs.stringify({
+                userid: sessionStorage.getItem("keyId"),
+                accesstoken: sessionStorage.getItem("keyToken"),
                 taskId: this.icreTask.taskid,
                 taskName: this.icreTask.taskname,
                 taskIntro: this.icreTask.taskintro,
                 testContent: this.icreTask.taskcontent,
                 testStandard: this.icreTask.taskstandard,
-                taskFileStr: JSON.stringify(this.fileList)           
-            })).then(res=>{
-                if(res.data.updateTaskFlag==="success"){
-                     this.$alert('修改成功', '提示信息', {
-                            confirmButtonText: '确定',
-                        });
-                        this.IcredialogFormVisible=false;
-                        this.$store.dispatch("GET_TASKLIST", this.catalogId);     
+                taskFileStr: JSON.stringify(this.fileList)
+            })).then(res => {
+                if (res.data.updateTaskFlag === "success") {
+                    this.$alert('修改成功', '提示信息', {
+                        confirmButtonText: '确定',
+                    });
+                    this.IcredialogFormVisible = false;
+                    this.$store.dispatch("GET_TASKLIST", this.catalogId);
                 }
             })
         },
         getAllCatalog() {
-            this.$http.get(jy_url + "/yzh/education/inter/getAllCatalog?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
+            this.$http.get(jy_url + "/yzh/education/inter/getAllCatalog?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
                 this.data = res.data.catalogList;
             })
         },
@@ -322,8 +329,8 @@ export default {
             let rootNode = document.getElementById("rootNode").getElementsByTagName('input')[0].value;
             if (rootNode !== "") {
                 this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
-                    userid: sessionStorage.getItem("jykeyId"),
-                    accesstoken: sessionStorage.getItem("jykeyToken"),
+                    userid: sessionStorage.getItem("keyId"),
+                    accesstoken: sessionStorage.getItem("keyToken"),
                     catalogName: rootNode,
                 })).then(res => {
                     if (res.data.addCatalogFlag === "success") {
@@ -355,8 +362,8 @@ export default {
                 if (direInput.value !== "") {
                     let nodeData = { catalogId: '', catalogName: direInput.value, catalogList: [] };
                     this.$http.post(jy_url + "/yzh/education/inter/addPXCatalog", qs.stringify({
-                        userid: sessionStorage.getItem("jykeyId"),
-                        accesstoken: sessionStorage.getItem("jykeyToken"),
+                        userid: sessionStorage.getItem("keyId"),
+                        accesstoken: sessionStorage.getItem("keyToken"),
                         catalogName: direInput.value,
                         catalogPid: this.treeObj.data.catalogId
                     })).then(res => {
@@ -373,8 +380,8 @@ export default {
         },
         delDirectory() {
             this.$http.post(jy_url + "/yzh/education/inter/deletePXCatalog", qs.stringify({
-                userid: sessionStorage.getItem("jykeyId"),
-                accesstoken: sessionStorage.getItem("jykeyToken"),
+                userid: sessionStorage.getItem("keyId"),
+                accesstoken: sessionStorage.getItem("keyToken"),
                 catalogId: this.treeObj.data.catalogId,
             })).then(res => {
                 if (res.data.deleteCatalogFlag === "success") {
@@ -407,8 +414,8 @@ export default {
             if (ev.keyCode === 13 || ev.type === "blur") {
                 if (renameVal !== "") {
                     this.$http.post(jy_url + "/yzh/education/inter/updatePXCatalogName", qs.stringify({
-                        userid: sessionStorage.getItem("jykeyId"),
-                        accesstoken: sessionStorage.getItem("jykeyToken"),
+                        userid: sessionStorage.getItem("keyId"),
+                        accesstoken: sessionStorage.getItem("keyToken"),
                         catalogName: renameVal,
                         catalogId: this.treeObj.data.catalogId
                     })).then(res => {
@@ -423,11 +430,14 @@ export default {
         },
         createSource() {
             this.IcredialogFormVisible = true;
+            this.icreTask = {};
+            this.modifyFile = false;
         },
         icreTaskSource() {
+
             this.$http.post("/api/369education/yzh/education/inter/addTask", qs.stringify({
-                userid: sessionStorage.getItem("jykeyId"),
-                accesstoken: sessionStorage.getItem("jykeyToken"),
+                userid: sessionStorage.getItem("keyId"),
+                accesstoken: sessionStorage.getItem("keyToken"),
                 catalogId: this.treeObj.data.catalogId,
                 taskName: this.icreTask.taskname,
                 taskIntro: this.icreTask.taskintro,
@@ -447,6 +457,7 @@ export default {
 
         modifyTask(item) {
             this.IcredialogFormVisible = true;
+            this.fileList = [];
             this.modifyFile = true;
             this.icreTask = item;
         },
@@ -456,24 +467,23 @@ export default {
             })
             file.fileActive = true;
             this.taskFileStr = file;
-            console.log(this.taskFileStr)
         },
-        delTaskFile(file) {
+        delTaskFile(file, index) {
             let taskFile = {};
             this.icreTask.taskFileList.forEach(elem => {
                 if (elem.fileId === file.fileId) {
-                    this.icreTask.taskFileList.splice(elem, 1)
+                    this.icreTask.taskFileList.splice(index, 1)
                 }
             })
-            taskFile["fileId"]=file.fileId;
-            taskFile['fileMethod']="D";
-            this.fileList.push(taskFile)   
+            taskFile["fileId"] = file.fileId;
+            taskFile['fileMethod'] = "D";
+            this.fileList.push(taskFile)
         },
         removeTask(item) {
             this.$confirm('确认删除吗？').then(_ => {
                 this.$http.post("/api/369education/yzh/education/inter/deleteTask", qs.stringify({
-                    userid: sessionStorage.getItem("jykeyId"),
-                    accesstoken: sessionStorage.getItem("jykeyToken"),
+                    userid: sessionStorage.getItem("keyId"),
+                    accesstoken: sessionStorage.getItem("keyToken"),
                     catalogid: this.treeObj.data.catalogId,
                     taskid: item.taskid
                 })).then(res => {
@@ -523,9 +533,9 @@ export default {
             if (this.treeObj.data.taskFlag !== "N") {
                 this.newDire = false;
                 this.creShow = false;
-                this.$store.dispatch("GET_TASKLIST", data.catalogId)
             }
-            console.log(data)
+            this.$store.dispatch("GET_TASKLIST", data.catalogId)
+
         },
         renderContent: function (createElement, { node, data, store }) {
             var self = this;
@@ -577,6 +587,7 @@ export default {
         top: 0;
         bottom: 0;
         padding-top: 125px;
+        overflow-y: scroll;
         .el-tree {
             border: none;
             background-color: #f6f6f6; //    .el-tree-node.el-tree-node__content {
@@ -610,7 +621,7 @@ export default {
         width: 144px;
         line-height: 34px;
         background-color: #ffffff;
-        position: absolute;
+        position: fixed;
         border: 1px solid #8ecde7;
         box-shadow: 2px 2px 3px #aaaaaa;
         z-index: 1000;

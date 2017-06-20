@@ -2,7 +2,7 @@
   <div id="ability" class="clearfix">
   
     <div class="ability-tree" id="ability-tree">
-      <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false">
+      <el-tree :data="data" :props="defaultProps" node-key="id" ref="tree" highlight-current  default-expand-all @node-click="handleNodeClick" :expand-on-click-node="false">
       </el-tree>
     </div>
     <div class="ability-query">
@@ -27,7 +27,7 @@
       </el-form>
       <div class="source-list">
         <el-button class="btn" style="margin-bottom:17px;" type="primary" @click="newTest">新建测评</el-button>
-        <el-table :data="testQBList" border style="width: 100%" class='course-list' row-key='testQBList.testid' current-row-key highlight-current-row v-show="testQBList.length!==0">
+        <el-table :data="testQBList" border style="width: 100%" class='course-list' row-key='testQBList.testid' @row-click="rowClick" :row-class-name="tableRowClassName" highlight-current-row v-show="testQBList.length!==0">
           <el-table-column fixed prop="index" label="序号" width="52" class="course-index">
           </el-table-column>
           <el-table-column prop="testname" label="测评名称" width="180" class="course-index">
@@ -88,39 +88,58 @@ export default {
       let data = {
         courseid: this.$store.state.courseId,
       }
-      this.handleNodeClick(data)
-    }
+      this.handleNodeClick(data);
+
+    };
   },
+  mounted() {
+
+  },
+  
   filters: {
     testState
   },
   computed: {
-    ...mapGetters(['courseId'])
+    ...mapGetters(['courseId', 'isCurrentRow']),
+
   },
   methods: {
     getAllCourse() {
-      this.$http.get(jy_url + "/yzh/education/inter/getAllCourse?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken")).then(res => {
+      this.$http.get(jy_url + "/yzh/education/inter/getAllCourse?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
         this.data = res.data.courseList;
       })
     },
     getAllTest() {
-      this.$http.get(jy_url + "/yzh/education/inter/getAllTest?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid).then(res => {
+      this.$http.get(jy_url + "/yzh/education/inter/getAllTest?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&courseId=" + this.courseid).then(res => {
         if (res.data) {
           this.testQBList = res.data.testQBList;
-          this.testQBList.forEach((elem,index) => {
+          this.testQBList.forEach((elem, index) => {
             if (elem.publishdate) {
               this.$set(elem, 'ispublishActive', true)
-              this.$set(elem, 'index', (index+1))
             }
+              this.$set(elem, 'index', (index + 1))
           })
         }
       }, err => console.log(err))
+
     },
+    rowClick(row) {
+      this.$store.dispatch("GET_CURRENTCLASS", row);
+    },
+    tableRowClassName(row, index) {
+     if(this.$store.state.isCurrentRow!==null){
+        let currentIndex = this.$store.state.isCurrentRow.index;
+        if ((index+1) === currentIndex) {
+          return 'current-row';
+        } 
+        return '';
+     }
+      },
     publishTest(data) {
       if (data.publishdate === null) {
         this.$http.post(jy_url + "/yzh/education/inter/publishTest", qs.stringify({
-          userid: sessionStorage.getItem("jykeyId"),
-          accesstoken: sessionStorage.getItem("jykeyToken"),
+          userid: sessionStorage.getItem("keyId"),
+          accesstoken: sessionStorage.getItem("keyToken"),
           testId: data.testid
         })).then(res => {
           if (res.data.publishTestFlag === "success") {
@@ -130,13 +149,13 @@ export default {
       }
     },
     updateTest(testid) {
-      this.$http.get(jy_url + "/yzh/education/inter/getTestById?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid + "&testId=" + testid).then(res => {
+      this.$http.get(jy_url + "/yzh/education/inter/getTestById?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&courseId=" + this.courseid + "&testId=" + testid).then(res => {
         this.$router.push({ path: 'addtest', query: { updateTest: JSON.stringify(res.data.testQB), update: 'true' } })
       })
 
     },
     checkTest(testid) {
-      this.$http.get(jy_url + "/yzh/education/inter/getTestById?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid + "&testId=" + testid).then(res => {
+      this.$http.get(jy_url + "/yzh/education/inter/getTestById?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&courseId=" + this.courseid + "&testId=" + testid).then(res => {
         this.$router.push({ path: 'testList', query: { checkTest: JSON.stringify(res.data.testQB) } })
       })
 
@@ -146,7 +165,7 @@ export default {
         if (this.test.status === "") {
           get_testState[this.test.status] = "";
         }
-        this.$http.get(jy_url + "/yzh/education/inter/getTestByCondition?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseid=" + this.courseid + "&testname=" + encodeURIComponent(this.test.name) + "&teststate=" + get_testState[this.test.status] + "&publishstartdate=" + this.test.startTime + "&publishenddate=" + this.test.endTime).then(res => {
+        this.$http.get(jy_url + "/yzh/education/inter/getTestByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&courseid=" + this.courseid + "&testname=" + encodeURIComponent(this.test.name) + "&teststate=" + get_testState[this.test.status] + "&publishstartdate=" + this.test.startTime + "&publishenddate=" + this.test.endTime).then(res => {
           this.testQBList = res.data.testQBList
         }, err => console.log(err))
       } else {
@@ -189,7 +208,7 @@ export default {
 
     handleNodeClick(data, node) {
       this.courseid = data.courseid;
-      this.$http.get(jy_url + "/yzh/education/inter/getAllClassByCourseId?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&courseId=" + this.courseid).then(res => {
+      this.$http.get(jy_url + "/yzh/education/inter/getAllClassByCourseId?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&courseId=" + this.courseid).then(res => {
         this.classList = res.data.classList;
       })
       if (this.testQBList !== []) {
@@ -207,10 +226,10 @@ export default {
 </script>
 <style lang="less" scoped>
 .ability-tree {
- top: 0;
-    position: fixed;
-    bottom: 0;
-    margin-top: 50px;
+  top: 0;
+  position: fixed;
+  bottom: 0;
+  margin-top: 50px;
   .el-tree {
     border: none;
     background-color: #f6f6f6;

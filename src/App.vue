@@ -56,8 +56,8 @@ export default {
           passWord: this.accesstoken
         })).then(res => {
           this.$router.go(0)
-          sessionStorage.setItem('jykeyId', res.data.userid)
-          sessionStorage.setItem('jykeyToken', res.data.accesstoken)
+          sessionStorage.setItem('keyId', res.data.userid)
+          sessionStorage.setItem('keyToken', res.data.accesstoken)
 
         }, error => {
           if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {

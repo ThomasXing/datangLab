@@ -20,13 +20,15 @@ import Ability from '@/components/jy/Ability.vue'
 import JobEval from '@/components/jy/JobEval.vue'
 import AddTest from '@/components/jy/AddTest.vue'
 import TestList from '@/components/jy/TestList.vue'
+import StuLogin from '@/components/stu/StuLogin.vue'
 Vue.use(Router)
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
+
     },
     {
       path: '/lab',
@@ -47,33 +49,45 @@ export default new Router({
       path: '/labman',
       name: 'jw',
       component: LabMan,
-      children:[
-        {path:'course',component:Course},
-        {path:'newCourse',name:'newCourse',component:NewCourse},
-        {path:'classs',component:Classs},
-        {path:'newclass',name:'newClass',component:NewClass},
-        {path:'xueji',component:XueJi},
-        {path:'newXueJi/:stuId',name:'newXuJi',component:NewXueJi}
+      meta: {
+        requireAuth: true
+      },
+      children: [
+        { path: 'course', component: Course },
+        { path: 'newCourse', name: 'newCourse', component: NewCourse },
+        { path: 'classs', component: Classs },
+        { path: 'newclass', name: 'newClass', component: NewClass },
+        { path: 'xueji', component: XueJi },
+        { path: 'newXueJi/:stuId', name: 'newXuJi', component: NewXueJi }
       ]
     },
     {
-      path:'/sourceLab',
-      name:'jy',
-      component:SourceLab,
-      children:[
-        {path:'source',component:Source},
-        {path:'ability',component:Ability},
-        {path:'jobeval',component:JobEval},
-        {path:'addtest',component:AddTest},
-        {path:'testList',component:TestList},
+      path: '/sourceLab',
+      name: 'jy',
+      component: SourceLab,
+      meta: {
+        requireAuth: true
+      },
+      children: [
+        { path: 'source', component: Source },
+        { path: 'ability', component: Ability },
+        { path: 'jobeval', component: JobEval },
+        { path: 'addtest', component: AddTest },
+        { path: 'testList', component: TestList },
       ]
     },
-    {path:'/cultivate',component:Cultivate,
-      children:[
-        {path:'stuBaseNews',component:StuBaseNews},
-        {path:'gaimi',component:Gaimi},
+    {
+      path: '/cultivate', component: Cultivate,
+      children: [
+        { path: 'stuBaseNews', component: StuBaseNews },
+        { path: 'gaimi', component: Gaimi },
       ]
-    }
+    },
+    { path: '/stulogin', component: StuLogin }
+
   ]
 
 })
+
+
+export default router;

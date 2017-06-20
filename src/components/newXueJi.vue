@@ -80,7 +80,7 @@
                                 <el-button class='btn-w' type="text" size="small" @click="visible2 = false">取消</el-button>
                             </div>
                         </el-popover>
-                        <el-button class="btn" type="primary" v-popover:addxueji @click="getAllClass">添加班级</el-button>
+                        <el-button class="btn" type="primary" v-popover:addxueji>添加班级</el-button>
                     </td>
     
                 </tr>
@@ -180,7 +180,7 @@
                                 <td class="choClass">选择班级：</td>
                                 <td>
                                     <el-select v-model="stuEventList.fuxueClass" placeholder="请选择">
-                                        <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
+                                        <el-option v-for="(val,key) in classList" :key="val" :label="val.className" :value="val.className">
                                         </el-option>
                                     </el-select>
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写复学原因" v-model="stuEventList.instructions"></el-input>
@@ -191,7 +191,7 @@
                                 <td class="choClass">选择班级：</td>
                                 <td>
                                     <el-select v-model="stuEventList.liuji" placeholder="请选择">
-                                        <el-option v-for="(val,key) in myClassList" :key="key" :label="val" :value="val">
+                                         <el-option v-for="(val,key) in classList" :key="val" :label="val.className" :value="val.className">
                                         </el-option>
                                     </el-select>
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写留级原因" v-model="stuEventList.instructions"></el-input>
@@ -221,8 +221,9 @@
                             <tr class="addxueji" v-show="stuEvent.chongdu">
                                 <td class="choClass">选择班级：</td>
                                 <td>
-                                    <el-select v-model="stuEventList.chongdu" placeholder="请选择">
-                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                     <el-select v-model="stuEventList.fuxueClass" placeholder="请选择">
+                                        <el-option v-for="(val,key) in classList" :key="val" :label="val.className" :value="val.className">
+                                        </el-option>
                                     </el-select>
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写重读的详细原因" v-model="stuEventList.instructions"></el-input>
     
@@ -232,7 +233,7 @@
                                 <td class="choClass">退学原因：</td>
                                 <td>
                                     <el-select v-model="stuEventList.tuixue" placeholder="请选择">
-                                        <el-option :label="key" :value="key" v-for="(val,key) in stuEventName" :key="val"></el-option>
+                                        <el-option label="纪律分低于要求" value="纪律分低于要求"></el-option>
                                     </el-select>
                                     <el-input style="margin-top:20px;" type="textarea" placeholder="请填写退学的详细原因" v-model="stuEventList.instructions"></el-input>
     
@@ -475,6 +476,7 @@ export default {
         this.getTeacherList()
         this.getpmList()
         this.getAllCourse()
+        this.getAllClass()
         this.$store.dispatch('SHOW_ACTIVECLASS', 'xuejiActive')
         if (this.$route.params.stuId === "new") {
             this.$store.dispatch("addXuJi")
@@ -646,11 +648,21 @@ export default {
                             this.newStuEvent = [];
                         }
                         this.newStuEvent.push(newStuEvent)
-                    
                         for (let key in this.newStuEvent[0]) {
                             for (let stuEventIndex of Object.keys(this.stuEventName)) {
                                 if (this.stuEventName[stuEventIndex] === this.newStuEvent[0][key].eventName) {
-                                    this.newStuEvent[0][key].eventName = stuEventIndex
+                                    this.newStuEvent[0][key].eventName = stuEventIndex;
+                                    for(let index in this.classList){
+                                        if(this.newStuEvent[0][key].event5ClassId===this.classList[index].classId){
+                                            this.newStuEvent[0][key]['event5ClassId']=this.classList[index].className;
+                                        }else if(this.newStuEvent[0][key].event6ClassId===this.classList[index].classId){
+                                            this.newStuEvent[0][key]['event6ClassId']=this.classList[index].className;
+                                            
+                                        }else if(this.newStuEvent[0][key].event9ClassId===this.classList[index].classId){
+                                            this.newStuEvent[0][key]['event9ClassId']=this.classList[index].className;
+                                            
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -658,6 +670,8 @@ export default {
                         this.$set(this.classEvent, list.classId, this.newStuEvent)
                     };
                     this.$set(this.myClassList, list.classCreDate, list.className)
+                    
+                    // console.log(this.myClassList,this.stuManagementQB.className)
                     let obj = {};
                     let XueJiNews = [];
                     obj['graduationState'] = this.stuManagementQB.classRefList[key]['graduationState']
@@ -784,7 +798,6 @@ export default {
                 this.$set(this.newStuEvent[0], time, stuEventList)                          
             }
             this.$set(this.classEvent, this.classId, this.newStuEvent)
-            console.log(this.classEvent)
             this.visible3 = false;
         },
         addXueJi(formName) {
@@ -915,7 +928,7 @@ export default {
 
 .base-news {
     margin: 34px;
-    width: 908px;
+    width: 1200px;
     border-bottom: 1px solid #ddd;
 
     .baseNews {
@@ -929,6 +942,8 @@ export default {
 
 
 .sub {
+    width: 1200px;
+    margin: 34px;
     text-align: center;
     .btn-w {
         background-color: #ffffff;

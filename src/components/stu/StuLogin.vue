@@ -1,8 +1,8 @@
 <template >
     <div id="login">
         <div class="login-title">
-            <img src="../assets/images/logo_1.png" alt="logo">
-            <h2>{{$route.params.id}}</h2>
+            <img src="../../assets/images/logo_1.png" alt="logo">
+            <h2>企业级实验室</h2>
         </div>
         <div class="login-box">
             <form action="" @keyup.enter="login">
@@ -44,45 +44,22 @@ export default {
     },
     methods: {
         login() {
-            if (this.userid == "" || this.accesstoken == "") {
+             if (this.userid == "" || this.accesstoken == "") {
                 this.$alert('用户名或密码不能为空', '提示信息', {
                     confirmButtonText: '确定',
                 })
-            } else if (this.$route.params.id == "竞争力培养") {
-                if (sessionStorage.getItem("rolelist") === "1") {
-                    this.$http.post('/api/369research/yzh/inter/login', qs.stringify({
-                        userName: this.userid,
-                        passWord: this.accesstoken
-                    })).then(res => {
-                        sessionStorage.setItem('userid', this.userid)
-                        sessionStorage.setItem('userName', res.data.truename)                        
-                        this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
-                        sessionStorage.setItem('keyId', res.data.userid)
-                        sessionStorage.setItem('keyToken', res.data.accesstoken)
-
-                    }, error => {
-                        if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
-                            this.$alert('网络错误', '提示信息', {
-                                confirmButtonText: '确定',
-                            });
-                        } else {
-                            this.$alert('用户名或密码输入错误', '提示信息', {
-                                confirmButtonText: '确定',
-                            })
-                        }
-                    })
-                } else if (sessionStorage.getItem("rolelist") === "2") {
-                    this.$http.post('http://www.369college.com/369education/yzh/inter/login', qs.stringify({
-                        userName: this.userid,
-                        passWord: this.accesstoken
-                    })).then(res => {
+            }else{
+                this.$http.post("/api/369student/yzh/inter/login",qs.stringify({
+                    userName: this.userid,
+                    passWord: this.accesstoken
+                })).then(res=>{
                         sessionStorage.setItem('userid', this.userid)
                         sessionStorage.setItem('userName', res.data.truename)
-                        this.$router.push({ path: '/jingzheng/' + this.userid, params: { userId: this.userid } })
-                        sessionStorage.setItem('keyId', res.data.userid)
-                        sessionStorage.setItem('keyToken', res.data.accesstoken)
-
-                    }, error => {
+                        this.$router.push({ path: '/jingzheng/'})
+                        sessionStorage.setItem('stukeyId', res.data.userid)
+                        sessionStorage.setItem('stukeyToken', res.data.accesstoken)
+                    console.log(res)
+                }, error => {
                         if (error.message === "Network Error" || new XMLHttpRequest().status == 0) {
                             this.$alert('网络错误', '提示信息', {
                                 confirmButtonText: '确定',
@@ -93,9 +70,11 @@ export default {
                             })
                         }
                     })
-                }
-
+                
             }
+                
+
+            
         },
         rempw() {
             if (this.checked === true) {
@@ -136,7 +115,7 @@ export default {
     -o-background-size: cover;
     background-size: cover;
     zoom: 1;
-    background: url(../assets/images/login-bg.png);
+    background: url(../../assets/images/login-bg.png);
     overflow-y: hidden;
     .login-title {
         text-align: center;
@@ -175,12 +154,12 @@ export default {
             top: 9px;
         }
         .login-user {
-            background-image: url(../assets/images/user1.png);
+            background-image: url(../../assets/images/user1.png);
             background-repeat: no-repeat;
             background-size: 18px;
         }
         .login-pw {
-            background-image: url(../assets/images/pass-wd.png);
+            background-image: url(../../assets/images/pass-wd.png);
             background-repeat: no-repeat;
             background-size: 18px;
         }

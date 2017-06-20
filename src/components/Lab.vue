@@ -51,9 +51,6 @@ export default {
   created(){
       this.$store.dispatch("SET_TITLE",'教研平台')
   },
-  mounted(){
-  
-  },
   components:{
     HeadView
   }

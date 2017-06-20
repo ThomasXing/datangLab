@@ -130,12 +130,14 @@ export default {
         }
         this.item.taskFileList.forEach(elem => {
             if (elem.fileurl.slice(-3) === "ogg" || elem.fileurl.slice(-3) === "pdf") {
-                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/play.png")
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/play.png")
                 this.$set(elem, 'download', false)
             } else {
-                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/download.png")
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/download.png")
                 this.$set(elem, 'download', elem.filename)
             }
+            elem.fileurl = "http://115.182.107.198/" + elem.fileurl.replace(/http:\/\/115.182.107.198\//g, "");
+            elem.filethumbnail = "http://115.182.107.198/" + elem.filethumbnail.replace(/http:\/\/115.182.107.198\//g, "");
         })
     },
     // computed: {
@@ -170,8 +172,8 @@ export default {
         },
         saveTest(testState) {
             this.$http.post("api/369education/yzh/education/inter/addTest", qs.stringify({
-                userid: sessionStorage.getItem("jykeyId"),
-                accesstoken: sessionStorage.getItem("jykeyToken"),
+                userid: sessionStorage.getItem("keyId"),
+                accesstoken: sessionStorage.getItem("keyToken"),
                 courseId: this.$route.query.courseid,
                 taskId: this.item.taskid,
                 testName: this.item.taskname,
@@ -192,8 +194,8 @@ export default {
         },
         updateTest(teststate) {
             let params = {
-                userid: sessionStorage.getItem("jykeyId"),
-                accesstoken: sessionStorage.getItem("jykeyToken"),
+                userid: sessionStorage.getItem("keyId"),
+                accesstoken: sessionStorage.getItem("keyToken"),
                 testid: this.testid,
                 taskid: this.item.taskid,
                 testname: this.item.taskname,
@@ -217,6 +219,7 @@ export default {
             if (this.$route.query.update === 'true') {
                 this.$router.push({ path: 'source', query: { source: 'test', update: 'true', updateTest: this.$route.query.updateTest } })
             } else {
+                
                 this.$router.push({ path: 'source', query: { source: 'test', newTest: 'true', classList: this.$route.query.classList, courseid: this.$route.query.courseid } })
             }
         },

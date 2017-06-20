@@ -3,7 +3,7 @@
     <a href="#" class="lab-logo fl"><img src="../assets/images/logo_1.png" alt="logo"></a>
     <span class="lab-name fl">{{title}}</span>
     <div class="user fr">
-      <a href="javascript:;" class="fl" @click="userCheck">{{userid}}</a><a href='' class="exit fl">退出</a>
+      <a href="javascript:;" class="fl" @click="userCheck">{{truename}}</a><a href='' class="exit fl">退出</a>
     </div>
   </div>
 </template>
@@ -12,11 +12,11 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      userid:''
+      truename:''
     }
   },
   created(){
-    this.userid = sessionStorage.getItem('userid')
+    this.truename = sessionStorage.getItem('userName')
   },
   computed:{
     ...mapGetters(

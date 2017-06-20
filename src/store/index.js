@@ -17,13 +17,16 @@ const state = {
     taskList: [],
     courseId:"",
     reLogin:false,
-    catalogId:''
+    catalogId:'',
+    isCurrentRow: null,
+    userId:""
    
 }
 
 const actions = {
     SET_TITLE: ({ commit }, val) => commit("set_title", val),
     GET_CURRENT: ({ commit }, val) => commit("get_current", val),
+    GET_USERID: ({ commit }, val) => commit("get_userid", val),
     LoginFalse: ({ commit }) => commit("login_false"),
     GET_SCHOOLLIST: ({ commit }) => {
         axios.get("/api/369research/yzh/research/inter/getAllSchool?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken")).then(res => {
@@ -47,9 +50,11 @@ const actions = {
     SOURCE_HIDE: ({ commit }) => commit("source_hide"),
     SOURCE_ShOW: ({ commit }) => commit("source_show"),
     GET_TASKLIST: ({ commit }, item) => {
-        axios.get("/api/369education/yzh/education/inter/getTaskByCondition?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&catalogId=" + item).then(res => {
-            let data = res.data.taskList;
-            for (let val of data) {
+        axios.get("/api/369education/yzh/education/inter/getTaskByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&catalogId=" + item).then(res => {
+             let data="";
+            if(res.data!==""){
+                 data = res.data.taskList;               
+                for (let val of data) {
                 for (let list of val.taskFileList) {
                         Vue.set(list, 'fileActive', false)               
                     if (list.fileurl.slice(-3) === "ogg" || list.fileurl.slice(-3) === "pdf") {
@@ -64,10 +69,12 @@ const actions = {
                     list.filethumbnail="http://115.182.107.198/"+list.filethumbnail.replace(/http:\/\/115.182.107.198\//g,"");
                 }
             }
+           }
             commit("get_taskList",data)
             commit("get_catalogId",item)
         })
     },
+    GET_CURRENTCLASS:({commit},row)=>commit("get_currentClass",row)
 
 
 }
@@ -78,6 +85,9 @@ const mutations = {
     },
       get_current(state, val) {
         state.courseId = val
+    },
+    get_userid(state,val){
+        state.userId = val;
     },
     xiugaixueji(state) {
         state.isXiugai = true;
@@ -124,18 +134,15 @@ const mutations = {
     },
     get_catalogId:(state,item)=>{
         state.catalogId = item;
+    },
+    get_currentClass:(state,data)=>{
+        state.isCurrentRow =  data;
     }
- 
-        //    
-        // state.menuHeight = menuHeight;
-        // labMenu.style.height = state.menuHeight;
-        // console.log(labMenu.style.height)
-        // console.log(state.wh)
-
     
 }
 const getters = {
     title: state => state.title,
+    userId: state => state.userId,
     courseId:state=>state.courseId,
     stuManagementQB: state => state.stuManagementQB,
     xuejiActive: state => state.xuejiActive,
@@ -148,6 +155,7 @@ const getters = {
     taskList: state => state.taskList,
     reLogin: state => state.reLogin,
     catalogId: state => state.catalogId,
+    isCurrentRow: state => state.isCurrentRow,
 }
 export default new Vuex.Store({
     state,

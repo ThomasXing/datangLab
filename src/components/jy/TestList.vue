@@ -115,18 +115,20 @@ export default {
         this.testid = testQD['testid']
         this.item.taskFileList.forEach(elem => {
             if (elem.fileurl.slice(-3) === "ogg" || elem.fileurl.slice(-3) === "pdf") {
-                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/play.png")
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/play.png")
                 this.$set(elem, 'download', false)
             } else {
-                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/lab/static/img/download.png")
+                this.$set(elem, 'playIcon', "http://www.369college.com/yzhcmnet/yzh_user1/static/img/download.png")
                 this.$set(elem, 'download', elem.filename)
             }
+            elem.fileurl = "http://115.182.107.198/" + elem.fileurl.replace(/http:\/\/115.182.107.198\//g, "");
+            elem.filethumbnail = "http://115.182.107.198/" + elem.filethumbnail.replace(/http:\/\/115.182.107.198\//g, "");
         })
         this.getClassTest()
     },
     methods: {
         getClassTest() {
-            this.$http.get(jy_url + "/yzh/education/inter/getAllStuTestByCondition?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&testId=" + this.testid + "&classId=" + this.activeName).then(res => {
+            this.$http.get(jy_url + "/yzh/education/inter/getAllStuTestByCondition?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&testId=" + this.testid + "&classId=" + this.activeName).then(res => {
                 this.stuTestList = res.data.stuTestList
                 this.stuTestList.forEach((elem, index) => {
                     if (elem.testFlag === "N") {
@@ -140,7 +142,7 @@ export default {
             })
         },
         checkStuTestDetail(stuId) {
-            this.$http.get(jy_url + "/yzh/education/inter/getStuTestDetail?userid=" + sessionStorage.getItem("jykeyId") + "&accesstoken=" + sessionStorage.getItem("jykeyToken") + "&testId=" + this.testid + "&stuId=" + stuId).then(res => {
+            this.$http.get(jy_url + "/yzh/education/inter/getStuTestDetail?userid=" + sessionStorage.getItem("keyId") + "&accesstoken=" + sessionStorage.getItem("keyToken") + "&testId=" + this.testid + "&stuId=" + stuId).then(res => {
                 console.log(res)
 
             })
